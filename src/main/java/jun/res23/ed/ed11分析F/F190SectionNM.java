@@ -2,9 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package jun.res23.ed.ed02;
+package jun.res23.ed.ed11分析F;
 
-import java.awt.Color;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,111 +12,108 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jun.chart.JunChartUtil;
-import jun.chart.JunXYChartCreator2;
-import jun.res23.ed.util.BeamInfo;
 import jun.res23.ed.util.EdefenseInfo;
 import jun.res23.ed.util.BeamSectionInfo;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.complex.ComplexUtils;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 
 /**
- *
+ *　ピーク振動数をひずみ（）で判断している。a03/01とかg02/01で判断している。
  * @author jun
  */
-public class R193GraphBeamStiffness2 {
+public class F190SectionNM {
 
     public static Path databaseDir = Path.of("/home/jun/Dropbox (SSLUoT)/res23/ed/ed02/R140DatabaseQ");
-    private static String dburl = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res23/ed/ed02/R190MNQ";
+    public static String fourierTable="R151FourierR"; //"R152FourierS";
+    public static String driftTable= "R170StoryDriftR"; // ここのなかでは (k01+k02-k03-k04)*0.5 として相対加速度を計算している。すなわち、2層分の相対加速度である。
+    public static String dburl="jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res23/ed/ed11分析F/ed11";
+    public static String outputTable="F190SectionNM";
 
     public static String[] testnames = {"D01Q01", "D01Q02", "D01Q03", "D01Q04", "D01Q05", "D01Q06", "D01Q08", "D01Q09", "D01Q10", "D01Q11",
-        "D02Q01", "D02Q02", "D02Q03", "D02Q05", "D02Q06", "D02Q07", "D02Q08"
-    /*        "D03Q01", "D03Q02", "D03Q03", "D03Q04", "D03Q05", "D03Q06", "D03Q08", "D03Q09"*/
+        "D02Q01", "D02Q02", "D02Q03", "D02Q05", "D02Q06", "D02Q07", "D02Q08",
+        "D03Q01", "D03Q02", "D03Q03", "D03Q04", "D03Q05", "D03Q06", "D03Q08", "D03Q09"
     };
-
-//    public static String[] testnames={"D01Q04","D01Q05","D01Q06"};
-    private static final Logger logger = Logger.getLogger(R193GraphBeamStiffness2.class.getName());
+    private static final Logger logger = Logger.getLogger(F190SectionNM.class.getName());
 
     public static void main(String[] args) {
 
-        BeamInfo beam = EdefenseInfo.Beam3;
-
         try {
-            try (Connection con = DriverManager.getConnection(dburl, "junapp", "")) {
-                Statement st = con.createStatement();
-                BeamSectionInfo[] sections = beam.getBeamSections();
-                XYSeriesCollection axialCollection = new XYSeriesCollection();
-                XYSeriesCollection momentCollection = new XYSeriesCollection();
-                XYSeriesCollection totalMomentCollection = new XYSeriesCollection();
-                XYLineAndShapeRenderer re1 = new XYLineAndShapeRenderer(true, false);
-                XYLineAndShapeRenderer re2 = new XYLineAndShapeRenderer(true, false);
-                XYLineAndShapeRenderer re3 = new XYLineAndShapeRenderer(true, false);
-                for (int i = 0; i < 28; i++) {
-                    double ratio = i / 28.0;
-                    float hue = (float) (0.0 + i * 0.8 / 28);
-                    float bri = Math.min(1.0f, 0.3f + 2 * (float) (Math.abs(ratio - 0.5)));
-                    float satu = 1.0f;
-                    re1.setSeriesPaint(i, Color.getHSBColor(hue, satu, bri));
-                    re2.setSeriesPaint(i, Color.getHSBColor(hue, satu, bri));
-                    re3.setSeriesPaint(i, Color.getHSBColor(hue, satu, bri));
-                }
+            try (Connection con = DriverManager.getConnection(dburl, "junapp", ""); Statement st = con.createStatement()) {
+                st.executeUpdate("drop table if exists \""+outputTable+"\"");
+                st.executeUpdate("create table \""+outputTable+"\" (_NO identity, TESTNAME varchar, \"Freq[Hz]\" double, SECTION varchar, "
+                        + "\"AxialA[N*s]\"double , \"AxialP[rad]\" double ,"
+                        + "\"MomentXA[Nm*s]\"double , \"MomentXP[rad]\" double ,"
+                        + "\"MomentYA[Nm*s]\"double , \"MomentYP[rad]\" double ,"
+                        + "\"StoryDriftA[gal*s]\" double,\"StoryDriftP[rad]\" double,"
+                        + " \"NMsatio[m]\" double,"
+                        + "\"StiffnessAxialA[N/m]\" double, \"StiffnessAxialP[rad]\" double, "
+                        + "\"StiffnessMomentXA[Nm/m]\" double, \"StiffnessMomentXP[rad]\" double, "
+                        + "\"StiffnessMomentYA[Nm/m]\" double, \"StiffnessMomentYP[rad]\" double"
+                        + ")");
                 for (String testname : testnames) {
-                    if (testname.startsWith("D01Q02")
-                            || testname.startsWith("D01Q11")
-                            || testname.startsWith("D02Q05")
-                            || testname.startsWith("D03Q09")) {
-                        re1.setSeriesShapesVisible(axialCollection.getSeriesCount(), true);
-                        re2.setSeriesShapesVisible(axialCollection.getSeriesCount(), true);
-                        re3.setSeriesShapesVisible(axialCollection.getSeriesCount(), true);
-                    } else {
+                    double freqNS = getPeakFreq(testname, fourierTable, "a03/01", "Amp[με*s]");
+                    double freqEW = getPeakFreq(testname,  fourierTable, "g02/01", "Amp[με*s]");
+                    Complex[] storyDrift = getStoryDrift(testname, driftTable/* "R170StoryDriftR"*/, freqNS, freqEW); // この時点では [gal*s]
+                    for (BeamSectionInfo section : EdefenseInfo.beamSectionsNS) {
+//                        logger.log(Level.INFO, section.getName());
+                        Complex[] nm = getNM(testname, freqNS, fourierTable, section);
+                        double omega2 = 4 * Math.PI * Math.PI * freqNS * freqNS;
+                        Complex stiffnessAxial = nm[0].divide(storyDrift[0]).multiply(omega2 * 100); // [N/(cm/s2)  * (100/s2) = N/m]
+                        Complex stiffnessMomentX = nm[1].divide(storyDrift[0]).multiply(omega2 * 100); //[Nm/(cm/s2) * (100/s2) = [Nm/m]
+                        Complex stiffnessMomentY = nm[2].divide(storyDrift[0]).multiply(omega2 * 100);
 
+                        st.executeUpdate("insert into \""+outputTable+"\" (TESTNAME,\"Freq[Hz]\", SECTION,"
+                                + "\"AxialA[N*s]\", \"AxialP[rad]\", "
+                                + "\"MomentXA[Nm*s]\", \"MomentXP[rad]\", "
+                                + "\"MomentYA[Nm*s]\", \"MomentYP[rad]\", "
+                                + "\"NMsatio[m]\","
+                                + "\"StoryDriftA[gal*s]\",\"StoryDriftP[rad]\","
+                                + "\"StiffnessAxialA[N/m]\", \"StiffnessAxialP[rad]\", "
+                                + "\"StiffnessMomentXA[Nm/m]\", \"StiffnessMomentXP[rad]\", "
+                                + "\"StiffnessMomentYA[Nm/m]\", \"StiffnessMomentYP[rad]\" "
+                                + ") values ('" + testname + "'," + freqNS + ",'" + section.getName() + "'"
+                                + "," + nm[0].abs() + "," + nm[0].getArgument()
+                                + "," + nm[1].abs() + "," + nm[1].getArgument()
+                                + "," + nm[2].abs() + "," + nm[2].getArgument()
+                                + "," + (nm[1].abs() / nm[0].abs())
+                                + "," + storyDrift[0].abs() + "," + storyDrift[0].getArgument() + ","
+                                + stiffnessAxial.abs() + "," + stiffnessAxial.getArgument() + ","
+                                + stiffnessMomentX.abs() + "," + stiffnessMomentX.getArgument() + ","
+                                + stiffnessMomentY.abs() + "," + stiffnessMomentY.getArgument()
+                                + ")");
                     }
-                    XYSeries axialSeries = new XYSeries(testname + "s");
-                    XYSeries momentSeries = new XYSeries(testname + "s");
-                    XYSeries totalMomentSeries = new XYSeries(testname + "s");
-                    double momentbasephase = Double.NaN;
-                    double axialbasephase = Double.NaN;
-                    for (int i = 0; i < sections.length; i++) {
-                        BeamSectionInfo section = sections[i];
-                        double armlength = section.getHeight() / 2 + 0.055; // スラブは 110のふらっとスラブ。
-                        double location = beam.getLocation(i);
-                        String sql;
-                        ResultSet rs = st.executeQuery(sql = "select \"StiffnessMomentXA[Nm/m]\", \"StiffnessMomentXP[rad]\", \"StiffnessAxialA[N/m]\",\"StiffnessAxialP[rad]\" ,"
-                                + "\"Freq[Hz]\" "
-                                + "from  \"R190SectionNMs\" where SECTION='" + section.getName() + "' and TESTNAME='" + testname + "s'");
-                        rs.next();
-                        logger.log(Level.INFO, sql);
-//                        double freq=rs.getDouble(5);
-//                        double omega2=4*Math.PI*Math.PI*freq*freq;
-                        double moment = ComplexUtils.polar2Complex(rs.getDouble(1), rs.getDouble(2)).getReal();//*omega2*100;
+                    for (BeamSectionInfo section : EdefenseInfo.beamSectionsEW) {
+//                        logger.log(Level.INFO, section.getName());
+                        Complex[] nm = getNM(testname, freqEW, fourierTable/* "R152FourierS"*/, section);
+                        double omega2 = 4 * Math.PI * Math.PI * freqEW * freqEW;
+                        Complex stiffnessAxial = nm[0].divide(storyDrift[1]).multiply(omega2 * 100); // [N/(cm/s2)  * (100/s2) = N/m]
+                        Complex stiffnessMomentX = nm[1].divide(storyDrift[1]).multiply(omega2 * 100); // [Nm/(cm/s2)  * (100/s2) = Nm/m]
+                        Complex stiffnessMomentY = nm[2].divide(storyDrift[1]).multiply(omega2 * 100); // [Nm/(cm/s2)  * (100/s2) = Nm/m]
 
-                        double axial = ComplexUtils.polar2Complex(rs.getDouble(3), rs.getDouble(4)).getReal();//*omega2*100;
-
-                        double totalMoment = moment + axial * armlength;
-                        axialSeries.add(location, axial * 1e-6);
-                        momentSeries.add(location, moment * 1e-6);
-                        totalMomentSeries.add(location, totalMoment * 1e-6);
+                        st.executeUpdate("insert into \""+outputTable+"\" (TESTNAME,\"Freq[Hz]\", SECTION,"
+                                + "\"AxialA[N*s]\", \"AxialP[rad]\", "
+                                + "\"MomentXA[Nm*s]\", \"MomentXP[rad]\", "
+                                + "\"MomentYA[Nm*s]\", \"MomentYP[rad]\", "
+                                + "\"NMsatio[m]\","
+                                + "\"StoryDriftA[gal*s]\",\"StoryDriftP[rad]\","
+                                + "\"StiffnessAxialA[N/m]\", \"StiffnessAxialP[rad]\", "
+                                + "\"StiffnessMomentXA[Nm/m]\", \"StiffnessMomentXP[rad]\", "
+                                + "\"StiffnessMomentYA[Nm/m]\", \"StiffnessMomentYP[rad]\" "
+                                + ") values ('" + testname + "'," + freqEW + ",'" + section.getName() + "'"
+                                + "," + nm[0].abs() + "," + nm[0].getArgument()
+                                + "," + nm[1].abs() + "," + nm[1].getArgument()
+                                + "," + nm[2].abs() + "," + nm[2].getArgument()
+                                + "," + (nm[1].abs() / nm[0].abs())
+                                + "," + storyDrift[1].abs() + "," + storyDrift[1].getArgument() + ","
+                                + stiffnessAxial.abs() + "," + stiffnessAxial.getArgument() + ","
+                                + stiffnessMomentX.abs() + "," + stiffnessMomentX.getArgument() + ","
+                                + stiffnessMomentY.abs() + "," + stiffnessMomentY.getArgument()
+                                + ")");
                     }
-
-                    axialCollection.addSeries(axialSeries);
-                    momentCollection.addSeries(momentSeries);
-                    totalMomentCollection.addSeries(totalMomentSeries);
                 }
-                JFreeChart chart1 = new JunXYChartCreator2().setTitle("axial").setDomainAxisLabel("Location[m]").setRangeAxisLabel("AxialStiffness[kN/mm]").setDataset(axialCollection).setRenderer(re1).create();
-                JFreeChart chart2 = new JunXYChartCreator2().setTitle("moment").setDomainAxisLabel("Location[m]").setRangeAxisLabel("MomentStiffness[kNm/mm]").setDataset(momentCollection).setRenderer(re2).create();
-                JFreeChart chart3 = new JunXYChartCreator2().setTitle("total").setDomainAxisLabel("Location[m]").setRangeAxisLabel("TotalMomentStifffness[kNm/mm]").setDataset(totalMomentCollection).setRenderer(re3).create();
-
-                st.close();
-
-                JunChartUtil.show(beam.getName(), new JFreeChart[][]{{chart1, chart2, chart3}});
-
             }
         } catch (SQLException ex) {
-            Logger.getLogger(R193GraphBeamStiffness2.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(F190SectionNM.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -159,6 +155,39 @@ public class R193GraphBeamStiffness2 {
         String dburl = "jdbc:h2:tcp://localhost/" + databaseDir.resolve(testname + "q");
         Connection con = DriverManager.getConnection(dburl, "junapp", "");
         return CalculateNM(con, schema, freq, section.getULname(), section.getURname(), section.getLLname(), section.getLRname(), section.getE(), section.getA(), section.getInnerZx(), section.getZy());
+    }
+
+    /**
+     * この時点では
+     * @param testname
+     * @param freq
+     * @param tablename
+     * @return [0]=NS, [1]=EW いずれも、まだ、単位は gal*s
+     * @throws SQLException
+     */
+    public static Complex[] getStoryDrift(String testname, String tablename, double freqNS, double freqEW) throws SQLException {
+        Complex[] ans = new Complex[2];
+        String dburl = "jdbc:h2:tcp://localhost/" + databaseDir.resolve(testname + "q");
+        Connection con = DriverManager.getConnection(dburl, "junapp", "");
+        Statement st = con.createStatement();
+        {
+
+            ResultSet rs = st.executeQuery("select \"RelAmpY[gal*s]\", \"RelPhaseY[rad]\" from \"" + tablename + "\" where \"Freq[Hz]\"=" + freqNS);
+            rs.next();
+            double abs = rs.getDouble(1);
+            double phase = rs.getDouble(2);
+            ans[0] = ComplexUtils.polar2Complex(abs, phase);
+            rs.close();
+        }
+        {
+            ResultSet rs = st.executeQuery("select \"RelAmpX[gal*s]\", \"RelPhaseX[rad]\" from \"" + tablename + "\" where \"Freq[Hz]\"=" + freqEW);
+            rs.next();
+            double abs = rs.getDouble(1);
+            double phase = rs.getDouble(2);
+            ans[1] = ComplexUtils.polar2Complex(abs, phase);
+            rs.close();
+        }
+        return ans;
     }
 
     /**

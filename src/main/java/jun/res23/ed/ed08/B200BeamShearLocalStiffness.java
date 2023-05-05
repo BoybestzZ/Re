@@ -5,8 +5,6 @@
 package jun.res23.ed.ed08;
 
 import java.awt.Color;
-import jun.res23.ed.ed06分析T.*;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,9 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jun.chart.JunChartCreator;
 import jun.chart.JunChartUtil;
-import jun.chart.JunXYChartCreator2;
 import jun.res23.ed.util.BeamInfo;
 import jun.res23.ed.util.EdefenseInfo;
 import static jun.res23.ed.util.EdefenseInfo.*;
@@ -31,7 +27,6 @@ import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 
 /**
  *

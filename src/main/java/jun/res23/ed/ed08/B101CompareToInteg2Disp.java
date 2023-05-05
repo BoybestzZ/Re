@@ -25,12 +25,12 @@ import org.jfree.data.xy.DefaultXYDataset;
  */
 public class B101CompareToInteg2Disp {
 
-    public static final String ed06dburl = "jdbc:h2:tcp://localhost//home/jun/Dropbox (SSLUoT)/res22/ed/ed06分析T/res22ed06";
-    public static final String ed08dburl = "jdbc:h2:tcp://localhost//home/jun/Dropbox (SSLUoT)/res22/ed/ed08防災科研/res22ed08";
+    public static final String ed06dburl = "jdbc:h2:tcp://localhost//home/jun/Dropbox (SSLUoT)/res23/ed/ed06分析T/res22ed06";
+    public static final String ed08dburl = "jdbc:h2:tcp://localhost//home/jun/Dropbox (SSLUoT)/res23/ed/ed08防災科研/res22ed08";
     public static final String schemaInteg2Disp = "T301Integ2StoryDisp";
 
     public static void main(String[] args) {
-        B101CompareToInteg2Disp.main(EdefenseInfo.D01Q04);
+        B101CompareToInteg2Disp.main(EdefenseInfo.D01Q01);
     }
 
     public static void main(EdefenseKasinInfo test) {
