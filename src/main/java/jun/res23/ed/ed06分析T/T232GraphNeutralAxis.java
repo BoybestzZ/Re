@@ -16,7 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import jun.chart.JunChartCreator;
 import jun.chart.JunChartUtil;
-import jun.res23.ed.util.BeamInfo;
+import jun.chart.JunXYChartCreator2;
 import jun.res23.ed.util.BeamSectionInfo;
 import jun.res23.ed.util.EdefenseInfo;
 import jun.res23.ed.util.EdefenseKasinInfo;

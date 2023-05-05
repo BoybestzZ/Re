@@ -88,7 +88,7 @@ public class R170StoryDriftR {
             Complex k02x = ComplexUtils.polar2Complex(k02array[1][i], k02array[2][i]);
             Complex k03x = ComplexUtils.polar2Complex(k03array[1][i], k03array[2][i]);
             Complex k04x = ComplexUtils.polar2Complex(k04array[1][i], k04array[2][i]);
-            Complex diffx = k01x.add(k02x).subtract(k03x).subtract(k04x);
+            Complex diffx = k01x.add(k02x).subtract(k03x).subtract(k04x); // ( (1+2) - (3+4) ) * 0.5 としている。すなわち、2層分の変位である。
             diffx = diffx.multiply(0.5);
             Complex k01y = ComplexUtils.polar2Complex(k01array[3][i], k01array[4][i]);
             Complex k02y = ComplexUtils.polar2Complex(k02array[3][i], k02array[4][i]);

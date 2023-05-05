@@ -13,16 +13,12 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jun.chart.JunChartUtil;
-import jun.chart.JunXYChartCreator2;
-import jun.data.ResultSetUtils;
 import jun.fourier.FourierUtils;
 import jun.res23.ed.util.BeamInfo;
 import jun.res23.ed.util.EdefenseInfo;
-import static jun.res23.ed.util.EdefenseInfo.LA3S1;
 import jun.res23.ed.util.BeamSectionInfo;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.complex.ComplexUtils;
-import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 

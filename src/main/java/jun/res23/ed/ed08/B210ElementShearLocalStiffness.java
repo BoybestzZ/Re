@@ -4,7 +4,6 @@
  */
 package jun.res23.ed.ed08;
 
-import jun.res23.ed.ed06分析T.*;
 import java.awt.Color;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,17 +13,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jun.chart.JunChartCreator;
 import jun.chart.JunChartUtil;
-import jun.chart.JunXYChartCreator2;
-import jun.res23.ed.util.BeamInfo;
-import jun.res23.ed.util.BeamSectionInfo;
-import jun.res23.ed.util.ColumnInfo;
-import jun.res23.ed.util.ColumnSectionInfo;
 import jun.res23.ed.util.EdefenseInfo;
 import static jun.res23.ed.util.EdefenseInfo.*;
 import jun.res23.ed.util.EdefenseKasinInfo;
