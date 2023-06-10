@@ -40,12 +40,13 @@ import org.jfree.data.xy.DefaultXYDataset;
 public class T301Integ2StoryDisp {
 
     public static final String outputSchema = "T301Integ2StoryDisp";
-    public static final String dburl = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res22/ed/ed06分析T/res22ed06";
-    private static final Path svgdir = Path.of("/home/jun/Dropbox (SSLUoT)/res22/ed/ed06分析T/T301Integ2StoryDisp");
+    public static final String dburl = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res23/ed/ed06分析T/res22ed06";
+    private static final Path svgdir = Path.of("/home/jun/Dropbox (SSLUoT)/res23/ed/ed06分析T/T301Integ2StoryDisp");
+
 
     public static void main(String[] args) {
         try {
-            if (true) {
+            if (false) {
                 calculate(EdefenseInfo.D03Q09);
                 B101CompareToInteg2Disp.main(EdefenseInfo.D03Q09);
 //                calculate(EdefenseInfo.D01Q02);
@@ -78,38 +79,38 @@ public class T301Integ2StoryDisp {
 //                calculate(EdefenseInfo.D03Q09);
             }
 
-            //         try {
-//                svg(EdefenseInfo.D01Q01);
-//                svg(EdefenseInfo.D01Q02);
-//                svg(EdefenseInfo.D01Q03);
-//                svg(EdefenseInfo.D01Q04);
-//                svg(EdefenseInfo.D01Q05);
-//                svg(EdefenseInfo.D01Q06);
-//                //          svg(EdefenseInfo.D01Q07);
-//                svg(EdefenseInfo.D01Q08);
-//                svg(EdefenseInfo.D01Q09);
-//                svg(EdefenseInfo.D01Q10);
-//                svg(EdefenseInfo.D01Q11);
-//                svg(EdefenseInfo.D02Q01);
-//                svg(EdefenseInfo.D02Q02);
-//                svg(EdefenseInfo.D02Q03);
-////            svg(EdefenseInfo.D02Q04);
-//                svg(EdefenseInfo.D02Q05);
-//                svg(EdefenseInfo.D02Q06);
-//                svg(EdefenseInfo.D02Q07);
-//                svg(EdefenseInfo.D02Q08);
-//
-//                svg(EdefenseInfo.D03Q02);
-//                svg(EdefenseInfo.D03Q03);
-//                svg(EdefenseInfo.D03Q04);
-//                svg(EdefenseInfo.D03Q05);
-//                svg(EdefenseInfo.D03Q06);
-////            svg(EdefenseInfo.D03Q07);
-//                svg(EdefenseInfo.D03Q08);
-//                svg(EdefenseInfo.D03Q09);
-//            } catch (IOException ex) {
-//                Logger.getLogger(T301Integ2StoryDisp.class.getName()).log(Level.SEVERE, null, ex);
-//            }
+         try {
+                svg(EdefenseInfo.D01Q01);
+                svg(EdefenseInfo.D01Q02);
+                svg(EdefenseInfo.D01Q03);
+                svg(EdefenseInfo.D01Q04);
+                svg(EdefenseInfo.D01Q05);
+                svg(EdefenseInfo.D01Q06);
+                //          svg(EdefenseInfo.D01Q07);欠番
+                svg(EdefenseInfo.D01Q08);
+                svg(EdefenseInfo.D01Q09);
+                svg(EdefenseInfo.D01Q10);
+                svg(EdefenseInfo.D01Q11);
+                svg(EdefenseInfo.D02Q01);
+                svg(EdefenseInfo.D02Q02);
+                svg(EdefenseInfo.D02Q03);
+//            svg(EdefenseInfo.D02Q04);欠番
+                svg(EdefenseInfo.D02Q05);
+                svg(EdefenseInfo.D02Q06);
+//                svg(EdefenseInfo.D02Q07); 失敗した福島
+                svg(EdefenseInfo.D02Q08);
+                svg(EdefenseInfo.D03Q01);
+                svg(EdefenseInfo.D03Q02);
+                svg(EdefenseInfo.D03Q03);
+                svg(EdefenseInfo.D03Q04);
+                svg(EdefenseInfo.D03Q05);
+                svg(EdefenseInfo.D03Q06);
+//            svg(EdefenseInfo.D03Q07);欠番
+                svg(EdefenseInfo.D03Q08);
+                svg(EdefenseInfo.D03Q09);
+            } catch (IOException ex) {
+                Logger.getLogger(T301Integ2StoryDisp.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } catch (SQLException ex) {
             Logger.getLogger(T301Integ2StoryDisp.class.getName()).log(Level.SEVERE, null, ex);
         }

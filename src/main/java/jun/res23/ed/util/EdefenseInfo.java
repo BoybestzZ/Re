@@ -302,6 +302,17 @@ public class EdefenseInfo {
         LA4S1, LA4S2, LA4S3, LA4S4, LA4S5
     };
 
+    public static final ColumnSectionInfo[] columnSections = {
+        CS2FA3B, CS2FA3C, CS2FA3T,
+        CS2FA4B, CS2FA4C, CS2FA4T,
+        CS2FB3B, CS2FB3C, CS2FB3T,
+        CS2FB4B, CS2FB4C, CS2FB4T,
+        CS3FA3B, CS3FA3C, CS3FA3T,
+        CS3FA4B, CS3FA4C, CS3FA4T,
+        CS3FB3B, CS3FB3C, CS3FB3T,
+        CS3FB4B, CS3FB4C, CS3FB4T
+    };
+
     public static final BeamInfo Beam3 = new BeamInfo("Beam3", 3.1, 0.435, LA3S1, 0.520, LA3S2, 0.620, LA3S3, 0.620, LA3S4, 0.520, LA3S5, 0.385);
     public static final BeamInfo Beam4 = new BeamInfo("Beam4", 3.1, 0.435, LA4S1, 0.520, LA4S2, 0.620, LA4S3, 0.620, LA4S4, 0.520, LA4S5, 0.385);
     public static final BeamInfo BeamA = new BeamInfo("BeamA", 4.0, 0.370, LAAS1, 0.815, LAAS2, 0.815, LAAS3, 0.815, LAAS4, 0.815, LAAS5, 0.370);

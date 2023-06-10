@@ -19,17 +19,16 @@ import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.complex.ComplexUtils;
 
 /**
- *k1,k2 と、 k3,4,5,6, で向きが異なることを考慮してない！　これを使うときは注意
- * R175から修正した。
+ * R175 : R170からコピーして作成したが、k1,k2 と、 k3,4,5,6, で向きが異なることを考慮してなかったので、 R175から修正。
  * @author jun
  */
-public class R170StoryDriftR {
-
+public class R175StoryDriftU {
+    private static final Logger logger = Logger.getLogger(R175StoryDriftU.class.getName());
     public static void main(String[] args) {
         try {
-            Path databaseDir = Path.of("/home/jun/Dropbox (SSLUoT)/res22/ed/ed02/R140DatabaseQ");
-            String inputSchema="R151FourierR";
-            String outputTable="R170StoryDriftR";
+            Path databaseDir = Path.of("/home/jun/Dropbox (SSLUoT)/res23/ed/ed02/R140DatabaseQ");
+            String inputSchema="R155FourierU";
+            String outputTable="R175StoryDriftU";
             main(databaseDir, "D01Q01",inputSchema, outputTable);
             main(databaseDir, "D01Q02",  inputSchema, outputTable);
             main(databaseDir, "D01Q03",  inputSchema, outputTable);
@@ -56,7 +55,7 @@ public class R170StoryDriftR {
             main(databaseDir, "D03Q08",  inputSchema, outputTable);
             main(databaseDir, "D03Q09",  inputSchema, outputTable);
         } catch (SQLException ex) {
-            Logger.getLogger(R170StoryDriftR.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(R175StoryDriftU.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -64,6 +63,7 @@ public class R170StoryDriftR {
     private static void main(Path databaseDir, String testname, String schema, String tablename) throws SQLException {
         ZoneId zone = ZoneId.systemDefault();
         String dburl = "jdbc:h2:tcp://localhost/" + databaseDir.resolve(testname + "q");
+        logger.log(Level.INFO, testname);
 
         Connection con = DriverManager.getConnection(dburl, "junapp", "");
         Statement st = con.createStatement();
@@ -78,9 +78,9 @@ public class R170StoryDriftR {
         double[][] k04array = ResultSetUtils.createSeriesArray(rs);
 
         st.executeUpdate("drop table if exists \"" + tablename + "\"");
-        st.executeUpdate("create table \"" + tablename + "\" (\"Freq[Hz]\" double, \"RelAmpX[gal*s]\" double, \"RelPhaseX[rad]\" double,\"RelAmpY[gal*s]\" double,"
-                + " \"RelPhaseY[rad]\" double)");
-        String sql = "insert into \"" + tablename + "\" (\"Freq[Hz]\", \"RelAmpX[gal*s]\", \"RelPhaseX[rad]\",\"RelAmpY[gal*s]\", \"RelPhaseY[rad]\")"
+        st.executeUpdate("create table \"" + tablename + "\" (\"Freq[Hz]\" double, \"RelAmpEW[gal*s]\" double, \"RelPhaseEW[rad]\" double,\"RelAmpNS[gal*s]\" double,"
+                + " \"RelPhaseNS[rad]\" double)");
+        String sql = "insert into \"" + tablename + "\" (\"Freq[Hz]\", \"RelAmpEW[gal*s]\", \"RelPhaseEW[rad]\",\"RelAmpNS[gal*s]\", \"RelPhaseNS[rad]\")"
                 + " values (?,?,?,?,?)";
         PreparedStatement ps = con.prepareStatement(sql);
 
@@ -89,14 +89,14 @@ public class R170StoryDriftR {
             Complex k02x = ComplexUtils.polar2Complex(k02array[1][i], k02array[2][i]);
             Complex k03x = ComplexUtils.polar2Complex(k03array[1][i], k03array[2][i]);
             Complex k04x = ComplexUtils.polar2Complex(k04array[1][i], k04array[2][i]);
-            Complex diffx = k01x.add(k02x).subtract(k03x).subtract(k04x); // ( (1+2) - (3+4) ) * 0.5 としている。すなわち、2層分の変位である。
-            diffx = diffx.multiply(0.5);
+            Complex diffx = k01x.add(k02x).add(k03x).add(k04x); // ( (1+2) - (3+4) ) * 0.5 としている。すなわち、2層分の変位である。ちなみにX方向は逆向きなのでsubtractじゃなくて、addになってる。
+            diffx = diffx.multiply(-0.5); // ((-k01x-k02x) - (k03x+k04x)) * 0.5 これで EW方向が正になる。
             Complex k01y = ComplexUtils.polar2Complex(k01array[3][i], k01array[4][i]);
             Complex k02y = ComplexUtils.polar2Complex(k02array[3][i], k02array[4][i]);
             Complex k03y = ComplexUtils.polar2Complex(k03array[3][i], k03array[4][i]);
             Complex k04y = ComplexUtils.polar2Complex(k04array[3][i], k04array[4][i]);
             Complex diffy = k01y.add(k02y).subtract(k03y).subtract(k04y);
-            diffy = diffy.multiply(0.5);
+            diffy = diffy.multiply(0.5); // ((k01y+k02y)-(k03y+k04y))*0.5 これで NS方向が正。
 
             ps.setDouble(1, k01array[0][i]);
             ps.setDouble(2, diffx.abs());

@@ -18,12 +18,12 @@ public class EdefenseKasinInfo {
     private final String wavename;
     private final int no;
 
-    public EdefenseKasinInfo(String name,int no,  String wavename, double tmrTimeDiffSeconds, double niedTimeDiffSeconds) {
+    public EdefenseKasinInfo(String name, int no, String wavename, double tmrTimeDiffSeconds, double niedTimeDiffSeconds) {
         this.tmrTimeDiffSeconds = tmrTimeDiffSeconds;
         this.niedTimeDiffSeconds = niedTimeDiffSeconds;
         this.name = name;
         this.wavename = wavename;
-        this.no=no;
+        this.no = no;
         if (name.endsWith("s")) {
             testname = name.substring(0, name.length() - 1);
         } else {
@@ -31,8 +31,8 @@ public class EdefenseKasinInfo {
         }
     }
 
-    public EdefenseKasinInfo(String name,int no,  String wavename, double tmrTimeDiffSeconds) {
-        this(name,no, wavename, tmrTimeDiffSeconds, 0.0);
+    public EdefenseKasinInfo(String name, int no, String wavename, double tmrTimeDiffSeconds) {
+        this(name, no, wavename, tmrTimeDiffSeconds, Double.NaN);
 
     }
 
@@ -68,6 +68,7 @@ public class EdefenseKasinInfo {
     public String getTestName() {
         return testname;
     }
+
     public int getTestNo() {
         return no;
     }

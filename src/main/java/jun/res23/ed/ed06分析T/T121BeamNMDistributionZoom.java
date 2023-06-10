@@ -42,11 +42,11 @@ import org.jfree.data.xy.XYSeriesCollection;
 public class T121BeamNMDistributionZoom {
 
     private static final Logger logger = Logger.getLogger(T121BeamNMDistributionZoom.class.getName());
-    static final Path svgdir = null;// h2Path.of("/home/jun/Dropbox (SSLUoT)/res22/ed/ed06分析T/T121BeamNMDistribution");
+    static final Path svgdir = Path.of("/home/jun/Dropbox (SSLUoT)/res23/ed/ed06分析T/T121BeamNMDistribution");
 
     public static void main(String[] args) {
         try {
-            main(EdefenseInfo.D01Q09.toString(), EdefenseInfo.Beam3);
+//            main(EdefenseInfo.D01Q09.toString(), EdefenseInfo.Beam3);
 //            main(EdefenseInfo.D01Q02.toString(), EdefenseInfo.Beam3); // kumamoto
 //            main(EdefenseInfo.D01Q03.toString(), EdefenseInfo.Beam3); // tohoku
 //            main(EdefenseInfo.D01Q04.toString(), EdefenseInfo.Beam3); // Kobe 25%
@@ -55,11 +55,11 @@ public class T121BeamNMDistributionZoom {
 //            main(EdefenseInfo.D01Q08.toString(), EdefenseInfo.Beam3); // Kobe 50%
 //            main(EdefenseInfo.D01Q09.toString(), EdefenseInfo.Beam3);
 //            main(EdefenseInfo.D01Q10.toString(), EdefenseInfo.Beam3); // Kobe 75%
-//            main(EdefenseInfo.D01Q11.toString(), EdefenseInfo.Beam3);
-//            main(EdefenseInfo.D02Q01.toString(), EdefenseInfo.Beam3);
-//            main(EdefenseInfo.D02Q02.toString(), EdefenseInfo.Beam3);
+//          main(EdefenseInfo.D01Q11.toString(), EdefenseInfo.Beam3); //random
+            main(EdefenseInfo.D02Q01.toString(), EdefenseInfo.Beam3); // kumamoto
+            main(EdefenseInfo.D02Q02.toString(), EdefenseInfo.Beam3); // tohoku
 //            main(EdefenseInfo.D02Q03.toString(), EdefenseInfo.Beam3); // Kobe 100%
-//            main(EdefenseInfo.D02Q05.toString(), EdefenseInfo.Beam3);
+            main(EdefenseInfo.D02Q05.toString(), EdefenseInfo.Beam3); //random
 //            main(EdefenseInfo.D02Q06.toString(), EdefenseInfo.Beam3);
 //            main(EdefenseInfo.D02Q07.toString(), EdefenseInfo.Beam3);
 //            main(EdefenseInfo.D02Q08.toString(), EdefenseInfo.Beam3);
