@@ -246,8 +246,9 @@ public class EdefenseInfo {
             StrainGaugeInfo.CS3F_B4_C_N, StrainGaugeInfo.CS3F_B4_C_E, StrainGaugeInfo.CS3F_B4_C_W, StrainGaugeInfo.CS3F_B4_C_S, E,
             AreaC3, ZnsC3, ZewC3, HC3);
     public static final ColumnSectionInfo CS3FB4B = new ColumnSectionInfo("CS3FB4B",
-            StrainGaugeInfo.CS3F_B4_C_N, StrainGaugeInfo.CS3F_B4_B_E, StrainGaugeInfo.CS3F_B4_B_W, StrainGaugeInfo.CS3F_B4_B_S, E,
+            StrainGaugeInfo.CS3F_B4_B_N, StrainGaugeInfo.CS3F_B4_B_E, StrainGaugeInfo.CS3F_B4_B_W, StrainGaugeInfo.CS3F_B4_B_S, E,
             AreaC3, ZnsC3, ZewC3, HC3);
+    // 2023/06/11 上記 CS3F_B4_B_N となるべきところが CS3F_B4_CN となっていたので修正。
 
     // 2F- A3    C1=C2
     public static final ColumnSectionInfo CS2FA3T = new ColumnSectionInfo("CS2FA3T",
@@ -333,6 +334,25 @@ public class EdefenseInfo {
 
     public static ColumnInfo Column3FB3 = new ColumnInfo("Column3F3B", 2.6, 0.11 + 0.35 / 2 + 0.465,
             CS3FB3B, 1.04 - 0.465, CS3FB3C, 1.615 - 1.040, CS3FB3T, 0.700);
+    // スラブ厚110、梁せい 350、 すなわち梁心=FL-110-350/2,  ゲージは FL+465, FL+1040, FL+ 1615 に貼ってある。    
+
+
+    // 柱曲げモーメントが直線じゃない。####
+    public static ColumnInfo Column2FA4 = new ColumnInfo("Column2F4A", 2.6,
+            0.11 + 0.35 / 2 + 0.465,
+            CS2FA4B, 1.04 - 0.465, CS2FA4C, 1.615 - 1.040, CS2FA4T, 0.700);
+    // スラブ厚110、梁せい 350、 すなわち梁心=FL-110-350/2,  ゲージは FL+465, FL+1040, FL+ 1615 に貼ってある。
+
+    public static ColumnInfo Column3FA4 = new ColumnInfo("Column3F4A", 2.6, 0.11 + 0.35 / 2 + 0.465,
+            CS3FA4B, 1.04 - 0.465, CS3FA4C, 1.615 - 1.040, CS3FA4T, 0.700);
+    // スラブ厚110、梁せい 350、 すなわち梁心=FL-110-350/2,  ゲージは FL+465, FL+1040, FL+ 1615 に貼ってある。
+
+    public static ColumnInfo Column2FB4 = new ColumnInfo("Column2F4B", 2.6, 0.11 + 0.35 / 2 + 0.465,
+            CS2FB4B, 1.04 - 0.465, CS2FB4C, 1.615 - 1.040, CS2FB4T, 0.700);
+    // スラブ厚110、梁せい 350、 すなわち梁心=FL-110-350/2,  ゲージは FL+465, FL+1040, FL+ 1615 に貼ってある。
+
+    public static ColumnInfo Column3FB4 = new ColumnInfo("Column3F4B", 2.6, 0.11 + 0.35 / 2 + 0.465,
+            CS3FB4B, 1.04 - 0.465, CS3FB4C, 1.615 - 1.040, CS3FB4T, 0.700);
     // スラブ厚110、梁せい 350、 すなわち梁心=FL-110-350/2,  ゲージは FL+465, FL+1040, FL+ 1615 に貼ってある。    
 
     public static final UnitInfo lookForUnit(String macaddress) {

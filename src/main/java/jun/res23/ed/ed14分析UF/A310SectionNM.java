@@ -21,15 +21,13 @@ import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.complex.ComplexUtils;
 
 /**
-* A100からA300を作成。A100ではピーク周波数を一つのひずみゲージのスペクトルだけから判断していたが、
-* A300では、断面の曲げモーメントを算出してそのピーク値を得ている。
-* なお、2023/06/11の時点でCS3F_B4_B_N を C_N としていたのを修正しているので、
-* データとしてもA300は誤り。　なので、今後はA310を使うこと！
+ * A100からA300を作成。A100ではピーク周波数を一つのひずみゲージのスペクトルだけから判断していたが、
+ * A300では、断面の曲げモーメントを算出してそのピーク値を得ている。 が、結果としては A100と同じ結果となっているので、どちらでもよい。
+ * 2023/06/11 : A300からA310を作成。 ひずみの値を個別に出力する。
  *
- * @deprecated A310 will output the strain data. The results should be the same as A300
  * @author jun
  */
-public class A300SectionNM {
+public class A310SectionNM {
 
     public static Path databaseDir = Path.of("/home/jun/Dropbox (SSLUoT)/res23/ed/ed02/R140DatabaseQ");
     public static String fourierTable = "R155FourierU"; //"R152FourierS";
@@ -37,14 +35,14 @@ public class A300SectionNM {
     // ↑これは U のフーリエ変換による層間変形を示している。ここのなかでは (k01+k02-k03-k04)*0.5 として相対加速度を計算している。すなわち、2層分の相対加速度である。
     // なお、R175は k01とk02のEW方向の符号が逆転していることを考慮している。
     public static String dburl = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res23/ed/ed14分析UF/ed14";
-    public static String outputTable = "A300SectionNM";
+    public static String outputTable = "A310SectionNM";
 
     public static String[] testnames = {"D01Q01", "D01Q02", "D01Q03", "D01Q04", "D01Q05", "D01Q06", "D01Q08", "D01Q09", "D01Q10", "D01Q11",
         "D02Q01", "D02Q02", "D02Q03", "D02Q05", "D02Q06", "D02Q07", "D02Q08",
-        "D03Q01", "D03Q02", "D03Q03", "D03Q04", "D03Q05", "D03Q06", "D03Q08", "D03Q09"   };
+        "D03Q01", "D03Q02", "D03Q03", "D03Q04", "D03Q05", "D03Q06", "D03Q08", "D03Q09"};
 //    public static String[] testnames = {"D01Q01"};
 
-    private static final Logger logger = Logger.getLogger(A300SectionNM.class.getName());
+    private static final Logger logger = Logger.getLogger(A310SectionNM.class.getName());
 
     public static void main(String[] args) {
 
@@ -52,15 +50,20 @@ public class A300SectionNM {
             try (Connection con = DriverManager.getConnection(dburl, "junapp", ""); Statement st = con.createStatement()) {
                 st.executeUpdate("drop table if exists \"" + outputTable + "\"");
                 st.executeUpdate("create table \"" + outputTable + "\" (_NO identity, TESTNAME varchar, \"Freq[Hz]\" double, SECTION varchar, "
-                        + "\"AxialA[N*s]\"double , \"AxialP[rad]\" double ,"
-                        + "\"MomentXA[Nm*s]\"double , \"MomentXP[rad]\" double ,"
-                        + "\"MomentYA[Nm*s]\"double , \"MomentYP[rad]\" double ,"
-                        + "\"StoryDriftA[gal*s]\" double,\"StoryDriftP[rad]\" double,"
-                        + " \"NMsatio[m]\" double,"
-                        + "\"StiffnessAxialA[N/m]\" double, \"StiffnessAxialP[rad]\" double, "
-                        + "\"StiffnessMomentXA[Nm/m]\" double, \"StiffnessMomentXP[rad]\" double, "
-                        + "\"StiffnessMomentYA[Nm/m]\" double, \"StiffnessMomentYP[rad]\" double"
-                        + ")");
+                        + "\"AxialA[N*s]\" real , \"AxialP[rad]\" real ,"
+                        + "\"MomentXA[Nm*s]\"real , \"MomentXP[rad]\" real ,"
+                        + "\"MomentYA[Nm*s]\"real , \"MomentYP[rad]\" real ,"
+                        + "\"StoryDriftA[gal*s]\" real,\"StoryDriftP[rad]\" real,"
+                        + " \"NMsatio[m]\" real,"
+                        + "\"StiffnessAxialA[N/m]\" real, \"StiffnessAxialP[rad]\" real, "
+                        + "\"StiffnessMomentXA[Nm/m]\" real, \"StiffnessMomentXP[rad]\" real, "
+                        + "\"StiffnessMomentYA[Nm/m]\" real, \"StiffnessMomentYP[rad]\" real,"
+                        + "\"Strain1A[με*s]\" real, \"Strain1P[rad]\" real,"
+                        + "\"Strain2A[με*s]\" real, \"Strain2P[rad]\" real,"
+                        + "\"Strain3A[με*s]\" real, \"Strain3P[rad]\" real,"
+                        + "\"Strain4A[με*s]\" real, \"Strain4P[rad]\" real"
+                        + ")"
+                );
                 for (String testname : testnames) {
                     logger.log(Level.INFO, testname);
                     double freqNS = getPeakFreq(testname, fourierTable, EdefenseInfo.LA3S2, con);
@@ -129,7 +132,9 @@ public class A300SectionNM {
                     for (ColumnSectionInfo section : EdefenseInfo.columnSections) {
                         //                        logger.log(Level.INFO, section.getName());
                         {
-                            Complex[] nm = getColumnNMew(testname, freqEW, fourierTable/* "R152FourierS"*/, section);
+                            Complex strains[] = getColumnStrainsEW(testname, freqEW, fourierTable/* "R152FourierS"*/, section);
+
+                            Complex[] nm = convertColumnStrainsToNM(strains, section.getE(), section.getA(), section.getZew(), section.getZns());
                             double omega2 = 4 * Math.PI * Math.PI * freqEW * freqEW;
                             Complex stiffnessAxial = nm[0].divide(storyDriftEW).multiply(omega2 * 100); // [N/(cm/s2)  * (100/s2) = N/m]
                             Complex stiffnessMomentX = nm[1].divide(storyDriftEW).multiply(omega2 * 100); // [Nm/(cm/s2)  * (100/s2) = Nm/m]
@@ -143,7 +148,11 @@ public class A300SectionNM {
                                     + "\"StoryDriftA[gal*s]\",\"StoryDriftP[rad]\","
                                     + "\"StiffnessAxialA[N/m]\", \"StiffnessAxialP[rad]\", "
                                     + "\"StiffnessMomentXA[Nm/m]\", \"StiffnessMomentXP[rad]\", "
-                                    + "\"StiffnessMomentYA[Nm/m]\", \"StiffnessMomentYP[rad]\" "
+                                    + "\"StiffnessMomentYA[Nm/m]\", \"StiffnessMomentYP[rad]\", "
+                                    + "\"Strain1A[με*s]\" , \"Strain1P[rad]\" ,"
+                                    + "\"Strain2A[με*s]\" , \"Strain2P[rad]\" ,"
+                                    + "\"Strain3A[με*s]\" , \"Strain3P[rad]\" ,"
+                                    + "\"Strain4A[με*s]\" , \"Strain4P[rad]\" "
                                     + ") values ('" + testname + "'," + freqEW + ",'" + section.getName() + "ew'"
                                     + "," + nm[0].abs() + "," + nm[0].getArgument()
                                     + "," + nm[1].abs() + "," + nm[1].getArgument()
@@ -152,11 +161,16 @@ public class A300SectionNM {
                                     + "," + storyDriftEW.abs() + "," + storyDriftEW.getArgument() + ","
                                     + stiffnessAxial.abs() + "," + stiffnessAxial.getArgument() + ","
                                     + stiffnessMomentX.abs() + "," + stiffnessMomentX.getArgument() + ","
-                                    + stiffnessMomentY.abs() + "," + stiffnessMomentY.getArgument()
+                                    + stiffnessMomentY.abs() + "," + stiffnessMomentY.getArgument() + ","
+                                    + strains[0].abs() + "," + strains[0].getArgument() + ","
+                                    + strains[1].abs() + "," + strains[1].getArgument() + ","
+                                    + strains[2].abs() + "," + strains[2].getArgument() + ","
+                                    + strains[3].abs() + "," + strains[3].getArgument()
                                     + ")");
                         }
                         {
-                            Complex[] nm = getColumnNMns(testname, freqNS, fourierTable/* "R152FourierS"*/, section);
+                            Complex strains[] = getColumnStrainsNS(testname, freqNS, fourierTable/* "R152FourierS"*/, section);
+                            Complex[] nm = convertColumnStrainsToNM(strains, section.getE(), section.getA(), section.getZns(), section.getZew());
                             double omega2 = 4 * Math.PI * Math.PI * freqNS * freqNS;
                             Complex stiffnessAxial = nm[0].divide(storyDriftNS).multiply(omega2 * 100); // [N/(cm/s2)  * (100/s2) = N/m]
                             Complex stiffnessMomentX = nm[1].divide(storyDriftNS).multiply(omega2 * 100); // [Nm/(cm/s2)  * (100/s2) = Nm/m]
@@ -170,7 +184,11 @@ public class A300SectionNM {
                                     + "\"StoryDriftA[gal*s]\",\"StoryDriftP[rad]\","
                                     + "\"StiffnessAxialA[N/m]\", \"StiffnessAxialP[rad]\", "
                                     + "\"StiffnessMomentXA[Nm/m]\", \"StiffnessMomentXP[rad]\", "
-                                    + "\"StiffnessMomentYA[Nm/m]\", \"StiffnessMomentYP[rad]\" "
+                                    + "\"StiffnessMomentYA[Nm/m]\", \"StiffnessMomentYP[rad]\", "
+                                     + "\"Strain1A[με*s]\" , \"Strain1P[rad]\" ,"
+                                    + "\"Strain2A[με*s]\" , \"Strain2P[rad]\" ,"
+                                    + "\"Strain3A[με*s]\" , \"Strain3P[rad]\" ,"
+                                    + "\"Strain4A[με*s]\" , \"Strain4P[rad]\" "
                                     + ") values ('" + testname + "'," + freqNS + ",'" + section.getName() + "ns'"
                                     + "," + nm[0].abs() + "," + nm[0].getArgument()
                                     + "," + nm[1].abs() + "," + nm[1].getArgument()
@@ -179,14 +197,18 @@ public class A300SectionNM {
                                     + "," + storyDriftNS.abs() + "," + storyDriftNS.getArgument() + ","
                                     + stiffnessAxial.abs() + "," + stiffnessAxial.getArgument() + ","
                                     + stiffnessMomentX.abs() + "," + stiffnessMomentX.getArgument() + ","
-                                    + stiffnessMomentY.abs() + "," + stiffnessMomentY.getArgument()
+                                    + stiffnessMomentY.abs() + "," + stiffnessMomentY.getArgument() + ","
+                                    + strains[0].abs() + "," + strains[0].getArgument() + ","
+                                    + strains[1].abs() + "," + strains[1].getArgument() + ","
+                                    + strains[2].abs() + "," + strains[2].getArgument() + ","
+                                    + strains[3].abs() + "," + strains[3].getArgument()
                                     + ")");
                         }
                     }
                 }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(A300SectionNM.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A310SectionNM.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -267,18 +289,18 @@ public class A300SectionNM {
     }
 
     // Nが上、Sが下、Wが左、Eが右
-    public static Complex[] getColumnNMns(String testname, double freq, String schema, ColumnSectionInfo section) throws SQLException {
+    public static Complex[] getColumnStrainsNS(String testname, double freq, String schema, ColumnSectionInfo section) throws SQLException {
         String dburl = "jdbc:h2:tcp://localhost/" + databaseDir.resolve(testname + "q");
         Connection con = DriverManager.getConnection(dburl, "junapp", "");
-        return CalculateColumnNM(con, schema, freq, section.getNorthName(), section.getSouthName(), section.getWestName(), section.getEastName(), section.getE(),
+        return getColumnStrains(con, schema, freq, section.getNorthName(), section.getSouthName(), section.getWestName(), section.getEastName(), section.getE(),
                 section.getA(), section.getZns(), section.getZew());
     }
 
     // Eが上、Wが下、Nが左、Sが右    
-    public static Complex[] getColumnNMew(String testname, double freq, String schema, ColumnSectionInfo section) throws SQLException {
+    public static Complex[] getColumnStrainsEW(String testname, double freq, String schema, ColumnSectionInfo section) throws SQLException {
         String dburl = "jdbc:h2:tcp://localhost/" + databaseDir.resolve(testname + "q");
         Connection con = DriverManager.getConnection(dburl, "junapp", "");
-        return CalculateColumnNM(con, schema, freq, section.getEastName(), section.getWestName(), section.getNorthName(), section.getSouthName(), section.getE(),
+        return getColumnStrains(con, schema, freq, section.getEastName(), section.getWestName(), section.getNorthName(), section.getSouthName(), section.getE(),
                 section.getA(), section.getZew(), section.getZns());
     }
 
@@ -354,7 +376,45 @@ public class A300SectionNM {
 
     }
 
-    private static Complex[] CalculateColumnNM(Connection con, String schema, double freq, String top, String bottom, String left, String right, double E, double A, double Zx, double Zy) throws SQLException {
+//    private static Complex[] CalculateColumnNM(Connection con, String schema, double freq, String top, String bottom, String left, String right, double E, double A, double Zx, double Zy) throws SQLException {
+//        Statement st = con.createStatement();
+//
+//        String[] tables = {top, bottom, left, right};
+//        Complex[] c = new Complex[4];
+//        for (int i = 0; i < c.length; i++) {
+//            ResultSet rs = st.executeQuery("select \"Amp[με*s]\" , \"Phase[rad]\" from \"" + schema + "\".\"" + tables[i] + "\" where \"Freq[Hz]\"=" + freq);
+//            rs.next();
+//            double amp = rs.getDouble(1);
+//            double phase = rs.getDouble(2);
+//            c[i] = ComplexUtils.polar2Complex(amp, phase);
+//        }
+//        st.close();
+//        // ひずみは圧縮が正として出力されている。
+//        Complex axialStrain = (c[0].add(c[1]).add(c[2]).add(c[3])).multiply(-0.25); // 引張が正となる (ように 0.25に-を付している）
+//        Complex momentxStrain = (c[0].subtract(c[1])).multiply(0.50); // 上から下を引いている。上側圧縮（つまり下側引張）が正となる。
+//        Complex momentyStrain = (c[2].subtract(c[3])).multiply(0.50);// 左から右を引いている。左側圧縮（つまり右側引張）が正となる。
+//
+//        Complex axialForce = axialStrain.multiply(1e-6 * E * A); // ひずみはμεなので、1e-6を乗じてμを消す。　単位は N*sとなる。
+//        Complex bendingMomentX = momentxStrain.multiply(1e-6 * E * Zx);// 単位は Nm
+//        Complex bendingMomentY = momentyStrain.multiply(1e-6 * E * Zy); // 単位はNm
+//
+//        return new Complex[]{axialForce, bendingMomentX, bendingMomentY};
+//
+//    }
+    private static Complex[] convertColumnStrainsToNM(Complex[] c, double E, double A, double Zx, double Zy) {
+        // ひずみは圧縮が正として出力されている。
+        Complex axialStrain = (c[0].add(c[1]).add(c[2]).add(c[3])).multiply(-0.25); // 引張が正となる (ように 0.25に-を付している）
+        Complex momentxStrain = (c[0].subtract(c[1])).multiply(0.50); // 上から下を引いている。上側圧縮（つまり下側引張）が正となる。
+        Complex momentyStrain = (c[2].subtract(c[3])).multiply(0.50);// 左から右を引いている。左側圧縮（つまり右側引張）が正となる。
+
+        Complex axialForce = axialStrain.multiply(1e-6 * E * A); // ひずみはμεなので、1e-6を乗じてμを消す。　単位は N*sとなる。
+        Complex bendingMomentX = momentxStrain.multiply(1e-6 * E * Zx);// 単位は Nm
+        Complex bendingMomentY = momentyStrain.multiply(1e-6 * E * Zy); // 単位はNm
+
+        return new Complex[]{axialForce, bendingMomentX, bendingMomentY};
+    }
+
+    private static Complex[] getColumnStrains(Connection con, String schema, double freq, String top, String bottom, String left, String right, double E, double A, double Zx, double Zy) throws SQLException {
         Statement st = con.createStatement();
 
         String[] tables = {top, bottom, left, right};
@@ -367,83 +427,8 @@ public class A300SectionNM {
             c[i] = ComplexUtils.polar2Complex(amp, phase);
         }
         st.close();
-        // ひずみは圧縮が正として出力されている。
-        Complex axialStrain = (c[0].add(c[1]).add(c[2]).add(c[3])).multiply(-0.25); // 引張が正となる (ように 0.25に-を付している）
-        Complex momentxStrain = (c[0].subtract(c[1])).multiply(0.50); // 上から下を引いている。上側圧縮（つまり下側引張）が正となる。
-        Complex momentyStrain = (c[2].subtract(c[3])).multiply(0.50);// 左から右を引いている。左側圧縮（つまり右側引張）が正となる。
 
-        Complex axialForce = axialStrain.multiply(1e-6 * E * A); // ひずみはμεなので、1e-6を乗じてμを消す。　単位は N*sとなる。
-        Complex bendingMomentX = momentxStrain.multiply(1e-6 * E * Zx);// 単位は Nm
-        Complex bendingMomentY = momentyStrain.multiply(1e-6 * E * Zy); // 単位はNm
-
-        return new Complex[]{axialForce, bendingMomentX, bendingMomentY};
-
+        return c;
     }
 
-//
-//    private static void CalculateMNQSpecColumn(Connection con, String inputSchema, double peakfreq,
-//            UnitInfo lowUnit1, int lowGauge1, UnitInfo lowUnit2, int lowGauge2, double EAlow, double EZlow,
-//            UnitInfo upUnit1, int upGauge1, UnitInfo upUnit2, int upGauge2, double EAup, double EZup,
-//            double[] gaugeLocations, double[] sectionLocations, String[] sectionNames,
-//            String schema, String table, String memberName
-//    ) throws SQLException {
-//        Statement st = con.createStatement();
-//        UnitInfo[] units = {lowUnit1, lowUnit2, upUnit1, upUnit2};
-//        int[] gauges = {lowGauge1, lowGauge2, upGauge1, upGauge2};
-//        // 今回は gaugeFactor=2.1, gain=128だから定数でいいけど。
-//        final double gain = 128;
-//        final double gaugeFactor = 2.10;
-//        Complex cc[] = new Complex[4]; // micro*s の複素数
-//        for (int i = 0; i < 4; i++) {
-//            UnitInfo unit = units[i];
-//            final int gaugeno = gauges[i];
-//            String sql = "select  \"AMP[LSB*s]\",\"PHASE[rad]\" from \"" + inputSchema + "\".\"" + unit.getHardwareAddress() + "/0" + gaugeno + "/str01\""
-//                    + " where \"FREQ[Hz]\"=" + peakfreq;
-//            ResultSet rs = st.executeQuery(sql);
-//            rs.next();
-//            final double amp = rs.getDouble(1) / gain / Math.pow(2, 24) * 4 / gaugeFactor * 1e6; // amplitue [micro*s]
-//            final double phase = rs.getDouble(2);
-//            final double cos = Math.cos(phase);
-//            final double sin = Math.sin(phase);
-//            cc[i] = Complex.valueOf(amp * cos, amp * sin);
-//        }
-//
-//        // 右側ひずみの符号と曲げひずみの符号が一緒になるようにしている。（ひずみが引張正ならば、右側引っ張りが正となる。）
-//        Complex bendingStrainLow = (cc[1].subtract(cc[0])).divide(2); // (上-下)/(2)            
-//        Complex bendingStrainUp = (cc[3].subtract(cc[2])).divide(2); // (上-下)/(2)            
-//        // ひずみの符号と軸力ひずみの符号が一緒になるようにしている。
-//        Complex axialStrainLow = (cc[0].add(cc[1])).divide(2); // (上+下)/(2)            
-//        Complex axialStrainUp = (cc[3].add(cc[2])).divide(2); // (上+下)/(2)            
-//        // ひずみの符号と軸力ひずみの符号が一緒になるようにしている。
-//
-//        //軸力は N=EAε
-//        //曲げモーメントは M=EZε
-//        Complex Nlow = axialStrainLow.multiply(EAlow * 1e-6); // ひずみ[με]×EA[N] = 軸力[N]
-//        Complex Nup = axialStrainUp.multiply(EAup * 1e-6); // ひずみ[με]×EA[N] = 軸力[N]a
-//        Complex Mlow = bendingStrainLow.multiply(EZlow * 1e-6); // ひずみ[με]×EZ[Nm] = 曲げモーメント[Nm]
-//        Complex Mup = bendingStrainUp.multiply(EZup * 1e-6); // ひずみ[με]×EZ[Nm] = 曲げモーメント[Nm]
-//
-//        // せん断力は ( Mup-Mlow ) /distance 
-//        Complex Q = (Mup.subtract(Mlow)).divide(gaugeLocations[1] - gaugeLocations[0]);
-//        Complex w = (Nup.subtract(Nlow)).divide(gaugeLocations[1] - gaugeLocations[0]);
-//        double lowLocation = gaugeLocations[0];
-//        Complex[] M = new Complex[sectionLocations.length];
-//        Complex[] N = new Complex[sectionLocations.length];
-//
-//        st.executeUpdate("create table if not exists \"" + schema + "\".\"" + table + "\" (MEMBER varchar, LOC double, KEY varchar, AMP double, PHASE double)");
-//
-//        for (int i = 0; i < sectionLocations.length; i++) {
-//            double loc = sectionLocations[i];
-//            M[i] = Mlow.add(Q.multiply(loc - lowLocation));
-//            N[i] = Nlow.add(w.multiply(loc - lowLocation));
-//            st.executeUpdate("insert into \"" + schema + "\".\"" + table + "\" (MEMBER,LOC, KEY,AMP,PHASE) values "
-//                    + "('" + memberName + "'," + sectionLocations[i] + ",'M" + sectionNames[i] + "'," + M[i].abs() + "," + M[i].getArgument() + ")");
-//            st.executeUpdate("insert into \"" + schema + "\".\"" + table + "\" (MEMBER,LOC, KEY,AMP,PHASE) values "
-//                    + "('" + memberName + "'," + sectionLocations[i] + ",'N" + sectionNames[i] + "'," + N[i].abs() + "," + N[i].getArgument() + ")");
-//        }
-//        st.executeUpdate("insert into \"" + schema + "\".\"" + table + "\" (MEMBER,KEY,AMP,PHASE) values "
-//                + "('" + memberName + "','Q'," + Q.abs() + "," + Q.getArgument() + ")");
-//        st.close();
-//
-//    }
 }

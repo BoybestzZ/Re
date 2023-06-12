@@ -143,8 +143,8 @@ public class StrainGaugeInfo {
     public static final StrainGaugeInfo CS2F_A4_C_S = new StrainGaugeInfo("2F_A4_C_S", EdefenseInfo.d01, 4, 2.08, 128);
     public static final StrainGaugeInfo CS2F_A4_T_N = new StrainGaugeInfo("2F_A4_T_N", EdefenseInfo.d01, 5, 2.08, 128);
     public static final StrainGaugeInfo CS2F_A4_T_E = new StrainGaugeInfo("2F_A4_T_E", EdefenseInfo.d01, 6, 2.08, 128);
-    public static final StrainGaugeInfo CS2F_A4_T_W = new StrainGaugeInfo("2F_A4_T_W", EdefenseInfo.d01, 7, 2.08, 128);
-    public static final StrainGaugeInfo CS2F_A4_T_S = new StrainGaugeInfo("2F_A4_T_S", EdefenseInfo.d01, 8, 2.08, 128);
+    public static final StrainGaugeInfo CS2F_A4_T_S = new StrainGaugeInfo("2F_A4_T_S", EdefenseInfo.d01, 7, 2.08, 128); // 2023/06/12 接続ミスを発見。修正。 (N-E-S-W の順にしてある）
+    public static final StrainGaugeInfo CS2F_A4_T_W = new StrainGaugeInfo("2F_A4_T_W", EdefenseInfo.d01, 8, 2.08, 128);
     public static final StrainGaugeInfo GSLO_A_A4_I_1 = new StrainGaugeInfo(EdefenseInfo.d02, 1, 2.11, 128);
     public static final StrainGaugeInfo GSLO_A_A4_I_2 = new StrainGaugeInfo(EdefenseInfo.d02, 2, 2.11, 128);
     public static final StrainGaugeInfo GSLO_A_A4_I_3 = new StrainGaugeInfo(EdefenseInfo.d02, 3, 2.11, 128);
