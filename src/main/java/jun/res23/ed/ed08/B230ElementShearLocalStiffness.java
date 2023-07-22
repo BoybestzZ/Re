@@ -34,78 +34,130 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.XYSeries;
 
 /**
+ * B220→B230 NSにもEWにも対応するように。NSはLA3S2、EWはLABS2の曲げモーメントが最大となった時刻を選択する。 B210→B220
+ * 元データを T231からT400に変更。もともとこのプログラムはEW専用。部材の切り替えも手動。
+ *
  *
  * @author jun
- * @deprecated このプログラムはT231TimeHistoryNMを使っているが、これがdeprecatedになり、T400ができている。T400を使ったあたらしいプログラムはB220として作成する。
+ *
  */
-@Deprecated
-public class B210ElementShearLocalStiffness {
+public class B230ElementShearLocalStiffness {
 
     //  private static final String T300Schema = T300Integ2StoryDisp.outputSchema;//"T300Integ2StoryDisp"
-    public static final String dburl = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res22/ed/ed06分析T/res22ed06";
-    public static final String ed08dburl = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res22/ed/ed08防災科研/res22ed08;IFEXISTS=TRUE";
-    public static final String outputTable = "B210ElementShearLocalStiffness";
-    public static final Path svgdir = Path.of("/home/jun/Dropbox (SSLUoT)/res22/ed/ed08防災科研/B210ElementShearLocalStiffness");
+    public static final String dburl = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res23/ed/ed06分析T/res22ed06";
+    public static final String nmtable = "T400TimeHistoryNM";
+    public static final String ed08dburl = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res23/ed/ed08防災科研/res22ed08;IFEXISTS=TRUE";
+    public static final String outputTable = "B230ElementShearLocalStiffness";
+    public static final Path svgdir = Path.of("/home/jun/Dropbox (SSLUoT)/res23/ed/ed08防災科研/B230ElementShearLocalStiffness");
 
-    private static final Logger logger = Logger.getLogger(B210ElementShearLocalStiffness.class.getName());
+    private static final Logger logger = Logger.getLogger(B230ElementShearLocalStiffness.class.getName());
 
     public static void main(String[] args) {
+//        main(EdefenseInfo.BeamA, "ew");
+//        main(EdefenseInfo.BeamB, "ew");
+//        main(EdefenseInfo.Beam3, "ns");
+//        main(EdefenseInfo.Beam4, "ns");
+
+        main(EdefenseInfo.Column2FA3, "ew");
+        main(EdefenseInfo.Column2FA4, "ew");
+        main(EdefenseInfo.Column2FB3, "ew");
+        main(EdefenseInfo.Column2FB4, "ew");
+        main(EdefenseInfo.Column3FA3, "ew");
+        main(EdefenseInfo.Column3FA4, "ew");
+        main(EdefenseInfo.Column3FB3, "ew");
+        main(EdefenseInfo.Column3FB4, "ew");
+
+        main(EdefenseInfo.Column2FA3, "ns");
+        main(EdefenseInfo.Column2FA4, "ns");
+        main(EdefenseInfo.Column2FB3, "ns");
+        main(EdefenseInfo.Column2FB4, "ns");
+        main(EdefenseInfo.Column3FA3, "ns");
+        main(EdefenseInfo.Column3FA4, "ns");
+        main(EdefenseInfo.Column3FB3, "ns");
+        main(EdefenseInfo.Column3FB4, "ns");
+        
+        
+        
+
+    }
+
+    public static void main(ElementInfo element, String ns) {
         try {
-//            ColumnInfo element = EdefenseInfo.Column2FA3;
-            ElementInfo element = EdefenseInfo.Beam3;
-            clearOutputTable(element);
-            JFreeChart[] positiveCharts = createChart(element, true);
-            JFreeChart[] negativeCharts = createChart(element, false);
+//            ElementInfo element = EdefenseInfo.Column2FA3;
+//            ElementInfo element = EdefenseInfo.Column3FA3;
+//            ElementInfo element = EdefenseInfo.Column3FA4;
+//                        ElementInfo element = EdefenseInfo.Column2FA4;
+//            ElementInfo element = EdefenseInfo.Beam3;
+//            ElementInfo element = EdefenseInfo.BeamA;
+//            ElementInfo element = ;
+//            String ns = "ew";
+
+            clearOutputTable(element,ns, /*dropTable*/ false);
+            JFreeChart[] positiveCharts = createChart(element, ns, true);
+            JFreeChart[] negativeCharts = createChart(element, ns, false);
             if (svgdir != null) {
                 try {
                     if (!Files.exists(svgdir)) {
                         Files.createDirectory(svgdir);
                     }
 
-                    final Path svgfile = svgdir.resolve(element.getName() + ".svg");
+                    final Path svgfile = svgdir.resolve(element.getName() + "_" + ns + ".svg");
 
                     //            JunChartUtil.show(chart);
                     JunChartUtil.svg(svgfile, 500, 350, new JFreeChart[][]{positiveCharts, negativeCharts});
                 } catch (IOException ex) {
-                    Logger.getLogger(B210ElementShearLocalStiffness.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(B230ElementShearLocalStiffness.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
                 JunChartUtil.show(new JFreeChart[][]{positiveCharts, negativeCharts});
             }
         } catch (SQLException ex) {
-            Logger.getLogger(B210ElementShearLocalStiffness.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(B230ElementShearLocalStiffness.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
 
-    public static void clearOutputTable(ElementInfo element) throws SQLException {
+    public static void clearOutputTable(ElementInfo element, String ns, boolean dropTable) throws SQLException {
 
         Connection con08 = DriverManager.getConnection(ed08dburl, "junapp", "");
         Statement st08 = con08.createStatement();
-        st08.executeUpdate("create table if not exists \"" + outputTable + "\" (TIMESTAMP timestamp,\"ElementName\" varchar,  \"TESTNAME\" varchar, \"PositiveDirection\" boolean, "
+        if (dropTable) {
+            st08.executeUpdate("drop table if exists \"" + outputTable + "\"");
+        }
+        st08.executeUpdate("create table if not exists \"" + outputTable + "\" (TIMESTAMP timestamp,\"ElementName\" varchar, DIRECTION varchar,  \"TESTNAME\" varchar, \"PositiveDirection\" boolean, "
                 + "\"TimePerTest[s]\" real , \"MomentS2[kNm]\" real,\"MomentS3[kNm]\" real, \"ShearForce[kN]\" real,\"Story2Drift[mm]\"real,\"LocalStiffness[kN/mm]\" real)");
-        st08.executeUpdate("delete \""+outputTable+"\" where \"ElementName\"='"+element.getName()+"'");
+        st08.executeUpdate("delete \"" + outputTable + "\" where \"ElementName\"='" + element.getName() + "' and DIRECTION='"+ns+"'");
         con08.close();
-        
 
     }
 
-    public static JFreeChart[] createChart(ElementInfo element, boolean directionPositive) throws SQLException {
+    public static JFreeChart[] createChart(ElementInfo element, String ns, boolean directionPositive) throws SQLException {
         SectionInfo[] sections = element.getSections();
-        if (element.isColumn()) { // 柱の場合は NS方向のモーメントを計算。
-            return createChart(element.getName(), sections[1].getName(), sections[2].getName(),
+        String NS = ns.toUpperCase();
+        if (element.isColumn()) { // 柱の場合は NSorEW方向のモーメントを計算。
+            return createChart(element.getName(), ns, sections[1].getName(), sections[2].getName(),
                     element.getLocation(2) - element.getLocation(1),
-                    directionPositive, "BendingMomentNSPerTest[kNm]", 0.0);
+                    directionPositive, "BendingMoment" + NS + "PerTest[kNm]", 0.0);
         } else {
-            return createChart(element.getName(), sections[1].getName(), sections[2].getName(),
+            return createChart(element.getName(), ns, sections[1].getName(), sections[2].getName(),
                     element.getLocation(2) - element.getLocation(1),
                     directionPositive, "BendingMomentPerTest[kNm]", sections[1].getHeight() * 0.5 + 0.11 * 0.5);
         }
     }
 
-    public static JFreeChart[] createChart(String elementName, String sectionName1, String sectionName2, double shearCalculationSpan, boolean directionPositive, String momentColumnName, double slabArmLength) throws SQLException {
+    public static JFreeChart[] createChart(String elementName, String ns, String sectionName1, String sectionName2, double shearCalculationSpan, boolean directionPositive, String momentColumnName, double slabArmLength) throws SQLException {
 
         // 方向 NS も指定しないといけない。
+        String XY;
+        String baseSection;
+
+        if (ns.equals("ns")) {
+            XY = "X";
+            baseSection = EdefenseInfo.LA3S2.getName();
+        } else {
+            XY = "Y";
+            baseSection = EdefenseInfo.LABS2.getName();
+        }
         XYSeries s = new XYSeries("localstiffness");
 
         Connection con = DriverManager.getConnection(dburl, "junapp", "");
@@ -136,16 +188,17 @@ public class B210ElementShearLocalStiffness {
         DefaultCategoryDataset datasetDispAbs = new DefaultCategoryDataset();
         DefaultCategoryDataset datasetForceAbs = new DefaultCategoryDataset();
 
-        st08.executeUpdate("create table if not exists \"" + outputTable + "\" (TIMESTAMP timestamp,\"ElementName\" varchar,  \"TESTNAME\" varchar, \"PositiveDirection\" boolean, "
+        st08.executeUpdate("create table if not exists \"" + outputTable + "\" (TIMESTAMP timestamp,\"ElementName\" varchar, DIRECTION varchar,  \"TESTNAME\" varchar, \"PositiveDirection\" boolean, "
                 + "\"TimePerTest[s]\" real , \"MomentS2[kNm]\" real,\"MomentS3[kNm]\" real, \"ShearForce[kN]\" real,\"Story2Drift[mm]\"real,\"LocalStiffness[kN/mm]\" real)");
 
         String timestamp = LocalDateTime.now().toString();
+        double firstStiffness = Double.NaN;
         for (EdefenseKasinInfo test : alltests) {
 
             String desc = directionPositive ? "desc" : "";
             ResultSet rs = st.executeQuery("select \"TimePerTest[s]\",\"BendingMomentPerTest[kNm]\", \"AxialForcePerTest[kN]\""
-                    + " from \"T231TimeHistoryNM\".\"" + EdefenseInfo.LA3S2.getName() + "\" "
-                    + " where TESTNAME='" + test.getName() + "t' "
+                    + " from \"" + nmtable + "\".\"" + baseSection + "\" "
+                    + " where TESTNAME='" + test.getName() + "t' and \"TimePerTest[s]\" < (120+" + test.getNiedTimeDiffSeconds() + ") "
                     + "order by \"BendingMomentPerTest[kNm]\" " + desc + " limit 1");
 
             rs.next();
@@ -153,36 +206,41 @@ public class B210ElementShearLocalStiffness {
             time = Math.round(time * 100) / 100.0;
 
             rs = st.executeQuery("select \"TimePerTest[s]\",\"" + momentColumnName + "\", \"AxialForcePerTest[kN]\""
-                    + " from \"T231TimeHistoryNM\".\"" + sectionName1 + "\" "
+                    + " from \"" + nmtable + "\".\"" + sectionName1 + "\" "
                     + "where \"TimePerTest[s]\" =" + time + "  and TESTNAME='" + test.getTestName() + "t'");
             rs.next();
 
             double momentS2 = rs.getDouble(2);
-            double momentTotalS2 = momentS2 + rs.getDouble(3) * slabArmLength;
+            double momentTotalS2 = momentS2 + rs.getDouble(3) * slabArmLength;// 柱の場合はslabArmLengthは0になってる。
             String sql;
             rs = st.executeQuery(sql = "select \"TimePerTest[s]\",\"" + momentColumnName + "\",\"AxialForcePerTest[kN]\""
-                    + " from \"T231TimeHistoryNM\".\"" + sectionName2 + "\" "
+                    + " from \"" + nmtable + "\".\"" + sectionName2 + "\" "
                     + "where \"TimePerTest[s]\" =" + time + "  and TESTNAME='" + test.getTestName() + "t'");
             System.out.println(sql);
             rs.next();
             double momentS3 = rs.getDouble(2);
-            double momentTotalS3 = momentS3; // + rs.getDouble(3) * (0.11 + 0.35) * 0.5;
+            double momentTotalS3 = momentS3 + rs.getDouble(3) * slabArmLength; // 柱の場合はslabArmLengthは0になってる。
 
-            double shearSteel = (momentS3 - momentS2) / shearCalculationSpan; //kN
+            // double shearSteel = (momentS3 - momentS2) / shearCalculationSpan; //kN
             double shearTotal = (momentTotalS3 - momentTotalS2) / shearCalculationSpan;
 
-            rs = st08.executeQuery(sql = "select avg(\"Story2DispW_X[mm]\"+\"Story3DispW_X[mm]\")*0.5 "
+            rs = st08.executeQuery(sql = "select avg(\"Story2DispW_" + XY + "[mm]\"+\"Story3DispW_" + XY + "[mm]\")*0.5 "
                     + " from \"" + test.getTestName() + "\" where \"Time[s]\"<2.0");
             rs.next();
             double niedavg = rs.getDouble(1);
-            rs = st08.executeQuery(sql = "select \"Time[s]\", (\"Story2DispW_X[mm]\"+\"Story3DispW_X[mm]\")*0.5 "
-                    + " from \"" + test.getTestName() + "\" order by abs(\"Time[s]\"-(" + (time + test.getNiedTimeDiffSeconds()) + ")) limit 1");
+            // 一番近い時刻の値を持ってくる。
+            // rs = st08.executeQuery(sql = "select \"Time[s]\", (\"Story2DispW_" + XY + "[mm]\"+\"Story3DispW_" + XY + "[mm]\")*0.5 "
+            //       + " from \"" + test.getTestName() + "\" order by abs(\"Time[s]\"-(" + (time + test.getNiedTimeDiffSeconds()) + ")) limit 1");
+            // 前後 プラスマイナス 0.02秒の範囲での絶対値が最大となるものを探してくる。
+            rs = st08.executeQuery(sql = "select \"Time[s]\", (\"Story2DispW_" + XY + "[mm]\"+\"Story3DispW_" + XY + "[mm]\")*0.5 "
+                    + " from \"" + test.getTestName() + "\" where \"Time[s]\" between " + (time + test.getNiedTimeDiffSeconds() - 0.02) + " and " + (time + test.getNiedTimeDiffSeconds() + 0.02)
+                    + " order by abs((\"Story2DispW_" + XY + "[mm]\"+\"Story3DispW_" + XY + "[mm]\")*0.5) desc limit 1;");
 
             System.out.println(sql);
             rs.next();
             double niedtime = rs.getDouble(1);
             double disp = rs.getDouble(2) - niedavg; // unit:mm
-            logger.log(Level.INFO, "NIED=" + disp + " @ " + niedtime + " s");
+            logger.log(Level.INFO, "NIED=" + disp + " @ niedtime= " + niedtime + " , time=" + (time + test.getNiedTimeDiffSeconds()));
 
             if (test.getName().endsWith("Y)")) {
                 continue;
@@ -191,27 +249,30 @@ public class B210ElementShearLocalStiffness {
             // if (isTestsIn(test, randoms)) {
 //                    datasetRandoms.addValue(shearTotal, "shearTotal", test.getTestName() + test.getWaveName());
 //                }
-            if (!test.getWaveName().endsWith("Y)")) {
-                String wavetype = "notset";
-                if (test.getWaveName().startsWith("random")) {
-                    wavetype = "random";
-                } else if (test.getWaveName().startsWith("Kobe")) {
-                    wavetype = "Kobe";
-                } else if (test.getWaveName().startsWith("kumamoto")) {
-                    wavetype = "kumamoto";
-                } else if (test.getWaveName().startsWith("tohoku")) {
-                    wavetype = "tohoku";
-                }
-                datasetStiffness.addValue(shearTotal / disp, wavetype, test.getTestName() + test.getWaveName());
-                datasetDisp.addValue(disp, wavetype, test.getTestName() + test.getWaveName());
-                datasetForce.addValue(shearTotal, wavetype, test.getTestName() + test.getWaveName());
-                datasetDispAbs.addValue(Math.abs(disp), wavetype, test.getTestName() + test.getWaveName());
-                datasetForceAbs.addValue(Math.abs(shearTotal), wavetype, test.getTestName() + test.getWaveName());
+            // if (!test.getWaveName().endsWith("Y")) {
+            String wavetype = "notset";
+            if (test.getWaveName().startsWith("Ran")) {
+                wavetype = "random";
+            } else if (test.getWaveName().startsWith("Kobe")) {
+                wavetype = "Kobe";
+            } else if (test.getWaveName().startsWith("KMM")) {
+                wavetype = "kumamoto";
+            } else if (test.getWaveName().startsWith("FKS")) {
+                wavetype = "tohoku";
             }
+            datasetStiffness.addValue(shearTotal / disp, wavetype, test.getTestName() + test.getWaveName());
+            datasetDisp.addValue(disp, wavetype, test.getTestName() + test.getWaveName());
+            datasetForce.addValue(shearTotal, wavetype, test.getTestName() + test.getWaveName());
+            datasetDispAbs.addValue(Math.abs(disp), wavetype, test.getTestName() + test.getWaveName());
+            datasetForceAbs.addValue(Math.abs(shearTotal), wavetype, test.getTestName() + test.getWaveName());
+            if (Double.isNaN(firstStiffness)) {
+                firstStiffness = shearTotal / disp; // 軸の正負を定めるため、一番最初の値を覚えておく。
+            }
+//            }
             st08.executeUpdate("insert into \"" + outputTable + "\" "
-                    + "(TIMESTAMP,\"ElementName\", TESTNAME,\"PositiveDirection\",\"TimePerTest[s]\", \"MomentS2[kNm]\", \"MomentS3[kNm]\", \"ShearForce[kN]\","
+                    + "(TIMESTAMP,\"ElementName\", DIRECTION, TESTNAME,\"PositiveDirection\",\"TimePerTest[s]\", \"MomentS2[kNm]\", \"MomentS3[kNm]\", \"ShearForce[kN]\","
                     + "\"Story2Drift[mm]\",\"LocalStiffness[kN/mm]\") "
-                    + "values ('" + timestamp + "','" + elementName + "','" + test.getTestName() + "'," + directionPositive + "," + time + "," + momentS2 + "," + momentS3
+                    + "values ('" + timestamp + "','" + elementName + "','" + ns + "','" + test.getTestName() + "'," + directionPositive + "," + time + "," + momentS2 + "," + momentS3
                     + "," + shearTotal + "," + disp + "," + shearTotal / disp
                     + ")");
 
@@ -219,12 +280,18 @@ public class B210ElementShearLocalStiffness {
 
         CategoryAxis xaxis = new CategoryAxis("Test");
         xaxis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_90);
-        NumberAxis yaxis = new NumberAxis("");
+        NumberAxis yaxis = new NumberAxis("LocalShearStiffness [kN/mm]");
+
         LineAndShapeRenderer renderer = new LineAndShapeRenderer(false, true);
         renderer.setSeriesPaint(3, Color.MAGENTA);
         CategoryPlot plot = new CategoryPlot(datasetStiffness, xaxis, yaxis, renderer);
         plot.setDomainGridlinesVisible(true);
-        plot.getRangeAxis().setFixedDimension(50);
+        yaxis.setFixedDimension(50);
+        if (firstStiffness > 0) {
+            yaxis.setLowerBound(0);
+        } else {
+            yaxis.setUpperBound(0);
+        }
         JFreeChart chart = new JFreeChart(plot);
 
         LineAndShapeRenderer rendererDisp = new LineAndShapeRenderer(false, true);

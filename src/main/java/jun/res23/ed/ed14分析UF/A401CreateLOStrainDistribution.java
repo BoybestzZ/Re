@@ -6,6 +6,7 @@ package jun.res23.ed.ed14分析UF;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -28,37 +29,47 @@ import org.apache.commons.math3.complex.ComplexUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.ValueMarker;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 /**
- * ed06T265→ed14A400
+ * ed06T265→ed14A400→ed14.A401
  *
  * @author jun
  */
-public class A400CreateLOStrainDistribution {
+public class A401CreateLOStrainDistribution {
 
-    private static final Logger logger = Logger.getLogger(A400CreateLOStrainDistribution.class.getName());
+    private static final Logger logger = Logger.getLogger(A401CreateLOStrainDistribution.class.getName());
     public static Path inputDatabaseDir = Path.of("/home/jun/Dropbox (SSLUoT)/res23/ed/ed02/R140DatabaseQ");
     public static String fourierSchema = "R155FourierU"; //"R152FourierS";
     public static String driftTable = "R175StoryDriftU";
     private static final String outputDburl = "jdbc:h2:tcp://localhost//home/jun/Dropbox (SSLUoT)/res23/ed/ed14分析UF/ed14";
-    public static String A300SectionNM = "A300SectionNM";
-    private static final String outputTableName = "A400LOStrainDistribution";
+    public static String A300SectionNM = A310SectionNM.outputTable; // "A310SectionNM";
+    private static final String outputTableName = "A401LOStrainDistribution";
 
-    private static final Path svgdir = Path.of("/home/jun/Dropbox (SSLUoT)/res23/ed/ed14分析UF/A400LOStrainDistribution");
+    private static final Path svgdir = Path.of("/home/jun/Dropbox (SSLUoT)/res23/ed/ed14分析UF/A401LOStrainDistribution");
 
     public static void main(String[] args) {
 
         try {
-            logger.log(Level.INFO, "Opening database");
+            logger.log(Level.INFO, "Opening database ");
             Connection outcon = DriverManager.getConnection(outputDburl, "junapp", "");
             logger.log(Level.INFO, "Opened.");
             Statement outst = outcon.createStatement();
             outst.executeUpdate("drop table if exists \"" + outputTableName + "\" ");
             outst.executeUpdate("create table if not exists \"" + outputTableName + "\" (TESTNAME varchar,WAVENAME varchar, EDGENAME varchar, "
                     + "\"Freq[Hz]\" real,\"Inter2StoryDispA[mm*s]\" real,\"Inter2StoryDispP[rad]\" real, "
+                    + "\"OuterLocalStiffness1R[με/mm]\" real,\"OuterLocalStiffness1I[με/mm]\" real,"
+                    + "\"OuterLocalStiffness2R[με/mm]\" real,\"OuterLocalStiffness2I[με/mm]\" real,"
+                    + "\"OuterLocalStiffness3R[με/mm]\" real,\"OuterLocalStiffness3I[με/mm]\" real,"
+                    + "\"OuterLocalStiffness4R[με/mm]\" real,\"OuterLocalStiffness4I[με/mm]\" real,"
+                    + "\"InnerLocalStiffness1R[με/mm]\" real,\"InnerLocalStiffness1I[με/mm]\" real,"
+                    + "\"InnerLocalStiffness2R[με/mm]\" real,\"InnerLocalStiffness2I[με/mm]\" real,"
+                    + "\"InnerLocalStiffness3R[με/mm]\" real,\"InnerLocalStiffness3I[με/mm]\" real,"
+                    + "\"InnerLocalStiffness4R[με/mm]\" real,\"InnerLocalStiffness4I[με/mm]\" real,"
                     + "\"MS1A[Nm*s]\" real,\"MS1P[rad]\" real,"
                     + "\"MS2A[Nm*s]\" real,\"MS2P[rad]\" real,"
                     + " \"QA[N*s]\" real, \"QP[rad]\" real,"
@@ -83,37 +94,27 @@ public class A400CreateLOStrainDistribution {
             outst.close();
 
             // LASection は 0-based.
-            main(outcon, EdefenseInfo.D01Q01, "3A", EdefenseInfo.Beam3, new String[]{"b03/05", "b03/06", "b03/07", "b03/08"}, new String[]{"b03/01", "b03/02", "b03/03", "b03/04"},
-                    new double[]{0.175 + 0.070, 0.175 + 0.070 + 0.025, 0.175 + 0.070 + 0.050, 0.175 + 0.070 + 0.075}, 1, 2, 1);
-            main(outcon, EdefenseInfo.D01Q09, "3A", EdefenseInfo.Beam3, new String[]{"b03/05", "b03/06", "b03/07", "b03/08"}, new String[]{"b03/01", "b03/02", "b03/03", "b03/04"},
-                    new double[]{0.175 + 0.070, 0.175 + 0.070 + 0.025, 0.175 + 0.070 + 0.050, 0.175 + 0.070 + 0.075}, 1, 2, 1);
-            main(outcon, EdefenseInfo.D01Q11, "3A", EdefenseInfo.Beam3, new String[]{"b03/05", "b03/06", "b03/07", "b03/08"}, new String[]{"b03/01", "b03/02", "b03/03", "b03/04"},
-                    new double[]{0.175 + 0.070, 0.175 + 0.070 + 0.025, 0.175 + 0.070 + 0.050, 0.175 + 0.070 + 0.075}, 1, 2, 1);
-            main(outcon, EdefenseInfo.D02Q05, "3A", EdefenseInfo.Beam3, new String[]{"b03/05", "b03/06", "b03/07", "b03/08"}, new String[]{"b03/01", "b03/02", "b03/03", "b03/04"},
-                    new double[]{0.175 + 0.070, 0.175 + 0.070 + 0.025, 0.175 + 0.070 + 0.050, 0.175 + 0.070 + 0.075}, 1, 2, 1);
+            EdefenseKasinInfo[] kasins = new EdefenseKasinInfo[]{
+                EdefenseInfo.D01Q01, EdefenseInfo.D01Q09, EdefenseInfo.D01Q11, EdefenseInfo.D02Q05,
+                EdefenseInfo.D03Q01, EdefenseInfo.D03Q09};
+            BeamEnd beamEnds[] = {BeamEnd3A, BeamEnd3B, BeamEnd4A, BeamEnd4B, BeamEndA3, BeamEndA4, BeamEndB3, BeamEndB4};
+            for (EdefenseKasinInfo kasin : kasins) {
+                for (jun.res23.ed.ed14分析UF.A401CreateLOStrainDistribution.BeamEnd beamend : beamEnds) {
+                    main(outcon, kasin, beamend, 1, 2, 1);
+                }
+            }
 
-            String[] outerGauge3B = new String[]{"f02/08", "f02/07", "f02/06", "f02/05"};
-            String[] innerGauge3B = new String[]{"f02/04", "f02/03", "f02/02", "f02/01"};
-            double[] gaugeLocations3B = new double[]{3.10 - (0.125 + 0.070) - 0.075, 3.10 - (0.125 + 0.070) - 0.050, 3.10 - (0.125 + 0.070) - 0.025, 3.10 - (0.125 + 0.070) - 0.0};
-
-            main(outcon, EdefenseInfo.D01Q01, "3B", EdefenseInfo.Beam3, outerGauge3B, innerGauge3B,
-                    gaugeLocations3B, 1, 2, 1);
-            main(outcon, EdefenseInfo.D01Q09, "3B", EdefenseInfo.Beam3, outerGauge3B, innerGauge3B,
-                    gaugeLocations3B, 1, 2, 1);
-            main(outcon, EdefenseInfo.D01Q11, "3B", EdefenseInfo.Beam3, outerGauge3B, innerGauge3B,
-                    gaugeLocations3B, 1, 2, 1);
-            main(outcon,
-                    EdefenseInfo.D02Q05, "3B", EdefenseInfo.Beam3, outerGauge3B, innerGauge3B,
-                    gaugeLocations3B, 1, 2, 1);
-
+//            main(outcon, EdefenseInfo.D01Q09, BeamEnd3A, 1,2,1);
+//            main(outcon, EdefenseInfo.D01Q11, BeamEnd3A, 1,2,1);
+//            main(outcon, EdefenseInfo.D02Q05, BeamEnd3A, 1,2,1);
             outcon.close();
         } catch (SQLException ex) {
-            Logger.getLogger(A400CreateLOStrainDistribution.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A401CreateLOStrainDistribution.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
 
-    public static BeamEnd BeamEnd3A = new BeamEnd("3A",3.1,
+    public static BeamEnd BeamEnd3A = new BeamEnd("3A", EdefenseInfo.Beam3, 3.1,
             new StrainGaugeInfo[]{
                 StrainGaugeInfo.GSLO_3_A3_O_1, StrainGaugeInfo.GSLO_3_A3_O_2, StrainGaugeInfo.GSLO_3_A3_O_3, StrainGaugeInfo.GSLO_3_A3_O_4
             },
@@ -122,16 +123,16 @@ public class A400CreateLOStrainDistribution {
             }, new double[]{0.175 + 0.070, 0.175 + 0.070 + 0.025, 0.175 + 0.070 + 0.050, 0.175 + 0.070 + 0.075}
     );
 
-    public static BeamEnd BeamEnd3B = new BeamEnd("3B",-3.1,
+    public static BeamEnd BeamEnd3B = new BeamEnd("3B", EdefenseInfo.Beam3, -3.1,
             new StrainGaugeInfo[]{
-                StrainGaugeInfo.GSLO_3_B3_O_1, StrainGaugeInfo.GSLO_3_B3_O_2, StrainGaugeInfo.GSLO_3_B3_O_3, StrainGaugeInfo.GSLO_3_B3_O_4
+                StrainGaugeInfo.GSLO_3_B3_O_4, StrainGaugeInfo.GSLO_3_B3_O_3, StrainGaugeInfo.GSLO_3_B3_O_2, StrainGaugeInfo.GSLO_3_B3_O_1
             },
             new StrainGaugeInfo[]{
-                StrainGaugeInfo.GSLO_3_B3_I_1, StrainGaugeInfo.GSLO_3_B3_I_2, StrainGaugeInfo.GSLO_3_B3_I_3, StrainGaugeInfo.GSLO_3_B3_I_4
-            }, new double[]{0.125 + 0.070, 0.125 + 0.070 + 0.025, 0.125 + 0.070 + 0.050, 0.125 + 0.070 + 0.075}
+                StrainGaugeInfo.GSLO_3_B3_I_4, StrainGaugeInfo.GSLO_3_B3_I_3, StrainGaugeInfo.GSLO_3_B3_I_2, StrainGaugeInfo.GSLO_3_B3_I_1
+            }, new double[]{3.1 - (0.125 + 0.070 + 0.075), 3.1 - (0.125 + 0.070 + 0.050), 3.1 - (0.125 + 0.070 + 0.025), 3.1 - (0.125 + 0.070 + 0.000)}
     );
 
-    public static BeamEnd BeamEnd4A = new BeamEnd("4A",3.1,
+    public static BeamEnd BeamEnd4A = new BeamEnd("4A", EdefenseInfo.Beam4, 3.1,
             new StrainGaugeInfo[]{
                 StrainGaugeInfo.GSLO_4_A4_O_1, StrainGaugeInfo.GSLO_4_A4_O_2, StrainGaugeInfo.GSLO_4_A4_O_3, StrainGaugeInfo.GSLO_4_A4_O_4
             },
@@ -140,16 +141,16 @@ public class A400CreateLOStrainDistribution {
             }, new double[]{0.175 + 0.070, 0.175 + 0.070 + 0.025, 0.175 + 0.070 + 0.050, 0.175 + 0.07 + 0.075}
     );
 
-    public static BeamEnd BeamEnd4B = new BeamEnd("4B",-3.1,
+    public static BeamEnd BeamEnd4B = new BeamEnd("4B", EdefenseInfo.Beam4, -3.1,
             new StrainGaugeInfo[]{
-                StrainGaugeInfo.GSLO_4_B4_O_1, StrainGaugeInfo.GSLO_4_B4_O_2, StrainGaugeInfo.GSLO_4_B4_O_3, StrainGaugeInfo.GSLO_4_B4_O_4
+                StrainGaugeInfo.GSLO_4_B4_O_4, StrainGaugeInfo.GSLO_4_B4_O_3, StrainGaugeInfo.GSLO_4_B4_O_2, StrainGaugeInfo.GSLO_4_B4_O_1
             },
             new StrainGaugeInfo[]{
-                StrainGaugeInfo.GSLO_4_B4_I_1, StrainGaugeInfo.GSLO_4_B4_I_2, StrainGaugeInfo.GSLO_4_B4_I_3, StrainGaugeInfo.GSLO_4_B4_I_4
-            }, new double[]{0.125 + 0.070, 0.125 + 0.070 + 0.025, 0.125 + 0.070 + 0.050, 0.125 + 0.070 + 0.075}
+                StrainGaugeInfo.GSLO_4_B4_I_4, StrainGaugeInfo.GSLO_4_B4_I_3, StrainGaugeInfo.GSLO_4_B4_I_2, StrainGaugeInfo.GSLO_4_B4_I_1
+            }, new double[]{3.1 - (0.125 + 0.070 + 0.075), 3.1 - (0.125 + 0.070 + 0.050), 3.1 - (0.125 + 0.070 + 0.025), 3.1 - (0.125 + 0.070 + 0.0)}
     );
 
-    public static BeamEnd BeamEndA3 = new BeamEnd("A3",4.0,
+    public static BeamEnd BeamEndA3 = new BeamEnd("A3", EdefenseInfo.BeamA, 4.0,
             new StrainGaugeInfo[]{
                 StrainGaugeInfo.GSLO_A_A3_O_1, StrainGaugeInfo.GSLO_A_A3_O_2, StrainGaugeInfo.GSLO_A_A3_O_3, StrainGaugeInfo.GSLO_A_A3_O_4
             },
@@ -158,16 +159,16 @@ public class A400CreateLOStrainDistribution {
             }, new double[]{0.175 + 0.070, 0.175 + 0.070 + 0.025, 0.175 + 0.070 + 0.050, 0.175 + 0.070 + 0.075}
     );
 
-    public static BeamEnd BeamEndA4 = new BeamEnd("A4",-4.0,
+    public static BeamEnd BeamEndA4 = new BeamEnd("A4", EdefenseInfo.BeamA, -4.0,
             new StrainGaugeInfo[]{
-                StrainGaugeInfo.GSLO_A_A4_O_1, StrainGaugeInfo.GSLO_A_A4_O_2, StrainGaugeInfo.GSLO_A_A4_O_3, StrainGaugeInfo.GSLO_A_A4_O_4
+                StrainGaugeInfo.GSLO_A_A4_O_4, StrainGaugeInfo.GSLO_A_A4_O_3, StrainGaugeInfo.GSLO_A_A4_O_2, StrainGaugeInfo.GSLO_A_A4_O_1
             },
             new StrainGaugeInfo[]{
-                StrainGaugeInfo.GSLO_A_A4_I_1, StrainGaugeInfo.GSLO_A_A4_I_2, StrainGaugeInfo.GSLO_A_A4_I_3, StrainGaugeInfo.GSLO_A_A4_I_4
-            }, new double[]{0.175 + 0.070, 0.175 + 0.070 + 0.025, 0.175 + 0.070 + 0.050, 0.175 + 0.070 + 0.075}
+                StrainGaugeInfo.GSLO_A_A4_I_4, StrainGaugeInfo.GSLO_A_A4_I_3, StrainGaugeInfo.GSLO_A_A4_I_2, StrainGaugeInfo.GSLO_A_A4_I_1
+            }, new double[]{4.0 - (0.175 + 0.070 + 0.075), 4.0 - (0.175 + 0.070 + 0.050), 4.0 - (0.175 + 0.070 + 0.025), 4.0 - (0.175 + 0.070)}
     );
 
-    public static BeamEnd BeamEndB3 = new BeamEnd("B3",4.0,
+    public static BeamEnd BeamEndB3 = new BeamEnd("B3", EdefenseInfo.BeamB, 4.0,
             new StrainGaugeInfo[]{
                 StrainGaugeInfo.GSLO_B_B3_O_1, StrainGaugeInfo.GSLO_B_B3_O_2, StrainGaugeInfo.GSLO_B_B3_O_3, StrainGaugeInfo.GSLO_B_B3_O_4
             },
@@ -176,22 +177,23 @@ public class A400CreateLOStrainDistribution {
             }, new double[]{0.125 + 0.045, 0.125 + 0.045 + 0.025, 0.125 + 0.045 + 0.050, 0.125 + 0.045 + 0.075}
     );
 
-    public static BeamEnd BeamEndB4 = new BeamEnd("B4",-4.0,
+    public static BeamEnd BeamEndB4 = new BeamEnd("B4", EdefenseInfo.BeamB, -4.0,
             new StrainGaugeInfo[]{
-                StrainGaugeInfo.GSLO_B_B4_O_1, StrainGaugeInfo.GSLO_B_B4_O_2, StrainGaugeInfo.GSLO_B_B4_O_3, StrainGaugeInfo.GSLO_B_B4_O_4
+                StrainGaugeInfo.GSLO_B_B4_O_4, StrainGaugeInfo.GSLO_B_B4_O_3, StrainGaugeInfo.GSLO_B_B4_O_2, StrainGaugeInfo.GSLO_B_B4_O_1
             },
             new StrainGaugeInfo[]{
-                StrainGaugeInfo.GSLO_B_B4_I_1, StrainGaugeInfo.GSLO_B_B4_I_2, StrainGaugeInfo.GSLO_B_B4_I_3, StrainGaugeInfo.GSLO_B_B4_I_4
-            }, new double[]{0.125 + 0.045, 0.125 + 0.045 + 0.025, 0.125 + 0.045 + 0.050, 0.125 + 0.045 + 0.075}
+                StrainGaugeInfo.GSLO_B_B4_I_4, StrainGaugeInfo.GSLO_B_B4_I_3, StrainGaugeInfo.GSLO_B_B4_I_2, StrainGaugeInfo.GSLO_B_B4_I_1
+            }, new double[]{4.0 - (0.125 + 0.045 + 0.075), 4.0 - (0.125 + 0.045 + 0.050), 4.0 - (0.125 + 0.045 + 0.025), 4.0 - (0.125 + 0.045)}
     );
 
     public static class BeamEnd {
 
-//        private final int edge;
+//        private final int edge;,EdefenseInfo.BeamB
         private final String name;
-//        private final BeamInfo beam;
+        private final BeamInfo beam;
         private final StrainGaugeInfo[] inner, outer;
         private final double[] locations;
+        private final double length;
 
         /**
          *
@@ -201,14 +203,15 @@ public class A400CreateLOStrainDistribution {
          * @param gaugeLocations 梁端からの距離（柱心からの距離）
          * @parma beamlength 梁の全長および方向。　柱心間の距離。　また、0端側は正値、1端側は負値とする。
          */
-        public BeamEnd(String name, double beamlength, StrainGaugeInfo[] outer,
+        public BeamEnd(String name, BeamInfo beam, double beamlength, StrainGaugeInfo[] outer,
                 StrainGaugeInfo[] inner, double[] gaugeLocations) {
 //            this.edge = edge;
             this.name = name;
-//            this.beam = beam;
+            this.beam = beam;
             this.inner = inner;
             this.outer = outer;
             this.locations = gaugeLocations;
+            this.length = beamlength;
         }
 
         public StrainGaugeInfo[] getInnerGauges() {
@@ -221,8 +224,8 @@ public class A400CreateLOStrainDistribution {
 
     }
 
-    public static void main(Connection con, EdefenseKasinInfo kasin, String edgeName, BeamInfo beam,
-            String[] outerGauges, String[] innerGauges, double[] LOlocations, int LASection1, int LASection2, int LASectionFindMax) {
+    public static void main(Connection con, EdefenseKasinInfo kasin, BeamEnd beamEnd, int LASection1, int LASection2, int LASectionFindMax) {
+        logger.log(Level.INFO, "beamEnd =" + beamEnd.name + " " + kasin.getName());
         Color[] co = new Color[]{
             new Color(1f, 0, 0),
             new Color(0, 0.6f, 0),
@@ -239,7 +242,7 @@ public class A400CreateLOStrainDistribution {
             re.setDefaultPaint(Color.BLACK);
 
             //      EdefenseKasinInfo kasin = EdefenseInfo.D01Q01;
-            XYSeries[] ss = createXYSeries(con, edgeName, kasin, beam, outerGauges, innerGauges, LOlocations, LASection1, LASection2, LASectionFindMax); // random
+            XYSeries[] ss = createXYSeries(con, beamEnd, kasin, LASection1, LASection2, LASectionFindMax); // random
             XYSeriesCollection c = new XYSeriesCollection();
             //svg(ss,kasin);
 
@@ -260,13 +263,27 @@ public class A400CreateLOStrainDistribution {
             JFreeChart chart = new JunXYChartCreator2().setDataset(c)
                     .setRenderer(re)
                     .create();
-            NumberAxis ra = (NumberAxis) chart.getXYPlot().getRangeAxis();
+            XYPlot plot = chart.getXYPlot();
+            NumberAxis ra = (NumberAxis) plot.getRangeAxis();
             ra.setAutoRangeIncludesZero(false);
             ra.setInverted(true);
             ra.setLabel("Strain [με] (tension)");
-            NumberAxis da = (NumberAxis) chart.getXYPlot().getDomainAxis();
+            NumberAxis da = (NumberAxis) plot.getDomainAxis();
             da.setLabel("");
             da.setAutoRangeIncludesZero(false);
+            double flangeEdgeLocation;
+            if (beamEnd.name.endsWith("B")) {
+                flangeEdgeLocation = -beamEnd.length - 0.125 - 0.025;
+            } else if (beamEnd.name.equals("3A")) {
+                flangeEdgeLocation = 0.125;
+            } else if (beamEnd.name.equals("3B")) {
+                flangeEdgeLocation = -beamEnd.length - 0.125;
+            } else {
+                flangeEdgeLocation = 0.175 + 0.025;
+            }
+
+            ValueMarker marker = new ValueMarker(flangeEdgeLocation); // フランジ端部。ダイアフラムあるいは柱フェイスとの溶接位置
+            plot.addDomainMarker(marker);
 
             if (svgdir == null) {
                 JunChartUtil.show(new Object() {
@@ -274,21 +291,49 @@ public class A400CreateLOStrainDistribution {
 
             } else {
                 try {
-                    Path svgfile = svgdir.resolve(kasin.getName() + "_" + edgeName + ".svg");
+                    Path svgdir2 = svgdir.resolve(beamEnd.name);
+                    if (!Files.exists(svgdir2)) {
+                        Files.createDirectory(svgdir2);
+                    }
+
+                    Path svgfile = svgdir2.resolve(kasin.getName() + "_" + beamEnd.name + ".svg");
                     JunChartUtil.svg(svgfile, 300, 200, chart);
                 } catch (IOException ex) {
-                    Logger.getLogger(A400CreateLOStrainDistribution.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(A401CreateLOStrainDistribution.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(A400CreateLOStrainDistribution.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A401CreateLOStrainDistribution.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public static XYSeries[] createXYSeries(Connection outcon, String edgeName, EdefenseKasinInfo kasin, BeamInfo beam, String[] outers, String[] inners, double[] LOlocations, int LASection1, int LASection2, int LASectionFindMax) throws SQLException {
+    /**
+     *
+     * @param outcon
+     * @param edgeName
+     * @param kasin
+     * @param beam
+     * @param outers
+     * @param inners
+     * @param LOlocations 梁端（柱心）からの距離が入ったものが入ってくる。　ただし、現状のプログラムは、梁の
+     * 0端（柱心）からの距離を前提としている。表示だけならばまあ大きな問題はないが。。。
+     * @param LASection1
+     * @param LASection2
+     * @param kasin
+     * @param beam
+     * @param outers
+     * @param inners
+     * @param LASectionFindMax
+     * @return
+     * @throws SQLException
+     */
+    public static XYSeries[] createXYSeries(Connection outcon, BeamEnd beamEnd, EdefenseKasinInfo kasin, int LASection1, int LASection2, int LASectionFindMax) throws SQLException {
 //        BeamInfo beam = EdefenseInfo.Beam3;
+        //String edgeName=beamEnd.
+//         BeamInfo beam, StrainGaugeInfo[] outers, StrainGaugeInfo[] inners, double[] LOlocations,
+        BeamInfo beam = beamEnd.beam;
 
         BeamSectionInfo maxFindSecetion = beam.getBeamSections()[LASectionFindMax];
         BeamSectionInfo beamSection2 = beam.getBeamSections()[LASection1];
@@ -296,7 +341,7 @@ public class A400CreateLOStrainDistribution {
 
         Statement st = outcon.createStatement();
 
-        st.executeUpdate("delete from \"" + outputTableName + "\" where TESTNAME='" + kasin.getTestName() + "' and EDGENAME='" + edgeName + "'");
+        st.executeUpdate("delete from \"" + outputTableName + "\" where TESTNAME='" + kasin.getTestName() + "' and EDGENAME='" + beamEnd.name + "'");
 
         String freqPeak;
         Complex momentSection2, axialSection2;
@@ -306,7 +351,7 @@ public class A400CreateLOStrainDistribution {
 
         // この加振、この方向のピーク振動数と変位（実際は加速度）を取得する。A300から取得している。（A100でも同じとは思うが。）
         // section2 と section3 の最大変異時刻時値を取得
-        ResultSet rs = st.executeQuery("select \"AxialA[N*s]\",\"AxialP[rad]\", \"MomentXA[Nm*s]\",\"MomentXP[rad]\" ,\"Freq[Hz]\",\"StoryDriftA[gal*s]\", \"StoryDriftP[rad]\" from \"A300SectionNM\" where SECTION='" + beamSection2.getName() + "' "
+        ResultSet rs = st.executeQuery("select \"AxialA[N*s]\",\"AxialP[rad]\", \"MomentXA[Nm*s]\",\"MomentXP[rad]\" ,\"Freq[Hz]\",\"StoryDriftA[gal*s]\", \"StoryDriftP[rad]\" from \"" + A300SectionNM + "\" where SECTION='" + beamSection2.getName() + "' "
                 + " and TESTNAME='" + kasin.getTestName() + "'");
         rs.next();
 
@@ -315,7 +360,7 @@ public class A400CreateLOStrainDistribution {
         freqPeak = rs.getString(5);
         Complex storyDrift = ComplexUtils.polar2Complex(rs.getDouble(6), rs.getDouble(7));
 
-        rs = st.executeQuery("select \"AxialA[N*s]\",\"AxialP[rad]\", \"MomentXA[Nm*s]\",\"MomentXP[rad]\"  from \"A300SectionNM\" where SECTION='" + beamSection3.getName() + "' "
+        rs = st.executeQuery("select \"AxialA[N*s]\",\"AxialP[rad]\", \"MomentXA[Nm*s]\",\"MomentXP[rad]\"  from \"" + A300SectionNM + "\" where SECTION='" + beamSection3.getName() + "' "
                 + " and TESTNAME='" + kasin.getTestName() + "'");
 
         rs.next();
@@ -338,8 +383,8 @@ public class A400CreateLOStrainDistribution {
 //            double axialLO1 = axialSection2 - axialSlope * (locationSection2 - locationSectionLO1);
 //            double bendingStrainL01 = 1e9 * momentLO1 / (beamSection2.getE() * beamSection2.getZx()); // [kNm]/[N/m2]/[m3] =kε → ×1e9 = με
 //            double axialStrainLO1 = 1e9 * axialLO1 / (beamSection2.getE() * beamSection2.getA()); // [kN]/[N/m2]/[m] =kε → ×1e9 = με
-        // z=0での値計算
-        double z0 = LOlocations[0] - 0.010;
+        // z=0での値計算（推定値を計算するはじめの位置）
+        double z0 = beamEnd.locations[0] - 0.010;
         Complex momentAtZ0 = momentSection2.subtract(shearForce.multiply(locationSection2 - z0)); // Nm*s 
         Complex axialAtZ0 = axialSection2.subtract(axialSlope.multiply(locationSection2 - z0)); // N*s
         Complex strainInnerAtZ0 = momentAtZ0.divide(beamSection2.getE() * beamSection2.getInnerZx()).multiply(1e6); // [Nm*s]/[N/m2]/[m3] =ε*s → ×1e6 = με*s
@@ -347,7 +392,7 @@ public class A400CreateLOStrainDistribution {
         Complex axialStrainAtZ0 = axialAtZ0.divide(beamSection2.getE() * beamSection2.getA()).multiply(1e6); // [N*s]/[N/m2]/[m] =ε*s → ×1e6 = με*s
 
         // z=での値計算
-        double z1 = LOlocations[3] + 0.010;
+        double z1 = beamEnd.locations[3] + 0.010;
         Complex momentAtZ1 = momentSection2.subtract(shearForce.multiply(locationSection2 - z1));
         Complex axialAtZ1 = axialSection2.subtract(axialSlope.multiply(locationSection2 - z1));
         Complex strainInnerAtZ1 = momentAtZ1.divide(beamSection2.getE() * beamSection2.getInnerZx()).multiply(1e6); // [Nm*s]/[N/m2]/[m3] =ε*s → ×1e6 = με*s
@@ -363,25 +408,26 @@ public class A400CreateLOStrainDistribution {
         Complex totalOuterStiffnessZ0 = totalOuterStrainZ0.divide(storyDrift);
         Complex totalOuterStiffnessZ1 = totalOuterStrainZ1.divide(storyDrift);
 
-        estimateInner.add((z0 - 0.2) * 1000, totalInnerStiffnessZ0.getReal()); // 曲げモーメントは下側引張が正なので、下側フランジが引っ張りならば正の値がでる。
-        estimateInner.add((z1 - 0.2) * 1000, totalInnerStiffnessZ1.getReal()); // 位置は 175mm+25mm を引いて、ダイアフラムエッジからの距離にしている。
+        estimateInner.add((z0) * 1000, totalInnerStiffnessZ0.getReal()); // 曲げモーメントは下側引張が正なので、下側フランジが引っ張りならば正の値がでる。
+        estimateInner.add((z1) * 1000, totalInnerStiffnessZ1.getReal()); // 位置は柱心からのまま
 
-        estimateOuter.add((z0 - 0.2) * 1000, totalOuterStiffnessZ0.getReal()); // 曲げモーメントは下側引張が正なので、下側フランジが引っ張りならば正の値がでる。
-        estimateOuter.add((z1 - 0.2) * 1000, totalOuterStiffnessZ1.getReal()); // 位置は 175mm+25mm を引いて、ダイアフラムエッジからの距離にしている。
-
+        estimateOuter.add((z0) * 1000, totalOuterStiffnessZ0.getReal()); // 曲げモーメントは下側引張が正なので、下側フランジが引っ張りならば正の値がでる。
+        estimateOuter.add((z1) * 1000, totalOuterStiffnessZ1.getReal()); // 位置は柱心からのまま
         // GS-LO-3A3-O-1〜4 b03/04〜08
 //        String gaugeNames[] = {"b03/05", "b03/06", "b03/07", "b03/08"};
         XYSeries outer = new XYSeries(kasin.getTestName() + "O");
 
         Complex outerStrain[] = new Complex[4];
         Complex innerStrain[] = new Complex[4];
+        Complex innerStiffness[] = new Complex[4];
+        Complex outerStiffness[] = new Complex[4];
 
         String inputDburl = "jdbc:h2:file:/" + inputDatabaseDir.resolve(kasin.getTestName() + "q");
         Connection incon = DriverManager.getConnection(inputDburl, "junapp", "");
         Statement inst = incon.createStatement();
 
-        for (int i = outers.length - 1; i >= 0; i--) {
-            String gaugeName = outers[i];
+        for (int i = beamEnd.outer.length - 1; i >= 0; i--) { // これなんで外側から書いてる？わざわざ逆にする意味がわからない。。。2023/07/14
+            String gaugeName = beamEnd.outer[i].getShortName();
 
             String sql = "select \"Amp[με*s]\",\"Phase[rad]\" from \"" + fourierSchema + "\".\"" + gaugeName + "\" where \"Freq[Hz]\"=" + freqPeak;
 
@@ -392,16 +438,17 @@ public class A400CreateLOStrainDistribution {
 
             Complex localStiffness = strain.divide(storyDrift);
 
-            outer.add(1000 * (LOlocations[i] - 0.2), -localStiffness.getReal()/*strain.getReal()*/); // マイナスにして引張を正としている。 位置は 175+25mm=200mm引いて、 mm 表示としている。
+            outer.add(1000 * (beamEnd.locations[i]), -localStiffness.getReal()/*strain.getReal()*/); // マイナスにして引張を正としている。 位置は 柱心からの距離のまま、 mm 表示としている。
 
+            outerStiffness[i] = localStiffness;
         }
 
         // GS-LO-3A3-O-1〜4 b03/04〜08
 //        gaugeName = new String[]{"b03/01", "b03/02", "b03/03", "b03/04"};
         XYSeries inner = new XYSeries(kasin.getTestName() + "I");
 
-        for (int i = inners.length - 1; i >= 0; i--) {
-            String gaugeName = inners[i];
+        for (int i = beamEnd.inner.length - 1; i >= 0; i--) {
+            String gaugeName = beamEnd.inner[i].getShortName();
 
             String sql = "select \"Amp[με*s]\",\"Phase[rad]\" from \"" + fourierSchema + "\".\"" + gaugeName + "\" where \"Freq[Hz]\"=" + freqPeak;
 
@@ -412,12 +459,21 @@ public class A400CreateLOStrainDistribution {
 
             Complex localStiffness = strain.divide(storyDrift);
 
-            inner.add(1000 * (LOlocations[i] - 0.2), -localStiffness.getReal()/*strain.getReal()*/); // マイナスにして引張を正としている。 位置は 175+25mm=200mm引いて、 mm 表示としている。
+            inner.add(1000 * (beamEnd.locations[i]), -localStiffness.getReal()/*strain.getReal()*/); // マイナスにして引張を正としている。 位置は柱心からのまま、、 mm 表示としている。
 
+            innerStiffness[i] = localStiffness;
         }
         st.executeUpdate("insert into \"" + outputTableName + "\" values ("
-                + "'" + kasin.getTestName() + "','" + kasin.getWaveName() + "','" + edgeName + "'," + freqPeak + ","
+                + "'" + kasin.getTestName() + "','" + kasin.getWaveName() + "','" + beamEnd.name + "'," + freqPeak + ","
                 + storyDrift.abs() + "," + storyDrift.getArgument() + ","
+                + outerStiffness[0].getReal() + "," + outerStiffness[0].getImaginary() + ","
+                + outerStiffness[1].getReal() + "," + outerStiffness[1].getImaginary() + ","
+                + outerStiffness[2].getReal() + "," + outerStiffness[2].getImaginary() + ","
+                + outerStiffness[3].getReal() + "," + outerStiffness[3].getImaginary() + ","
+                + innerStiffness[0].getReal() + "," + innerStiffness[0].getImaginary() + ","
+                + innerStiffness[1].getReal() + "," + innerStiffness[1].getImaginary() + ","
+                + innerStiffness[2].getReal() + "," + innerStiffness[2].getImaginary() + ","
+                + innerStiffness[3].getReal() + "," + innerStiffness[3].getImaginary() + ","
                 + momentSection2.abs() + "," + momentSection2.getArgument() + ","
                 + momentSection3.abs() + "," + momentSection3.getArgument() + ","
                 + shearForce.abs() + "," + shearForce.getArgument() + ","
@@ -437,10 +493,10 @@ public class A400CreateLOStrainDistribution {
                 + innerStrain[1].abs() + "," + innerStrain[1].getArgument() + ","
                 + innerStrain[2].abs() + "," + innerStrain[2].getArgument() + ","
                 + innerStrain[3].abs() + "," + innerStrain[3].getArgument() + ","
-                + LOlocations[0] + ","
-                + LOlocations[1] + ","
-                + LOlocations[2] + ","
-                + LOlocations[3] + ")"
+                + beamEnd.locations[0] + ","
+                + beamEnd.locations[1] + ","
+                + beamEnd.locations[2] + ","
+                + beamEnd.locations[3] + ")"
         );
 
         st.close();

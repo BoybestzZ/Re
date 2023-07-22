@@ -12,10 +12,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * @deprecated  T281 を使うこと。T280に加え、
+ * T280 → T281 : T270から最大時刻のものを取り出す。T280よりも多くの情報が出力される。
  * @author jun
+ * 
  */
-public class T280MaxFlangeLateralMoment {
+public class T281MaxFlangeLateralMoment {
 
     public static void main(String[] args) {
         try {
@@ -23,10 +24,13 @@ public class T280MaxFlangeLateralMoment {
             Connection con = DriverManager.getConnection(dburl, "junapp", "");
             Statement st = con.createStatement();
 
-            st.executeUpdate("drop table if exists \"T280MaxFlangeLateralMoment\"");
-            st.executeUpdate("create table \"T280MaxFlangeLateralMoment\" "
-                    + "(SECTION varchar, TESTNAME varchar, ALTNAME varchar, \"TimePerTest[s]\" real,\"DIRECTION\" varchar,\"LowerAxialStrainPerTest[με]\" real"
-                    + ",\"LowerBendingStrainPerTest[με]\" real)"
+            st.executeUpdate("drop table if exists \"T281MaxFlangeLateralMoment\"");
+            st.executeUpdate("create table \"T281MaxFlangeLateralMoment\" "
+                    + "(SECTION varchar, \"Location[m]\" real, DIRECTION varchar, ALTNAME varchar, "
+                    + "TESTNAME varchar,\"TimePerTest[s]\" real,\"TotalTime[s]\" real,\"TMRTime[s]\" real,"
+                    + "\"UpperAxialStrain[με]\" real,\"LowerAxialStrain[με]\" real,\"UpperBendingStrain[με]\" real,\"LowerBendingStrain[με]\" real,"
+                    + "\"UpperAxialStrainPerTest[με]\" real,\"LowerAxialStrainPerTest[με]\" real,\"UpperBendingStrainPerTest[με]\" real,"
+                    + "\"LowerBendingStrainPerTest[με]\" real,\"UpperBendingRatioPerTest\" real,\"LowerBendingRatioPerTest\" real ) "
                     + "");
 
             String sections[] = {
@@ -37,15 +41,15 @@ public class T280MaxFlangeLateralMoment {
             };
 
             for (String s : sections) {
-                st.executeUpdate("insert into \"T280MaxFlangeLateralMoment\" SELECT SECTIONNAME, m.TESTNAME, ALTNAME, "
-                        + "m.\"TimePerTest[s]\", \"DIRECTION\",\"LowerAxialStrainPerTest[με]\", "
-                        + "\"LowerBendingStrainPerTest[με]\" FROM \"T122BeamNMDistribution\" n join "
+                st.executeUpdate("insert into \"T281MaxFlangeLateralMoment\" "
+                        + "SELECT SECTIONNAME,\"LOCATION[m]\", DIRECTION, ALTNAME, m.* "
+                        + "FROM \"T122BeamNMDistribution\" n join "
                         + "\"T270TimeHistoryLAM\"." + s + " m where SECTIONNAME='" + s + "' and "
                         + "n.TESTNAME=m.TESTNAME and n.\"TimePerTest[s]\"=m.\"TimePerTest[s]\"");
             }
             con.close();
         } catch (SQLException ex) {
-            Logger.getLogger(T280MaxFlangeLateralMoment.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(T281MaxFlangeLateralMoment.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }

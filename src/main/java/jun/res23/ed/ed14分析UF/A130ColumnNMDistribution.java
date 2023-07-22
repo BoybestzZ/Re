@@ -55,6 +55,7 @@ public class A130ColumnNMDistribution {
                 main(EdefenseInfo.D01Q01.toString(), column, "ns");
                 main(EdefenseInfo.D01Q01.toString(), column, "ew");
             }
+            if (false) {
             {
                 ColumnInfo column = EdefenseInfo.Column2FB3;
                 main(EdefenseInfo.D01Q01.toString(), column, "ns");
@@ -91,7 +92,7 @@ public class A130ColumnNMDistribution {
                 main(EdefenseInfo.D01Q01.toString(), column, "ns");
                 main(EdefenseInfo.D01Q01.toString(), column, "ew");
             }
-
+            }
 //            main(EdefenseInfo.D01Q02.toString(), EdefenseInfo.Beam3); // kumamoto
 //            main(EdefenseInfo.D01Q03.toString(), EdefenseInfo.Beam3); // tohoku
 //            main(EdefenseInfo.D01Q04.toString(), EdefenseInfo.Beam3); // Kobe 25%

@@ -74,7 +74,11 @@ public class A310SectionNM {
                     Complex storyDriftEW = storyDrift[1];
                     for (BeamSectionInfo section : EdefenseInfo.beamSectionsNS) {
 //                        logger.log(Level.INFO, section.getName());
-                        Complex[] nm = getBeamNM(testname, freqNS, fourierTable, section);
+//                        Complex[] nm = getBeamNM(testname, freqNS, fourierTable, section);
+
+                        Complex strains[] = getBeamStrains(testname, freqNS, fourierTable/* "R152FourierS"*/, section);
+                        Complex[] nm = convertBeamStrainsToNM(strains, section.getE(), section.getA(), section.getInnerZx(), section.getZy());
+
                         double omega2 = 4 * Math.PI * Math.PI * freqNS * freqNS;
                         Complex stiffnessAxial = nm[0].divide(storyDriftNS).multiply(omega2 * 100); // [N/(cm/s2)  * (100/s2) = N/m]
                         Complex stiffnessMomentX = nm[1].divide(storyDriftNS).multiply(omega2 * 100); //[Nm/(cm/s2) * (100/s2) = [Nm/m]
@@ -88,7 +92,11 @@ public class A310SectionNM {
                                 + "\"StoryDriftA[gal*s]\",\"StoryDriftP[rad]\","
                                 + "\"StiffnessAxialA[N/m]\", \"StiffnessAxialP[rad]\", "
                                 + "\"StiffnessMomentXA[Nm/m]\", \"StiffnessMomentXP[rad]\", "
-                                + "\"StiffnessMomentYA[Nm/m]\", \"StiffnessMomentYP[rad]\" "
+                                + "\"StiffnessMomentYA[Nm/m]\", \"StiffnessMomentYP[rad]\", "
+                                + "\"Strain1A[με*s]\" , \"Strain1P[rad]\" ,"
+                                + "\"Strain2A[με*s]\" , \"Strain2P[rad]\" ,"
+                                + "\"Strain3A[με*s]\" , \"Strain3P[rad]\" ,"
+                                + "\"Strain4A[με*s]\" , \"Strain4P[rad]\" "
                                 + ") values ('" + testname + "'," + freqNS + ",'" + section.getName() + "'"
                                 + "," + nm[0].abs() + "," + nm[0].getArgument()
                                 + "," + nm[1].abs() + "," + nm[1].getArgument()
@@ -97,12 +105,19 @@ public class A310SectionNM {
                                 + "," + storyDriftNS.abs() + "," + storyDriftNS.getArgument() + ","
                                 + stiffnessAxial.abs() + "," + stiffnessAxial.getArgument() + ","
                                 + stiffnessMomentX.abs() + "," + stiffnessMomentX.getArgument() + ","
-                                + stiffnessMomentY.abs() + "," + stiffnessMomentY.getArgument()
+                                + stiffnessMomentY.abs() + "," + stiffnessMomentY.getArgument() + ","
+                                + strains[0].abs() + "," + strains[0].getArgument() + ","
+                                + strains[1].abs() + "," + strains[1].getArgument() + ","
+                                + strains[2].abs() + "," + strains[2].getArgument() + ","
+                                + strains[3].abs() + "," + strains[3].getArgument()
                                 + ")");
                     }
                     for (BeamSectionInfo section : EdefenseInfo.beamSectionsEW) {
 //                        logger.log(Level.INFO, section.getName());
-                        Complex[] nm = getBeamNM(testname, freqEW, fourierTable/* "R152FourierS"*/, section);
+
+                        Complex strains[] = getBeamStrains(testname, freqEW, fourierTable/* "R152FourierS"*/, section);
+                        Complex[] nm = convertBeamStrainsToNM(strains, section.getE(), section.getA(), section.getInnerZx(), section.getZy());
+
                         double omega2 = 4 * Math.PI * Math.PI * freqEW * freqEW;
                         Complex stiffnessAxial = nm[0].divide(storyDriftEW).multiply(omega2 * 100); // [N/(cm/s2)  * (100/s2) = N/m]
                         Complex stiffnessMomentX = nm[1].divide(storyDriftEW).multiply(omega2 * 100); // [Nm/(cm/s2)  * (100/s2) = Nm/m]
@@ -116,7 +131,11 @@ public class A310SectionNM {
                                 + "\"StoryDriftA[gal*s]\",\"StoryDriftP[rad]\","
                                 + "\"StiffnessAxialA[N/m]\", \"StiffnessAxialP[rad]\", "
                                 + "\"StiffnessMomentXA[Nm/m]\", \"StiffnessMomentXP[rad]\", "
-                                + "\"StiffnessMomentYA[Nm/m]\", \"StiffnessMomentYP[rad]\" "
+                                + "\"StiffnessMomentYA[Nm/m]\", \"StiffnessMomentYP[rad]\", "
+                                + "\"Strain1A[με*s]\" , \"Strain1P[rad]\" ,"
+                                + "\"Strain2A[με*s]\" , \"Strain2P[rad]\" ,"
+                                + "\"Strain3A[με*s]\" , \"Strain3P[rad]\" ,"
+                                + "\"Strain4A[με*s]\" , \"Strain4P[rad]\" "
                                 + ") values ('" + testname + "'," + freqEW + ",'" + section.getName() + "'"
                                 + "," + nm[0].abs() + "," + nm[0].getArgument()
                                 + "," + nm[1].abs() + "," + nm[1].getArgument()
@@ -125,7 +144,11 @@ public class A310SectionNM {
                                 + "," + storyDriftEW.abs() + "," + storyDriftEW.getArgument() + ","
                                 + stiffnessAxial.abs() + "," + stiffnessAxial.getArgument() + ","
                                 + stiffnessMomentX.abs() + "," + stiffnessMomentX.getArgument() + ","
-                                + stiffnessMomentY.abs() + "," + stiffnessMomentY.getArgument()
+                                + stiffnessMomentY.abs() + "," + stiffnessMomentY.getArgument() + ","
+                                + strains[0].abs() + "," + strains[0].getArgument() + ","
+                                + strains[1].abs() + "," + strains[1].getArgument() + ","
+                                + strains[2].abs() + "," + strains[2].getArgument() + ","
+                                + strains[3].abs() + "," + strains[3].getArgument()
                                 + ")");
                     }
 
@@ -133,7 +156,6 @@ public class A310SectionNM {
                         //                        logger.log(Level.INFO, section.getName());
                         {
                             Complex strains[] = getColumnStrainsEW(testname, freqEW, fourierTable/* "R152FourierS"*/, section);
-
                             Complex[] nm = convertColumnStrainsToNM(strains, section.getE(), section.getA(), section.getZew(), section.getZns());
                             double omega2 = 4 * Math.PI * Math.PI * freqEW * freqEW;
                             Complex stiffnessAxial = nm[0].divide(storyDriftEW).multiply(omega2 * 100); // [N/(cm/s2)  * (100/s2) = N/m]
@@ -185,7 +207,7 @@ public class A310SectionNM {
                                     + "\"StiffnessAxialA[N/m]\", \"StiffnessAxialP[rad]\", "
                                     + "\"StiffnessMomentXA[Nm/m]\", \"StiffnessMomentXP[rad]\", "
                                     + "\"StiffnessMomentYA[Nm/m]\", \"StiffnessMomentYP[rad]\", "
-                                     + "\"Strain1A[με*s]\" , \"Strain1P[rad]\" ,"
+                                    + "\"Strain1A[με*s]\" , \"Strain1P[rad]\" ,"
                                     + "\"Strain2A[με*s]\" , \"Strain2P[rad]\" ,"
                                     + "\"Strain3A[με*s]\" , \"Strain3P[rad]\" ,"
                                     + "\"Strain4A[με*s]\" , \"Strain4P[rad]\" "
@@ -282,12 +304,11 @@ public class A310SectionNM {
 
     }
 
-    public static Complex[] getBeamNM(String testname, double freq, String schema, BeamSectionInfo section) throws SQLException {
-        String dburl = "jdbc:h2:tcp://localhost/" + databaseDir.resolve(testname + "q");
-        Connection con = DriverManager.getConnection(dburl, "junapp", "");
-        return CalculateBeamNM(con, schema, freq, section.getULname(), section.getURname(), section.getLLname(), section.getLRname(), section.getE(), section.getA(), section.getInnerZx(), section.getZy());
-    }
-
+//    public static Complex[] getBeamNM(String testname, double freq, String schema, BeamSectionInfo section) throws SQLException {
+//        String dburl = "jdbc:h2:tcp://localhost/" + databaseDir.resolve(testname + "q");
+//        Connection con = DriverManager.getConnection(dburl, "junapp", "");
+//        return CalculateBeamNM(con, schema, freq, section.getULname(), section.getURname(), section.getLLname(), section.getLRname(), section.getE(), section.getA(), section.getInnerZx(), section.getZy());
+//    }
     // Nが上、Sが下、Wが左、Eが右
     public static Complex[] getColumnStrainsNS(String testname, double freq, String schema, ColumnSectionInfo section) throws SQLException {
         String dburl = "jdbc:h2:tcp://localhost/" + databaseDir.resolve(testname + "q");
@@ -348,12 +369,17 @@ public class A310SectionNM {
      * @param BL
      * @param BR
      * @param Zx Ix をゲージ距離の半分で除した値。
+     * @return TL, TR, BL, BR の順でひずみが入っている。
      * @throws SQLException
      */
-    private static Complex[] CalculateBeamNM(Connection con, String schema, double freq, String TL, String TR, String BL, String BR, double E, double A, double Zx, double Zy) throws SQLException {
+    private static Complex[] getBeamStrains(String testname, double freq, String schema, BeamSectionInfo section) throws SQLException {
+        //(String schema, double freq, String TL, String TR, String BL, String BR, double E, double A, double Zx, double Zy) throws SQLException {
+        String dburl = "jdbc:h2:tcp://localhost/" + databaseDir.resolve(testname + "q");
+        Connection con = DriverManager.getConnection(dburl, "junapp", "");
+
         Statement st = con.createStatement();
 
-        String[] tables = {TL, TR, BL, BR};
+        String[] tables = {section.getULname()/*TL*/, section.getURname()/*TR*/, section.getLLname()/*BL*/, section.getLRname()/*BR*/};
         Complex[] c = new Complex[4];
         for (int i = 0; i < c.length; i++) {
             ResultSet rs = st.executeQuery("select \"Amp[με*s]\" , \"Phase[rad]\" from \"" + schema + "\".\"" + tables[i] + "\" where \"Freq[Hz]\"=" + freq);
@@ -364,6 +390,19 @@ public class A310SectionNM {
         }
         st.close();
         // ひずみは圧縮が正として出力されている。
+        return c;
+    }
+
+    /**
+     *
+     * @param c
+     * @param E
+     * @param A
+     * @param Zx
+     * @param Zy
+     * @return axialForce, bendingMomentX, bendingMomentY
+     */
+    private static Complex[] convertBeamStrainsToNM(Complex[] c, double E, double A, double Zx, double Zy) {
         Complex axialStrain = (c[0].add(c[1]).add(c[2]).add(c[3])).multiply(-0.25); // 引張が正となる (ように 0.25に-を付している）
         Complex momentxStrain = (c[0].add(c[1]).subtract(c[2]).subtract(c[3])).multiply(0.25); // 上から下を引いている。上側圧縮（つまり下側引張）が正となる。
         Complex momentyStrain = (c[0].subtract(c[1]).add(c[2]).subtract(c[3])).multiply(0.25);// 上から下を引いている。上側圧縮（つまり下側引張）が正となる。
