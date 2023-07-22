@@ -44,7 +44,7 @@ import org.jfree.data.xy.XYSeries;
  *
  * @author 75496
  */
-public class A400StoryDriftRatioLA3 {
+public class A400StoryDriftRatioLA31 {
     
 
     public static void main(String[] args) throws IOException {
@@ -114,24 +114,6 @@ public class A400StoryDriftRatioLA3 {
             JFreeChart chart = ChartFactory.createXYLineChart("SDRatioLA3", "Testname", "Ratio",
                     dataset, PlotOrientation.VERTICAL, true, true, false);
 
-            // Customize the chart
-            XYPlot plot = chart.getXYPlot();
-            plot.setBackgroundPaint(Color.WHITE);
-            plot.setRangeGridlinePaint(Color.BLACK);
-            plot.setDomainGridlinesVisible(true);
-            plot.setDomainGridlinePaint(Color.BLACK);
-            NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
-            domainAxis.setTickLabelFont(domainAxis.getTickLabelFont().deriveFont((int) 12f));
-            domainAxis.setVerticalTickLabels(true);
-            domainAxis.setLowerBound(0.1);
-            domainAxis.setUpperBound(24.9);
-
-//            double lowerBound = 0.1; // Set the lower bound for the x-axis
-//            double upperBound = kasins.length + 0.9; // Set the upper bound for the x-axis
-//
-//            domainAxis.setLowerBound(lowerBound);
-//            domainAxis.setUpperBound(upperBound);
-            
             // Prepare the mapping of test names to labels dynamically
             String[] testNames = new String[kasins.length];
             double[] testValues = new double[kasins.length];
@@ -145,15 +127,21 @@ public class A400StoryDriftRatioLA3 {
             ChoiceFormat formatter = new ChoiceFormat(testValues, testNames);
 
 
-//            NumberFormat formatter=new ChoiceFormat(
-//                    new double[] {1.0,2.0,3.0}, 
-//                        new String[]{"D01Q01random", "D02Q02kumamoto","D03Q03tohoku"});
 
+            // Customize the chart
+            XYPlot plot = chart.getXYPlot();
+            plot.setBackgroundPaint(Color.WHITE);
+            plot.setRangeGridlinePaint(Color.BLACK);
+            plot.setDomainGridlinesVisible(true);
+            plot.setDomainGridlinePaint(Color.BLACK);
+            NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
+            domainAxis.setTickLabelFont(domainAxis.getTickLabelFont().deriveFont((int) 12f));
+            domainAxis.setVerticalTickLabels(true);
+            domainAxis.setLowerBound(0.5);
 
+            // Set the formatter for the domain axis
             domainAxis.setNumberFormatOverride(formatter);
-            
-            
-            
+
             NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
             rangeAxis.setRange(0.5, 1.5); // Set the y-axis range
             rangeAxis.setStandardTickUnits(NumberAxis.createStandardTickUnits());
@@ -162,27 +150,22 @@ public class A400StoryDriftRatioLA3 {
             renderer.setSeriesPaint(0, Color.RED);
             plot.setRenderer(renderer);
 
-            // Export the chart as PNG
+            // Export the chart as SVG
             int width = 500;
             int height = 250;
-//            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf_C2FA3ew.png";
-//            File chartFile = new File(filePath);
-//            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
+            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf_C2FA3ew.svg";
+            JunChartUtil.svg(filePath, width, height, chart);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf_C2FA3ew.svg";
-              JunChartUtil.svg(filePath, width, height, chart);
-
-
-//            // Display the chart in a frame
+            // Display the chart in a frame
             ChartFrame frame = new ChartFrame("Story Drift Ratio", chart);
-            frame.setPreferredSize(new Dimension(1200, 800));
+            frame.setPreferredSize(new Dimension(1200, 800));       
             frame.pack();
             frame.setVisible(true);
 
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A400StoryDriftRatioLA3.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A400StoryDriftRatioLA31.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
