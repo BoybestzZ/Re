@@ -47,59 +47,33 @@ public class A110BeamNMDistribution {
 
     public static void main(String[] args) {
         try {
-            main(EdefenseInfo.D01Q01.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D01Q02.toString(), EdefenseInfo.Beam3); // kumamoto
-            main(EdefenseInfo.D01Q03.toString(), EdefenseInfo.Beam3); // tohoku
-            main(EdefenseInfo.D01Q04.toString(), EdefenseInfo.Beam3); // Kobe 25%
-            main(EdefenseInfo.D01Q05.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D01Q06.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D01Q08.toString(), EdefenseInfo.Beam3); // Kobe 50%
-            main(EdefenseInfo.D01Q09.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D01Q10.toString(), EdefenseInfo.Beam3); // Kobe 75%
-            main(EdefenseInfo.D01Q11.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D02Q01.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D02Q02.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D02Q03.toString(), EdefenseInfo.Beam3); // Kobe 100%
-            main(EdefenseInfo.D02Q05.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D02Q06.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D02Q07.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D02Q08.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D03Q01.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D03Q02.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D03Q03.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D03Q04.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D03Q05.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D03Q06.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D03Q08.toString(), EdefenseInfo.Beam3);
-            main(EdefenseInfo.D03Q09.toString(), EdefenseInfo.Beam3);
+            BeamInfo beam = EdefenseInfo.BeamA;
+            main(EdefenseInfo.D01Q01.toString(), beam);
+            main(EdefenseInfo.D01Q02.toString(), beam); // kumamoto
+            main(EdefenseInfo.D01Q03.toString(), beam); // tohoku
+            main(EdefenseInfo.D01Q04.toString(), beam); // Kobe 25%
+            main(EdefenseInfo.D01Q05.toString(), beam);
+            main(EdefenseInfo.D01Q06.toString(), beam);
+            main(EdefenseInfo.D01Q08.toString(), beam); // Kobe 50%
+            main(EdefenseInfo.D01Q09.toString(), beam);
+            main(EdefenseInfo.D01Q10.toString(), beam); // Kobe 75%
+            main(EdefenseInfo.D01Q11.toString(), beam);
+            main(EdefenseInfo.D02Q01.toString(), beam);
+            main(EdefenseInfo.D02Q02.toString(), beam);
+            main(EdefenseInfo.D02Q03.toString(), beam); // Kobe 100%
+            main(EdefenseInfo.D02Q05.toString(), beam);
+            main(EdefenseInfo.D02Q06.toString(), beam);
+            main(EdefenseInfo.D02Q07.toString(), beam);
+            main(EdefenseInfo.D02Q08.toString(), beam);
+            main(EdefenseInfo.D03Q01.toString(), beam);
+            main(EdefenseInfo.D03Q02.toString(), beam);
+            main(EdefenseInfo.D03Q03.toString(), beam);
+            main(EdefenseInfo.D03Q04.toString(), beam);
+            main(EdefenseInfo.D03Q05.toString(), beam);
+            main(EdefenseInfo.D03Q06.toString(), beam);
+            main(EdefenseInfo.D03Q08.toString(), beam);
+            main(EdefenseInfo.D03Q09.toString(), beam);
 
-//            main(EdefenseInfo.D01Q01.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D01Q02.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D01Q03.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D01Q04.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D01Q05.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D01Q06.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D01Q08.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D01Q09.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D01Q10.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D01Q11.toString(), EdefenseInfo.BeamB);
-//
-//            main(EdefenseInfo.D02Q01.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D02Q02.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D02Q03.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D02Q05.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D02Q06.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D02Q07.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D02Q08.toString(), EdefenseInfo.BeamB);
-//
-//            main(EdefenseInfo.D03Q01.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D03Q02.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D03Q03.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D03Q04.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D03Q05.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D03Q06.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D03Q08.toString(), EdefenseInfo.BeamB);
-//            main(EdefenseInfo.D03Q09.toString(), EdefenseInfo.BeamB);
         } catch (SQLException ex) {
             Logger.getLogger(A110BeamNMDistribution.class.getName()).log(Level.SEVERE, null, ex);
         }

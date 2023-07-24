@@ -155,7 +155,7 @@ public class A200BeamShearLA3connectline {
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A200BeamShearLA3ConnectLine.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A200BeamShearLA3connectline.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

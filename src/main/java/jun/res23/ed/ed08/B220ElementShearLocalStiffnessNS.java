@@ -34,25 +34,31 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.XYSeries;
 
 /**
+ * B210→B220 元データを T231からT400に変更。もともとこのプログラムはNS専用。部材の切り替えも手動。
  *
  * @author jun
- * @deprecated このプログラムはT231TimeHistoryNMを使っているが、これがdeprecatedになり、T400ができている。T400を使ったあたらしいプログラムはB220として作成する。
+ *
  */
-@Deprecated
-public class B210ElementShearLocalStiffness {
+public class B220ElementShearLocalStiffnessNS {
 
     //  private static final String T300Schema = T300Integ2StoryDisp.outputSchema;//"T300Integ2StoryDisp"
-    public static final String dburl = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res22/ed/ed06分析T/res22ed06";
-    public static final String ed08dburl = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res22/ed/ed08防災科研/res22ed08;IFEXISTS=TRUE";
-    public static final String outputTable = "B210ElementShearLocalStiffness";
-    public static final Path svgdir = Path.of("/home/jun/Dropbox (SSLUoT)/res22/ed/ed08防災科研/B210ElementShearLocalStiffness");
+    public static final String dburl = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res23/ed/ed06分析T/res22ed06";
+    public static final String nmtable = "T400TimeHistoryNM";
+    public static final String ed08dburl = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res23/ed/ed08防災科研/res22ed08;IFEXISTS=TRUE";
+    public static final String outputTable = "B220ElementShearLocalStiffness";
+    public static final Path svgdir = Path.of("/home/jun/Dropbox (SSLUoT)/res23/ed/ed08防災科研/B220ElementShearLocalStiffness");
 
-    private static final Logger logger = Logger.getLogger(B210ElementShearLocalStiffness.class.getName());
+    private static final Logger logger = Logger.getLogger(B220ElementShearLocalStiffnessNS.class.getName());
 
     public static void main(String[] args) {
         try {
-//            ColumnInfo element = EdefenseInfo.Column2FA3;
-            ElementInfo element = EdefenseInfo.Beam3;
+//            ElementInfo element = EdefenseInfo.Column2FA3;
+//            ElementInfo element = EdefenseInfo.Column3FA3;
+//            ElementInfo element = EdefenseInfo.Column3FA4;
+//                        ElementInfo element = EdefenseInfo.Column2FA4;
+//            ElementInfo element = EdefenseInfo.Beam3;
+                        ElementInfo element = EdefenseInfo.Beam4;
+
             clearOutputTable(element);
             JFreeChart[] positiveCharts = createChart(element, true);
             JFreeChart[] negativeCharts = createChart(element, false);
@@ -67,13 +73,13 @@ public class B210ElementShearLocalStiffness {
                     //            JunChartUtil.show(chart);
                     JunChartUtil.svg(svgfile, 500, 350, new JFreeChart[][]{positiveCharts, negativeCharts});
                 } catch (IOException ex) {
-                    Logger.getLogger(B210ElementShearLocalStiffness.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(B220ElementShearLocalStiffnessNS.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
                 JunChartUtil.show(new JFreeChart[][]{positiveCharts, negativeCharts});
             }
         } catch (SQLException ex) {
-            Logger.getLogger(B210ElementShearLocalStiffness.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(B220ElementShearLocalStiffnessNS.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -84,9 +90,8 @@ public class B210ElementShearLocalStiffness {
         Statement st08 = con08.createStatement();
         st08.executeUpdate("create table if not exists \"" + outputTable + "\" (TIMESTAMP timestamp,\"ElementName\" varchar,  \"TESTNAME\" varchar, \"PositiveDirection\" boolean, "
                 + "\"TimePerTest[s]\" real , \"MomentS2[kNm]\" real,\"MomentS3[kNm]\" real, \"ShearForce[kN]\" real,\"Story2Drift[mm]\"real,\"LocalStiffness[kN/mm]\" real)");
-        st08.executeUpdate("delete \""+outputTable+"\" where \"ElementName\"='"+element.getName()+"'");
+        st08.executeUpdate("delete \"" + outputTable + "\" where \"ElementName\"='" + element.getName() + "'");
         con08.close();
-        
 
     }
 
@@ -144,7 +149,7 @@ public class B210ElementShearLocalStiffness {
 
             String desc = directionPositive ? "desc" : "";
             ResultSet rs = st.executeQuery("select \"TimePerTest[s]\",\"BendingMomentPerTest[kNm]\", \"AxialForcePerTest[kN]\""
-                    + " from \"T231TimeHistoryNM\".\"" + EdefenseInfo.LA3S2.getName() + "\" "
+                    + " from \"" + nmtable + "\".\"" + EdefenseInfo.LA3S2.getName() + "\" "
                     + " where TESTNAME='" + test.getName() + "t' "
                     + "order by \"BendingMomentPerTest[kNm]\" " + desc + " limit 1");
 
@@ -153,7 +158,7 @@ public class B210ElementShearLocalStiffness {
             time = Math.round(time * 100) / 100.0;
 
             rs = st.executeQuery("select \"TimePerTest[s]\",\"" + momentColumnName + "\", \"AxialForcePerTest[kN]\""
-                    + " from \"T231TimeHistoryNM\".\"" + sectionName1 + "\" "
+                    + " from \"" + nmtable + "\".\"" + sectionName1 + "\" "
                     + "where \"TimePerTest[s]\" =" + time + "  and TESTNAME='" + test.getTestName() + "t'");
             rs.next();
 
@@ -161,7 +166,7 @@ public class B210ElementShearLocalStiffness {
             double momentTotalS2 = momentS2 + rs.getDouble(3) * slabArmLength;
             String sql;
             rs = st.executeQuery(sql = "select \"TimePerTest[s]\",\"" + momentColumnName + "\",\"AxialForcePerTest[kN]\""
-                    + " from \"T231TimeHistoryNM\".\"" + sectionName2 + "\" "
+                    + " from \"" + nmtable + "\".\"" + sectionName2 + "\" "
                     + "where \"TimePerTest[s]\" =" + time + "  and TESTNAME='" + test.getTestName() + "t'");
             System.out.println(sql);
             rs.next();
@@ -193,13 +198,13 @@ public class B210ElementShearLocalStiffness {
 //                }
             if (!test.getWaveName().endsWith("Y)")) {
                 String wavetype = "notset";
-                if (test.getWaveName().startsWith("random")) {
+                if (test.getWaveName().startsWith("Ran")) {
                     wavetype = "random";
                 } else if (test.getWaveName().startsWith("Kobe")) {
                     wavetype = "Kobe";
-                } else if (test.getWaveName().startsWith("kumamoto")) {
+                } else if (test.getWaveName().startsWith("KMM")) {
                     wavetype = "kumamoto";
-                } else if (test.getWaveName().startsWith("tohoku")) {
+                } else if (test.getWaveName().startsWith("FKS")) {
                     wavetype = "tohoku";
                 }
                 datasetStiffness.addValue(shearTotal / disp, wavetype, test.getTestName() + test.getWaveName());
@@ -219,12 +224,14 @@ public class B210ElementShearLocalStiffness {
 
         CategoryAxis xaxis = new CategoryAxis("Test");
         xaxis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_90);
-        NumberAxis yaxis = new NumberAxis("");
+        NumberAxis yaxis = new NumberAxis("LocalShearStiffness [kN/mm]");
+
         LineAndShapeRenderer renderer = new LineAndShapeRenderer(false, true);
         renderer.setSeriesPaint(3, Color.MAGENTA);
         CategoryPlot plot = new CategoryPlot(datasetStiffness, xaxis, yaxis, renderer);
         plot.setDomainGridlinesVisible(true);
-        plot.getRangeAxis().setFixedDimension(50);
+        yaxis.setFixedDimension(50);
+        yaxis.setLowerBound(0);
         JFreeChart chart = new JFreeChart(plot);
 
         LineAndShapeRenderer rendererDisp = new LineAndShapeRenderer(false, true);

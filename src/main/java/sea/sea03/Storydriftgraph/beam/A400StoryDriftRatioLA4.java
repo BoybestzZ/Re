@@ -13,8 +13,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ChoiceFormat;
+import java.text.NumberFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jun.chart.JunChartUtil;
 import static jun.res23.ed.ed14分析UF.A310SectionNM.outputTable;
 import jun.res23.ed.util.EdefenseInfo;
 import jun.res23.ed.util.EdefenseKasinInfo;
@@ -84,10 +87,6 @@ public class A400StoryDriftRatioLA4 {
                     // get results
                     double storyDriftRatio = rs.getDouble(1);                  
 
-
-
-
-
                 // Insert the result into the table
                 String insertQuery = "INSERT INTO StoryDriftRatioLA4 (TestName, ShearForce) VALUES ('" + testName + "', " + storyDriftRatio + ")";
                 st.executeUpdate(insertQuery);
@@ -123,6 +122,38 @@ public class A400StoryDriftRatioLA4 {
             plot.setDomainGridlinePaint(Color.BLACK);
             NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
             domainAxis.setTickLabelFont(domainAxis.getTickLabelFont().deriveFont((int) 12f));
+            domainAxis.setVerticalTickLabels(true);
+            domainAxis.setLowerBound(0.1);
+            domainAxis.setUpperBound(24.9);
+
+//            double lowerBound = 0.1; // Set the lower bound for the x-axis
+//            double upperBound = kasins.length + 0.9; // Set the upper bound for the x-axis
+//
+//            domainAxis.setLowerBound(lowerBound);
+//            domainAxis.setUpperBound(upperBound);
+            
+            // Prepare the mapping of test names to labels dynamically
+            String[] testNames = new String[kasins.length];
+            double[] testValues = new double[kasins.length];
+
+            for (int i = 0; i < kasins.length; i++) {
+                testNames[i] = kasins[i].getTestName() + kasins[i].getWaveName();
+                testValues[i] = i + 1.0;
+            }
+
+            // Create the ChoiceFormat
+            ChoiceFormat formatter = new ChoiceFormat(testValues, testNames);
+
+
+//            NumberFormat formatter=new ChoiceFormat(
+//                    new double[] {1.0,2.0,3.0}, 
+//                        new String[]{"D01Q01random", "D02Q02kumamoto","D03Q03tohoku"});
+
+
+            domainAxis.setNumberFormatOverride(formatter);
+            
+            
+            
             NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
             rangeAxis.setRange(0.5, 1.5); // Set the y-axis range
             rangeAxis.setStandardTickUnits(NumberAxis.createStandardTickUnits());
@@ -132,11 +163,15 @@ public class A400StoryDriftRatioLA4 {
             plot.setRenderer(renderer);
 
             // Export the chart as PNG
-            int width = 1400;
-            int height = 1000;
+            int width = 500;
+            int height = 250;
 //            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf_C2FA3ew.png";
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
+
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf_C2FA3ew.svg";
+              JunChartUtil.svg(filePath, width, height, chart);
+
 
 //            // Display the chart in a frame
             ChartFrame frame = new ChartFrame("Story Drift Ratio", chart);

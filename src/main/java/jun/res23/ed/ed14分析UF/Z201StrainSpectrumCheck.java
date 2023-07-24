@@ -23,12 +23,13 @@ import org.jfree.data.xy.DefaultXYDataset;
  *
  * @author jun
  */
-public class A210StrainSpectrumCheck {
+public class Z201StrainSpectrumCheck {
 
-    private static final Logger logger = Logger.getLogger(A210StrainSpectrumCheck.class.getName());
+    private static final Logger logger = Logger.getLogger(Z201StrainSpectrumCheck.class.getName());
 
     public static void main(String[] args) {
-        String[] testnames = {/*"D01Q01", "D01Q09", "D01Q11",*/ "D02Q05"/*, "D03Q01", "D03Q09"*/};
+        String[] testnames = {/*"D01Q01", "D01Q09", "D01Q11",*/"D02Q05"/*, "D03Q01", "D03Q09"*/};
+        String[] strains = {"c01/02", "c01/04", "c01/06", "c01/08"};
         DefaultXYDataset dataset = new DefaultXYDataset();
         for (String testname : testnames) {
             logger.log(Level.INFO, testname);
@@ -38,14 +39,14 @@ public class A210StrainSpectrumCheck {
                 Statement st = con.createStatement();
 
                 //    ResultSet rs = st.executeQuery("select \"Freq[Hz]\",\"Amp[με*s]\" from \"R155FourierU\".\"a03/01\"");
-                ResultSet rs = st.executeQuery("select \"Freq[Hz]\",\"Amp[με*s]\" from \"R155FourierU\".\"g02/01\"");
-
-                double[][] ar = ResultSetUtils.createSeriesArray(rs);
-
-                dataset.addSeries(testname, ar);
+                for (String strain : strains) {
+                    ResultSet rs = st.executeQuery("select \"Freq[Hz]\",\"Amp[με*s]\",\"Phase[rad]\" from \"R155FourierU\".\""+strain+"\"");
+                    double[][] ar = ResultSetUtils.createSeriesArray(rs);
+                    dataset.addSeries(testname+"_"+strain, new double[][]{ar[0],ar[1]});
+                }
                 con.close();
             } catch (SQLException ex) {
-                Logger.getLogger(A210StrainSpectrumCheck.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Z201StrainSpectrumCheck.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
@@ -55,11 +56,11 @@ public class A210StrainSpectrumCheck {
                 .setDomainAxisRange(0.7, 1.7)
                 .create();
         Path svgfile = null;// Path.of("/home/jun/Dropbox (SSLUoT)/res23/ed/ed14分析UF/A210StrainSpectrumCheckEW.svg");
-        if (svgfile!=null)
+        if (svgfile != null)
         try {
             JunChartUtil.svg(svgfile, 500, 250, chart);
         } catch (IOException ex) {
-            Logger.getLogger(A210StrainSpectrumCheck.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Z201StrainSpectrumCheck.class.getName()).log(Level.SEVERE, null, ex);
         } else {
             JunChartUtil.show(chart);
         }

@@ -248,7 +248,7 @@ public class EdefenseInfo {
     public static final ColumnSectionInfo CS3FB4B = new ColumnSectionInfo("CS3FB4B",
             StrainGaugeInfo.CS3F_B4_B_N, StrainGaugeInfo.CS3F_B4_B_E, StrainGaugeInfo.CS3F_B4_B_W, StrainGaugeInfo.CS3F_B4_B_S, E,
             AreaC3, ZnsC3, ZewC3, HC3);
-    // 2023/06/11 上記 CS3F_B4_B_N となるべきところが CS3F_B4_CN となっていたので修正。
+    // 2023/06/11 上記 CS3F_B4_B_N となるべきところが CS3F_B4_C_N となっていたので修正。
 
     // 2F- A3    C1=C2
     public static final ColumnSectionInfo CS2FA3T = new ColumnSectionInfo("CS2FA3T",
@@ -367,7 +367,7 @@ public class EdefenseInfo {
 // 最後の tmrTimeDiffSecondsは、    t 時刻歴とTMRのTIME[s]との差分。 TMRのTIME[s]からこの時間（秒）を引けばt時刻歴と合致する。
     // 最後の tmrTimeDiffSecondsは、    t 時刻歴とNIEDのTIME[s]との差分。 NiedのTIME[s]からこの時間（秒）を引けばt時刻歴と合致する。
     public static final EdefenseKasinInfo D01Q01 = new EdefenseKasinInfo("D01Q01", 1, "Random", 311.6, -7.86);
-    public static final EdefenseKasinInfo D01Q02 = new EdefenseKasinInfo("D01Q02", 2, "KMMH02", 287.43, 6.94);
+    public static final EdefenseKasinInfo D01Q02 = new EdefenseKasinInfo("D01Q02", 2, "KMMH02", 287.43, 6.94+0.04);
     public static final EdefenseKasinInfo D01Q03 = new EdefenseKasinInfo("D01Q03", 3, "FKS020", 263.64, -11);
     public static final EdefenseKasinInfo D01Q04 = new EdefenseKasinInfo("D01Q04", 4, "Kobe25", 279.73, -7.98);
     public static final EdefenseKasinInfo D01Q05 = new EdefenseKasinInfo("D01Q05", 5, "Kobe25X", 276.6, -5.97);
@@ -380,7 +380,7 @@ public class EdefenseInfo {
     public static final EdefenseKasinInfo D02Q02 = new EdefenseKasinInfo("D02Q02", 12, "FKS020", 279.59, -1.368);
     public static final EdefenseKasinInfo D02Q03 = new EdefenseKasinInfo("D02Q03", 13, "Kobe100", 310.40, +0.191 + 3.297);
     public static final EdefenseKasinInfo D02Q05 = new EdefenseKasinInfo("D02Q05", 14, "Random", 275.63, -1.481);
-    public static final EdefenseKasinInfo D02Q06 = new EdefenseKasinInfo("D02Q06", 15, "KMMH02", 286.475, +7.653);
+    public static final EdefenseKasinInfo D02Q06 = new EdefenseKasinInfo("D02Q06", 15, "KMMH02", 286.475, +7.653+0.04);
     public static final EdefenseKasinInfo D02Q07 = new EdefenseKasinInfo("D02Q07", 0, "FKS020", 376.015);
     public static final EdefenseKasinInfo D02Q08 = new EdefenseKasinInfo("D02Q08", 16, "FKS020", 292.02, 0.556);
     public static final EdefenseKasinInfo D03Q01 = new EdefenseKasinInfo("D03Q01", 17, "Random", 294.94, -3.958);

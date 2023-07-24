@@ -37,7 +37,7 @@ public class Z101CheckDiff {
     public static void main(String[] args) {
 
         try {
-            String dburl = "jdbc:h2:tcp://localhost//" + databaseQdir + "/D02Q03q";
+            String dburl = "jdbc:h2:tcp://localhost//" + databaseQdir + "/D02Q05q";
             Connection con = DriverManager.getConnection(dburl, "junapp", "");
             Statement st = con.createStatement();
 

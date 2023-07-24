@@ -4,6 +4,7 @@
  */
 package jun.res23.ed.ed06分析T;
 
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -23,16 +24,16 @@ import jun.res23.ed.util.EdefenseKasinInfo;
 /**
  * R200Resampleで作成された同期時刻歴データを読み込んで、 res22ed06.mv.dbに出力する。 2023/03/19
  * テーブル列の名称を変えちゃったので、動かないプログラムが発生したかも。 TIME[s] -> TimePerTest[s] にすれば動くはず。
- *
+ * T231→T400 : 計算内容は同じだが、6/11の柱データの修正に伴う再計算。
  * @author jun
- * @deprecated 2023/06/11 に柱（2F-A4-T-WとSの取り違い、および 3F-B4-B-N ）の間違いが発覚したので、再度実行して T400とする。
+ *
  */
-@Deprecated
-public class T231CreateTimeHistoryBeamColumnNM {
+public class T400CreateTimeHistoryBeamColumnNM {
 
-    private static final Logger logger = Logger.getLogger(T231CreateTimeHistoryBeamColumnNM.class.getName());
-    public static final String outputSchema = "T231TimeHistoryNM";
-    public static final String outputDb = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res22/ed/ed06分析T/res22ed06";
+    private static final Logger logger = Logger.getLogger(T400CreateTimeHistoryBeamColumnNM.class.getName());
+    public static final Path databaseDir=Path.of("/home/jun/Dropbox (SSLUoT)/res23/ed/ed02/R140DatabaseQ");
+    public static final String outputSchema = "T400TimeHistoryNM";
+    public static final String outputDb = "jdbc:h2:file:///home/jun/Dropbox (SSLUoT)/res23/ed/ed06分析T/res22ed06";
 
     public static void main(String[] args) {
 //        BeamSectionInfo[] sections = new BeamSectionInfo[]{EdefenseInfo.LA3S1, EdefenseInfo.LA3S2, EdefenseInfo.LA3S3, EdefenseInfo.LA3S4, EdefenseInfo.LA3S5};
@@ -56,7 +57,7 @@ public class T231CreateTimeHistoryBeamColumnNM {
 
         try {
             // 各データベースを読み取って計算する。
-            T231CreateTimeHistoryBeamColumnNM o = new T231CreateTimeHistoryBeamColumnNM(beamsections, columnsections);
+            T400CreateTimeHistoryBeamColumnNM o = new T400CreateTimeHistoryBeamColumnNM(beamsections, columnsections);
             o.clearTable();
             boolean first = true;
             for (EdefenseKasinInfo test : EdefenseInfo.alltests) {
@@ -67,7 +68,7 @@ public class T231CreateTimeHistoryBeamColumnNM {
             o.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(T231CreateTimeHistoryBeamColumnNM.class
+            Logger.getLogger(T400CreateTimeHistoryBeamColumnNM.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -117,7 +118,7 @@ public class T231CreateTimeHistoryBeamColumnNM {
     }
 
     public void create(EdefenseKasinInfo test, boolean first) throws SQLException {
-        final String inputDb = "jdbc:h2:tcp://localhost/" + R200Resample.databaseDir.resolve(test.getTestName() + "q");
+        final String inputDb = "jdbc:h2:file:///" + databaseDir.resolve(test.getTestName() + "q");
         logger.log(Level.INFO, "Opening input database " + inputDb);
         Connection coni = DriverManager.getConnection(inputDb, "junapp", "");
         logger.log(Level.INFO, "Opened.");
@@ -366,7 +367,7 @@ public class T231CreateTimeHistoryBeamColumnNM {
 
     }
 
-    private T231CreateTimeHistoryBeamColumnNM(BeamSectionInfo[] sections, ColumnSectionInfo[] columnsections) throws SQLException {
+    private T400CreateTimeHistoryBeamColumnNM(BeamSectionInfo[] sections, ColumnSectionInfo[] columnsections) throws SQLException {
         this.beamsections = sections;
         this.columnsections = columnsections;
         this.zeroMomentBeam = new double[sections.length];
@@ -395,7 +396,7 @@ public class T231CreateTimeHistoryBeamColumnNM {
             cono.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(T231CreateTimeHistoryBeamColumnNM.class
+            Logger.getLogger(T400CreateTimeHistoryBeamColumnNM.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
     }
