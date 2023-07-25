@@ -4,6 +4,7 @@
  */
 package sea.sea03.Storydriftgraph.beam;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
@@ -27,6 +28,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.annotations.XYTitleAnnotation;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
@@ -34,6 +36,9 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.title.LegendTitle;
+import org.jfree.chart.ui.RectangleAnchor;
+import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
@@ -111,7 +116,7 @@ public class A400StoryDriftRatioLA3 {
             dataset.addSeries("kumamoto", kumamoto.toArray());
             dataset.addSeries("kobe", kobe.toArray());
             // Create the chart
-            JFreeChart chart = ChartFactory.createXYLineChart("SDRatioLA3", "Testname", "Ratio",
+            JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "Story drift ratio",
                     dataset, PlotOrientation.VERTICAL, true, true, false);
 
             // Customize the chart
@@ -120,11 +125,15 @@ public class A400StoryDriftRatioLA3 {
             plot.setRangeGridlinePaint(Color.BLACK);
             plot.setDomainGridlinesVisible(true);
             plot.setDomainGridlinePaint(Color.BLACK);
+           
             NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
             domainAxis.setTickLabelFont(domainAxis.getTickLabelFont().deriveFont((int) 12f));
             domainAxis.setVerticalTickLabels(true);
             domainAxis.setLowerBound(0.1);
             domainAxis.setUpperBound(24.9);
+            plot.setOutlinePaint(Color.BLACK);
+            plot.setOutlineStroke(new BasicStroke(2f)); // frame around the plot
+            plot.setAxisOffset(RectangleInsets.ZERO_INSETS); // remove space between frame and axis.
 
 //            double lowerBound = 0.1; // Set the lower bound for the x-axis
 //            double upperBound = kasins.length + 0.9; // Set the upper bound for the x-axis
@@ -161,9 +170,16 @@ public class A400StoryDriftRatioLA3 {
             XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
             renderer.setSeriesPaint(0, Color.RED);
             plot.setRenderer(renderer);
+            
+            // insert legend to the plot
+            LegendTitle legend = chart.getLegend(); // obtain legend box
+            XYTitleAnnotation ta=new XYTitleAnnotation(0.95 ,0.05, legend, RectangleAnchor.BOTTOM_RIGHT);
+            legend.setBorder(1, 1, 1, 1); // frame around legend
+            plot.addAnnotation(ta);
+            chart.removeLegend();
 
             // Export the chart as PNG
-            int width = 500;
+            int width = 650;
             int height = 250;
 //            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf_C2FA3ew.png";
 //            File chartFile = new File(filePath);
@@ -174,10 +190,10 @@ public class A400StoryDriftRatioLA3 {
 
 
 //            // Display the chart in a frame
-            ChartFrame frame = new ChartFrame("Story Drift Ratio", chart);
-            frame.setPreferredSize(new Dimension(1200, 800));
-            frame.pack();
-            frame.setVisible(true);
+//            ChartFrame frame = new ChartFrame("Story Drift Ratio", chart);
+//            frame.setPreferredSize(new Dimension(1200, 800));
+//            frame.pack();
+//            frame.setVisible(true);
 
             con.close();
 
