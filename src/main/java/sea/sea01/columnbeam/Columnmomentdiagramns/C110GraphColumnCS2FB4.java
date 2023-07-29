@@ -4,7 +4,6 @@
  */
 package sea.sea01.columnbeam.Columnmomentdiagramns;
 
-import sea.sea02.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;

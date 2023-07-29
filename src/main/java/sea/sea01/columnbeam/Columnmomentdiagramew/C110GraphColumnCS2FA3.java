@@ -7,7 +7,6 @@ package sea.sea01.columnbeam.Columnmomentdiagramew;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
-import sea.sea02.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -242,9 +241,9 @@ public class C110GraphColumnCS2FA3 {
             plot.addAnnotation(ta);
             chart.removeLegend();
 
-//            // Show Chart
-////            JunChartUtil.show("2FA3ew", chart);
-//            JunChartUtil.show(chart);
+            // Show Chart
+//            JunChartUtil.show("2FA3ew", chart);
+            JunChartUtil.show(chart);
             
             int width = 550;
             int height = 580;

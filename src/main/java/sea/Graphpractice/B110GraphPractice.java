@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea02;
+package sea.Graphpractice;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -25,19 +25,14 @@ import org.jfree.data.xy.XYSeriesCollection;
  *
  * @author 75496
  */
-public class B110GraphBeam4 {
+public class B110GraphPractice {
 
     public static void main(String[] args) {
-        String[] testnames = {"D01Q01", "D01Q02", "D01Q03", "D01Q04", "D01Q05", "D01Q06", "D01Q08", "D01Q09", 
-                                  "D01Q10", "D01Q11", "D02Q01", "D02Q02", "D02Q03", "D02Q05", 
-                                  "D02Q06", "D02Q08", "D03Q01", "D03Q02", "D03Q03", "D03Q04", "D03Q05", 
-                                  "D03Q06", "D03Q08", "D03Q09"};
+        String[] testnames = {"D01Q01", "D01Q02", "D01Q03", "D01Q04", "D01Q05", "D01Q06"};
 
         try {
             String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
 
-            double section = 0.23;
-            
             // Connect to database
             Connection con = DriverManager.getConnection(dburl, "junapp", "");
             Statement st = con.createStatement();
@@ -46,7 +41,7 @@ public class B110GraphBeam4 {
             XYSeriesCollection dataset = new XYSeriesCollection();
             for (String testname : testnames) {
 
-                String sql = "SELECT TESTNAME, CASE ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) WHEN 1 THEN 0.435 WHEN 2 THEN 0.955 WHEN 3 THEN 1.575 WHEN 4 THEN 2.195 WHEN 5 THEN 2.715 END AS NewColumn,\"StiffnessAxialA[N/m]\"*0.000002, \"StiffnessAxialP[rad]\", \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" WHERE TESTNAME = '" +testname+ "' AND SECTION LIKE 'LA4S%'";
+                String sql = "SELECT TESTNAME,substring(SECTION,5,1), \"StiffnessMomentXA[Nm/m]\",\"StiffnessMomentXP[rad]\" FROM \"A100SectionNM\" where TESTNAME='" + testname + "' and SECTION like 'LA3S%'";
 
                 // Execute query.
                 ResultSet rs = st.executeQuery(sql);
@@ -58,16 +53,11 @@ public class B110GraphBeam4 {
                 while (rs.next()) {
                     //  String testname=rs.getString(1);
                     double sectionNo = rs.getDouble(2);
-                    double axialamplitude = rs.getDouble(3);
-                    double axialphase = rs.getDouble(4);
-                    double momentamplitude = rs.getDouble(5);
-                    double momentphase = rs.getDouble(6);
-                    Complex axialMoment = ComplexUtils.polar2Complex(axialamplitude, axialphase);
-                    Complex moment = ComplexUtils.polar2Complex(momentamplitude, momentphase);
-
-                    Complex allMoment = moment.add((axialMoment).multiply(section));
-                    double allMomentReal = allMoment.getReal();
-                    series.add(sectionNo, allMomentReal); // Store X,Y data.
+                    double amplitude = rs.getDouble(3);
+                    double phase = rs.getDouble(4);
+                    Complex stiffness = ComplexUtils.polar2Complex(amplitude, phase);
+                    double stiffnessReal = stiffness.getReal();
+                    series.add(sectionNo, stiffnessReal); // Store X,Y data.
                     // Change the key of XYSeries
                     // series.setKey(testname);
                 }
@@ -79,7 +69,6 @@ public class B110GraphBeam4 {
             // Prepare X adn Y axis
             NumberAxis xaxis = new NumberAxis("Section No");
             NumberAxis yaxis = new NumberAxis("Stiffness");
-            yaxis.setRange(-20, 20); // Set the y-axis range from 0 to 20
 
             // Prepare Renderer
             XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, true);
@@ -92,12 +81,13 @@ public class B110GraphBeam4 {
 
             // Show Chart
             JunChartUtil.show(chart);
+            
 
             // close connection
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(B110GraphBeam4.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(B110GraphPractice.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }

@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea02;
+package sea.sea01.columnbeam.Beammomentdiagram;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -27,16 +28,18 @@ import org.jfree.data.xy.XYSeriesCollection;
  */
 public class B110GraphBeamB {
 
-    public static void main(String[] args) {
-        String[] testnames = {"D01Q01", "D01Q02", "D01Q03", "D01Q04", "D01Q05", "D01Q06", "D01Q08", "D01Q09", 
+    public static void main(String[] args) throws IOException {
+        String[] testnames = {"D01Q01", 
+            "D01Q02", "D01Q03", "D01Q04", "D01Q05", "D01Q06", "D01Q08", "D01Q09", 
                                   "D01Q10", "D01Q11", "D02Q01", "D02Q02", "D02Q03", "D02Q05", 
                                   "D02Q06", "D02Q08", "D03Q01", "D03Q02", "D03Q03", "D03Q04", "D03Q05", 
-                                  "D03Q06", "D03Q08", "D03Q09"};
-
+                                  "D03Q06", "D03Q08", "D03Q09"
+        };      
+//        String[] testnames = {"D01Q01"};
         try {
             String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
 
-            double section = 0.23;
+            double section = 0.177;
             
             // Connect to database
             Connection con = DriverManager.getConnection(dburl, "junapp", "");
@@ -92,6 +95,11 @@ public class B110GraphBeamB {
 
             // Show Chart
             JunChartUtil.show(chart);
+            
+            int width = 400;
+            int height = 400;
+            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\Beammoment\\BM_B.svg";
+            JunChartUtil.svg(filePath, width, height, chart);
 
             // close connection
             con.close();

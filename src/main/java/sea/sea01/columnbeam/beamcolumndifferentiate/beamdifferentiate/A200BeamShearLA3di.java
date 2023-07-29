@@ -58,8 +58,10 @@ public class A200BeamShearLA3di {
                 {"D01Q04", "D01Q05", "D01Q06", "D01Q08", "D01Q10", "D02Q03", "D03Q04", "D03Q05", "D03Q06", "D03Q08"}
             };
 
-            // Create table to store results
+            // Create table to store results if it doesn't exist
+            st.executeUpdate("DROP TABLE IF EXISTS ShearForceResultsLA3di");
             st.executeUpdate("CREATE TABLE IF NOT EXISTS ShearForceResultsLA3di (TestName VARCHAR(20), ShearForce DOUBLE)");
+           
 
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
@@ -98,6 +100,8 @@ public class A200BeamShearLA3di {
                     Complex allmoment2 = momentS2.add((axialMomentS2).multiply(section));
                     Complex allmoment4 = momentS4.add((axialMomentS4).multiply(section));
                     Complex shearForceComplex = (allmoment2.add(allmoment4)).divide(distance);
+                    
+                    
 
                     // Insert the result into the table
                     st.executeUpdate("INSERT INTO ShearForceResultsLA3di (TestName, ShearForce) VALUES ('" + testName + "', " + shearForceComplex.getReal() + ")");

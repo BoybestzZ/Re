@@ -4,7 +4,6 @@
  */
 package sea.sea03.Storydriftgraph;
 
-import sea.sea02.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
