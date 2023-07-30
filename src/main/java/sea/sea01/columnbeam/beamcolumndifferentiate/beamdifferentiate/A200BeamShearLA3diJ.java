@@ -116,7 +116,6 @@ public class A200BeamShearLA3diJ {
                     tohoku.add(i + 1, shearForceComplex.getReal());
                 } else if (waveName.startsWith("Kobe")) {
                     kobe.add(i + 1, shearForceComplex.getReal());
-
                 }
 
             }
