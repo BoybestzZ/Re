@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea01.columnbeam.shearforcepercentagenokobe;
+package sea.sea01.columnbeam.shearforcepercentagenokobe.ew;
 
 import sea.sea01.columnbeam.beamcolumndifferentiate.beamdifferentiate.*;
 import java.awt.BasicStroke;
@@ -59,7 +59,7 @@ import org.jfree.chart.axis.CategoryAnchor;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.ui.RectangleInsets;
 
-public class A200ColumnSFPLA3dink {
+public class A200ColumnSFPC3FA4nk {
 
     public static void main(String[] args) throws IOException {
 
@@ -80,8 +80,8 @@ public class A200ColumnSFPLA3dink {
             };
 
             // Create table to store results if it doesn't exist
-            st.executeUpdate("DROP TABLE IF EXISTS ShearForceResultsLA3di");
-            st.executeUpdate("CREATE TABLE IF NOT EXISTS ShearForceResultsLA3di (TestName VARCHAR(20), ShearForce DOUBLE)");
+            st.executeUpdate("DROP TABLE IF EXISTS ShearForcePerC3FA4ew");
+            st.executeUpdate("CREATE TABLE IF NOT EXISTS ShearForcePerC3FA4ew (TestName VARCHAR(20), ShearForce DOUBLE)");
            
 
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
@@ -104,7 +104,7 @@ public class A200ColumnSFPLA3dink {
 
                 for (String testName : testNames) {
                     // Execute query and get result set
-                ResultSet rs = st.executeQuery("SELECT \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" where testname='" + testName + "' and section like 'CS2FA3Bew'");
+                ResultSet rs = st.executeQuery("SELECT \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" where testname='" + testName + "' and section like 'CS3FA4Bew'");
 
                 rs.next(); // goto the 1st line
                 // get results
@@ -112,7 +112,7 @@ public class A200ColumnSFPLA3dink {
                 double phaseS2 = rs.getDouble(2);
 
                 // Execute query and get result set
-                rs = st.executeQuery("SELECT \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" where testname='" + testName + "' and section like 'CS2FA3Tew'");
+                rs = st.executeQuery("SELECT \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" where testname='" + testName + "' and section like 'CS3FA4Tew'");
 
                 rs.next();
                 double amplitudeS4 = rs.getDouble(1);
@@ -124,7 +124,7 @@ public class A200ColumnSFPLA3dink {
                 Complex shearForceComplex = (momentS2.subtract(momentS4)).divide(distance);
 
                     // Insert the result into the table
-                    st.executeUpdate("INSERT INTO ShearForceResultsC2FA3ew (TestName, ShearForce) VALUES ('" + testName + "', " + shearForceComplex.getReal() + ")");
+                    st.executeUpdate("INSERT INTO ShearForcePerC3FA4ew (TestName, ShearForce) VALUES ('" + testName + "', " + shearForceComplex.getReal() + ")");
 
                     // Add shear force value to the dataset with line name as series
                     dataset.addValue(shearForceComplex.getReal(), lineNames[i], testName);
@@ -316,7 +316,7 @@ public class A200ColumnSFPLA3dink {
         //            File chartFile = new File(filePath);
         //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-                      String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sfpnokobe_C2FA3ew.svg";
+                      String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf%nokobe_C3FA4ew.svg";
                       JunChartUtil.svg(filePath, width, height, lineChart);
                     
                     
@@ -371,7 +371,7 @@ public class A200ColumnSFPLA3dink {
 //            con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A200ColumnSFPLA3dink.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A200ColumnSFPC3FA4nk.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
