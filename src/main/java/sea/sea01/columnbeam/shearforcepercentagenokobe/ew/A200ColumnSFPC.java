@@ -42,18 +42,21 @@ public class A200ColumnSFPC {
 
     public static void main(String[] args) {
         try {
-            main(EdefenseInfo.Column2FA3, "ns");
+            columnShearForcePercentageGraph(EdefenseInfo.Column2FA3, "ns");
+            columnShearForcePercentageGraph(EdefenseInfo.Column2FA3, "ew");
             
             
         } catch (IOException ex) {
+            Logger.getLogger(A200ColumnSFPC.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
             Logger.getLogger(A200ColumnSFPC.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
 
-    public static void main(ColumnInfo columnInfo, String ns) throws IOException {
+    public static void columnShearForcePercentageGraph(ColumnInfo columnInfo, String ns) throws IOException, SQLException {
 
-        try {
+    
             String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
 
             // DELETE
@@ -70,8 +73,10 @@ public class A200ColumnSFPC {
             };
 
             // Create table to store results if it doesn't exist
-            st.executeUpdate("DROP TABLE IF EXISTS \"A200ColumnShearForce\"");
-            st.executeUpdate("CREATE TABLE IF NOT EXISTS \"A200ColumnShearForce\" (\"TestName\"VARCHAR(20), \"ColumnName\"  varchar, \"Direction\" varchar,  \"ShearForce\" DOUBLE)");
+          //  st.executeUpdate("DROP TABLE IF EXISTS \"A200ColumnShearForce\"");
+            st.executeUpdate("CREATE TABLE IF NOT EXISTS \"A200ColumnShearForce\" "
+                    + "(\"TestName\"VARCHAR(20), \"ColumnName\"  varchar, \"Direction\" varchar,  \"StiffnessShearForce[N/m]\" DOUBLE)");
+            st.executeUpdate("delete from \"A200ColumnShearForce\" where \"ColumnName\"='"+columnInfo.getName()+"' and \"Direction\"='"+ns+"'");
 
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
             DefaultCategoryDataset dataset2 = new DefaultCategoryDataset();
@@ -133,7 +138,9 @@ public class A200ColumnSFPC {
                     }
                 }
             }
+            System.out.println("Calculation finished.");
 
+            
 //
 //                    // Calculate the percentage values for shearForceValuesRandom
 //                    double firstShearForceValueRandom = shearForceValuesRandom.isEmpty() ? 0 : shearForceValuesRandom.get(0);
@@ -280,6 +287,7 @@ public class A200ColumnSFPC {
 //                    legend.setBorder(1, 1, 1, 1); // frame around legend
 //                    plot.addAnnotation((CategoryAnnotation) ta);
 //                    chart.removeLegend();
+
             // Display the chart using a ChartPanel in a JFrame
             ChartPanel chartPanel = new ChartPanel(lineChart);
             chartPanel.setPreferredSize(new Dimension(800, 600));
@@ -296,8 +304,8 @@ public class A200ColumnSFPC {
             //            File chartFile = new File(filePath);
             //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-//            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf%nokobe_C2FA3ew.svg";
-String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf%nokobe_"+columnInfo.getName()+ns+".svg";
+            //            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf%nokobe_C2FA3ew.svg";
+            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea02\\sf%nokobe_"+columnInfo.getName()+ns+".svg";
             JunChartUtil.svg(filePath, width, height, lineChart);
 
 //            // Customize the chart
@@ -341,8 +349,6 @@ String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf%nokobe_"+co
 //            frame.setVisible(true);
 //
 //            con.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(A200ColumnSFPC.class.getName()).log(Level.SEVERE, null, ex);
-        }
+   
     }
 }

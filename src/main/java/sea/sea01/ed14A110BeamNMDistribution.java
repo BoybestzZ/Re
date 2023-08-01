@@ -303,6 +303,8 @@ public class ed14A110BeamNMDistribution {
                 prevY = y;
             }
         }
+        
+//        System.out.println(inflectionPoint);
 
     
         XYPointerAnnotation anoMin = new XYPointerAnnotation(String.format("%.2f",inflectionPoint), inflectionPoint, 0, Math.PI*0.5);

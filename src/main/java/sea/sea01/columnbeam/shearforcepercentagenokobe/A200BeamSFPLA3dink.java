@@ -4,7 +4,6 @@
  */
 package sea.sea01.columnbeam.shearforcepercentagenokobe;
 
-import sea.sea01.columnbeam.beamcolumndifferentiate.beamdifferentiate.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
