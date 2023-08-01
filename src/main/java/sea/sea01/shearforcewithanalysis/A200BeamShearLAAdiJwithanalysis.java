@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate;
+package sea.sea01.shearforcewithanalysis;
 
+import sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -49,7 +50,7 @@ import org.jfree.data.xy.XYSeriesCollection;
  *
  * @author 75496
  */
-public class A200BeamShearLA3diJwithkaisekitest {
+public class A200BeamShearLAAdiJwithanalysis {
 
     public static void main(String[] args) throws IOException {
 
@@ -80,7 +81,7 @@ public class A200BeamShearLA3diJwithkaisekitest {
                 // Create series for y = 6 black line
             XYSeries blackLine = new XYSeries("Analysis");
             for (int i = 0; i < kasins.length; i++) {
-                blackLine.add(i + 1, 6.0);
+                blackLine.add(i + 1, 5.965);
             }
             
 
@@ -92,7 +93,7 @@ public class A200BeamShearLA3diJwithkaisekitest {
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    ResultSet rs = st.executeQuery("SELECT \"StiffnessAxialA[N/m]\"*0.000002, \"StiffnessAxialP[rad]\", \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" where TESTNAME='" + testName + "' and SECTION='LA3S2';");
+                    ResultSet rs = st.executeQuery("SELECT \"StiffnessAxialA[N/m]\"*0.000002, \"StiffnessAxialP[rad]\", \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" where TESTNAME='" + testName + "' and SECTION='LAAS2';");
                     rs.next();
 
                     // get results
@@ -102,7 +103,7 @@ public class A200BeamShearLA3diJwithkaisekitest {
                     double momentPhaseS2 = rs.getDouble(4);
 
                     // Execute query and get result set
-                    rs = st.executeQuery("SELECT \"StiffnessAxialA[N/m]\"*0.000002, \"StiffnessAxialP[rad]\", \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" where TESTNAME='" + testName + "' and SECTION='LA3S4';");
+                    rs = st.executeQuery("SELECT \"StiffnessAxialA[N/m]\"*0.000002, \"StiffnessAxialP[rad]\", \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" where TESTNAME='" + testName + "' and SECTION='LAAS4';");
 
                     rs.next();
 
@@ -146,7 +147,7 @@ public class A200BeamShearLA3diJwithkaisekitest {
             dataset.addSeries("Analysis", blackLine.toArray());
             
             // Create the chart
-            JFreeChart chart = ChartFactory.createXYLineChart("Sf_LA3diJ", "Testname", "Shearforce (kN)",
+            JFreeChart chart = ChartFactory.createXYLineChart("Sf_LAAdiJ", "Test No.", "Shearforce (kN/mm)",
                     dataset, PlotOrientation.VERTICAL, true, true, false);
 
             // Customize the chart
@@ -238,7 +239,7 @@ public class A200BeamShearLA3diJwithkaisekitest {
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea02\\sf_LA3withanalysis.svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea02\\sf_LAAwithanalysis.svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame
@@ -250,7 +251,7 @@ public class A200BeamShearLA3diJwithkaisekitest {
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A200BeamShearLA3diJwithkaisekitest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A200BeamShearLAAdiJwithanalysis.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

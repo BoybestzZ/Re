@@ -46,7 +46,7 @@ public class ed14A500BeamInflectionPointTest {
 
     private static final Logger logger = Logger.getLogger(ed14A500BeamInflectionPointTest.class.getName());
     static final Path svgdir = Path.of("C:\\Users\\75496\\Documents\\E-Defense\\BeamNMDistribution");
-    static final String dburl = "jdbc:h2:tcp://localhost/C://Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
+    static final String dburl = "jdbc:h2:tcp://localhost/C://Users\\75496\\Documents\\E-Defense\\test/ed14v230721";
     static final String readTable = "A310SectionNM";
 
     public static void main(String[] args) {

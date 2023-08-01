@@ -2,9 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate;
+package sea.sea01.shearforcewithanalysis.ns;
 
+import sea.sea01.shearforcewithanalysis.ew.*;
 import java.awt.BasicStroke;
+import sea.sea01.columnbeam.oldcolumnEW.columnEWJ.*;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
@@ -41,7 +43,6 @@ import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 
 /**
  * modified by Iyama. Use XYdataset. THe xaxisl will be number.
@@ -49,15 +50,14 @@ import org.jfree.data.xy.XYSeriesCollection;
  *
  * @author 75496
  */
-public class A200BeamShearLA3diJwithkaisekitest {
+public class A200BeamShearC3FB3 {
 
     public static void main(String[] args) throws IOException {
 
         try {
             String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
 
-            double distance = 1.24; // distance between Section 2 and Section 4;
-            double section = 0.23;
+            double distance = 1.15; // distance between Section 2 and Section 4;
 
             // Connect to database
             Connection con = DriverManager.getConnection(dburl, "junapp", "");
@@ -77,50 +77,41 @@ public class A200BeamShearLA3diJwithkaisekitest {
             XYSeries tohoku = new XYSeries("tohoku");
             XYSeries kobe = new XYSeries("kobe");
             
-                // Create series for y = 6 black line
+            // Create series for y = 6 black line
             XYSeries blackLine = new XYSeries("Analysis");
             for (int i = 0; i < kasins.length; i++) {
-                blackLine.add(i + 1, 6.0);
+                blackLine.add(i + 1, 4.448);
             }
-            
 
             // Create table to store results if it doesn't exist
-            st.executeUpdate("CREATE TABLE IF NOT EXISTS ShearForceResultsC2FA3ew (TestName VARCHAR(20), ShearForce DOUBLE)");
+            st.executeUpdate("CREATE TABLE IF NOT EXISTS ShearForceResultsC3FB3nsJ (TestName VARCHAR(20), ShearForce DOUBLE)");
 
             for (int i = 0; i < kasins.length; i++) {
                 String testName = kasins[i].getTestName();  //D01Q01
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    ResultSet rs = st.executeQuery("SELECT \"StiffnessAxialA[N/m]\"*0.000002, \"StiffnessAxialP[rad]\", \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" where TESTNAME='" + testName + "' and SECTION='LA3S2';");
-                    rs.next();
+                ResultSet rs = st.executeQuery("SELECT \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" where testname='" + testName + "' and section like 'CS3FB3Bns'");
 
-                    // get results
-                    double axialAmplitudeS2 = rs.getDouble(1);
-                    double axialPhaseS2 = rs.getDouble(2);
-                    double momentAmplitudeS2 = rs.getDouble(3);
-                    double momentPhaseS2 = rs.getDouble(4);
+                rs.next(); // goto the 1st line
+                // get results
+                double amplitudeS2 = rs.getDouble(1);
+                double phaseS2 = rs.getDouble(2);
 
-                    // Execute query and get result set
-                    rs = st.executeQuery("SELECT \"StiffnessAxialA[N/m]\"*0.000002, \"StiffnessAxialP[rad]\", \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" where TESTNAME='" + testName + "' and SECTION='LA3S4';");
+                // Execute query and get result set
+                rs = st.executeQuery("SELECT \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" where testname='" + testName + "' and section like 'CS3FB3Tns'");
 
-                    rs.next();
+                rs.next();
+                double amplitudeS4 = rs.getDouble(1);
+                double phaseS4 = rs.getDouble(2);
 
-                    double axialAmplitudeS4 = rs.getDouble(1);
-                    double axialPhaseS4 = rs.getDouble(2);
-                    double momentAmplitudeS4 = rs.getDouble(3);
-                    double momentPhaseS4 = rs.getDouble(4);
-
-                    Complex momentS2 = ComplexUtils.polar2Complex(momentAmplitudeS2, momentPhaseS2);
-                    Complex momentS4 = ComplexUtils.polar2Complex(momentAmplitudeS4, momentPhaseS4);
-                    Complex axialMomentS2 = ComplexUtils.polar2Complex(axialAmplitudeS2, axialPhaseS2);
-                    Complex axialMomentS4 = ComplexUtils.polar2Complex(axialAmplitudeS4, axialPhaseS4);
-                    Complex allmoment2 = momentS2.add((axialMomentS2).multiply(section));
-                    Complex allmoment4 = momentS4.add((axialMomentS4).multiply(section));
-                    Complex shearForceComplex = (allmoment4.subtract(allmoment2)).divide(distance);
+                // if you want to consider phase
+                Complex momentS2 = ComplexUtils.polar2Complex(amplitudeS2, phaseS2);
+                Complex momentS4 = ComplexUtils.polar2Complex(amplitudeS4, phaseS4);
+                Complex shearForceComplex = (momentS2.subtract(momentS4)).divide(distance);
 
                 // Insert the result into the table
-                String insertQuery = "INSERT INTO ShearForceResultsC2FA3ew (TestName, ShearForce) VALUES ('" + testName + "', " + shearForceComplex.getReal() + ")";
+                String insertQuery = "INSERT INTO ShearForceResultsC3FB3nsJ (TestName, ShearForce) VALUES ('" + testName + "', " + shearForceComplex.getReal() + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
 
@@ -132,6 +123,7 @@ public class A200BeamShearLA3diJwithkaisekitest {
                     tohoku.add(i + 1, shearForceComplex.getReal());
                 } else if (waveName.startsWith("Kobe")) {
                     kobe.add(i + 1, shearForceComplex.getReal());
+
                 }
 
             }
@@ -146,7 +138,7 @@ public class A200BeamShearLA3diJwithkaisekitest {
             dataset.addSeries("Analysis", blackLine.toArray());
             
             // Create the chart
-            JFreeChart chart = ChartFactory.createXYLineChart("Sf_LA3diJ", "Testname", "Shearforce (kN)",
+            JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "Shear local stiffness (kN/mm)",
                     dataset, PlotOrientation.VERTICAL, true, true, false);
 
             // Customize the chart
@@ -238,7 +230,7 @@ public class A200BeamShearLA3diJwithkaisekitest {
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea02\\sf_LA3withanalysis.svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea02\\sf_C3FB3nswithanalysis.svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame
@@ -250,7 +242,7 @@ public class A200BeamShearLA3diJwithkaisekitest {
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A200BeamShearLA3diJwithkaisekitest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A200BeamShearC3FB3.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

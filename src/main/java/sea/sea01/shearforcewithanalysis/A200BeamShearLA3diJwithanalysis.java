@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate;
+package sea.sea01.shearforcewithanalysis;
 
+import sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -49,7 +50,7 @@ import org.jfree.data.xy.XYSeriesCollection;
  *
  * @author 75496
  */
-public class A200BeamShearLA3diJwithkaisekitest {
+public class A200BeamShearLA3diJwithanalysis {
 
     public static void main(String[] args) throws IOException {
 
@@ -80,7 +81,7 @@ public class A200BeamShearLA3diJwithkaisekitest {
                 // Create series for y = 6 black line
             XYSeries blackLine = new XYSeries("Analysis");
             for (int i = 0; i < kasins.length; i++) {
-                blackLine.add(i + 1, 6.0);
+                blackLine.add(i + 1, 5.961);
             }
             
 
@@ -146,7 +147,7 @@ public class A200BeamShearLA3diJwithkaisekitest {
             dataset.addSeries("Analysis", blackLine.toArray());
             
             // Create the chart
-            JFreeChart chart = ChartFactory.createXYLineChart("Sf_LA3diJ", "Testname", "Shearforce (kN)",
+            JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "Shearforce (kN/mm)",
                     dataset, PlotOrientation.VERTICAL, true, true, false);
 
             // Customize the chart
@@ -250,7 +251,7 @@ public class A200BeamShearLA3diJwithkaisekitest {
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A200BeamShearLA3diJwithkaisekitest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A200BeamShearLA3diJwithanalysis.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
