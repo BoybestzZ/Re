@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea01.shearforcewithanalysis;
+package sea.sea03.NeutralAxis.Beam.BeamLA3;
 
 import sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate.*;
 import java.awt.BasicStroke;
@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 import jun.chart.JunChartUtil;
 import jun.res23.ed.util.EdefenseInfo;
 import jun.res23.ed.util.EdefenseKasinInfo;
-import jun.util.JunShapes;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.complex.ComplexUtils;
 import org.jfree.chart.ChartFactory;
@@ -42,7 +41,6 @@ import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 
 /**
  * modified by Iyama. Use XYdataset. THe xaxisl will be number.
@@ -50,15 +48,16 @@ import org.jfree.data.xy.XYSeriesCollection;
  *
  * @author 75496
  */
-public class A200BeamShearLABdiJwithanalysis {
+public class A700NeutralAxisLA3S2nk {
 
     public static void main(String[] args) throws IOException {
 
         try {
             String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
+            
+            double distance = 0.326; // distance between inner web (Beam3 = 350 - 2*12)
+            double slab = 0.11;
 
-            double distance = 1.63; // distance between Section 2 and Section 4;
-            double section = 0.177;
 
             // Connect to database
             Connection con = DriverManager.getConnection(dburl, "junapp", "");
@@ -73,81 +72,57 @@ public class A200BeamShearLABdiJwithanalysis {
 
             // Prepare dataset
             DefaultXYDataset dataset = new DefaultXYDataset();
+            
             XYSeries random = new XYSeries("random");
             XYSeries kumamoto = new XYSeries("kumamoto");
             XYSeries tohoku = new XYSeries("tohoku");
-            XYSeries kobe = new XYSeries("kobe");
-            
-                // Create series for y = 6 black line
-            XYSeries blackLine = new XYSeries("Analysis");
-            for (int i = 0; i < kasins.length; i++) {
-                blackLine.add(i + 1, 2.512);
-            }
-            
-
-            // Create table to store results if it doesn't exist
-            st.executeUpdate("CREATE TABLE IF NOT EXISTS ShearForceResultsC2FA3ew (TestName VARCHAR(20), ShearForce DOUBLE)");
 
             for (int i = 0; i < kasins.length; i++) {
                 String testName = kasins[i].getTestName();  //D01Q01
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    ResultSet rs = st.executeQuery("SELECT \"StiffnessAxialA[N/m]\"*0.000002, \"StiffnessAxialP[rad]\", \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" where TESTNAME='" + testName + "' and SECTION='LABS2';");
+                    ResultSet rs = st.executeQuery("SELECT \"Strain1A[με*s]\", \"Strain1P[rad]\", \"Strain2A[με*s]\", \"Strain2P[rad]\",  \"Strain3A[με*s]\", \"Strain3P[rad]\",  \"Strain4A[με*s]\", \"Strain4P[rad]\", FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = 'LA3S2'");
                     rs.next();
 
                     // get results
-                    double axialAmplitudeS2 = rs.getDouble(1);
-                    double axialPhaseS2 = rs.getDouble(2);
-                    double momentAmplitudeS2 = rs.getDouble(3);
-                    double momentPhaseS2 = rs.getDouble(4);
+                    double UL = rs.getDouble(1);
+                    double phaseUL = rs.getDouble(2);
+                    double UR = rs.getDouble(3);
+                    double phaseUR = rs.getDouble(4);
+                    double DL = rs.getDouble(5);
+                    double phaseDL = rs.getDouble(6);
+                    double DR = rs.getDouble(7);
+                    double phaseDR = rs.getDouble(8);
 
-                    // Execute query and get result set
-                    rs = st.executeQuery("SELECT \"StiffnessAxialA[N/m]\"*0.000002, \"StiffnessAxialP[rad]\", \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" where TESTNAME='" + testName + "' and SECTION='LABS4';");
+                    Complex strainUL = ComplexUtils.polar2Complex(UL, phaseUL);
+                    Complex strainUR = ComplexUtils.polar2Complex(UR, phaseUR);
+                    Complex strainDL = ComplexUtils.polar2Complex(DL, phaseDL);
+                    Complex strainDR = ComplexUtils.polar2Complex(DR, phaseDR);
+                    
+                    Complex strainU = (strainUL.add(strainUR)).multiply(0.5);
+                    Complex strainD = (strainDL.add(strainDR)).multiply(0.5);
+                    Complex strainUD = strainU.subtract(strainD);
+                    Complex neutralAxis = ((strainU.multiply(distance)).divide(strainUD)).add(slab);
 
-                    rs.next();
-
-                    double axialAmplitudeS4 = rs.getDouble(1);
-                    double axialPhaseS4 = rs.getDouble(2);
-                    double momentAmplitudeS4 = rs.getDouble(3);
-                    double momentPhaseS4 = rs.getDouble(4);
-
-                    Complex momentS2 = ComplexUtils.polar2Complex(momentAmplitudeS2, momentPhaseS2);
-                    Complex momentS4 = ComplexUtils.polar2Complex(momentAmplitudeS4, momentPhaseS4);
-                    Complex axialMomentS2 = ComplexUtils.polar2Complex(axialAmplitudeS2, axialPhaseS2);
-                    Complex axialMomentS4 = ComplexUtils.polar2Complex(axialAmplitudeS4, axialPhaseS4);
-                    Complex allmoment2 = momentS2.add((axialMomentS2).multiply(section));
-                    Complex allmoment4 = momentS4.add((axialMomentS4).multiply(section));
-                    Complex shearForceComplex = (allmoment4.subtract(allmoment2)).divide(distance);
-
-                // Insert the result into the table
-                String insertQuery = "INSERT INTO ShearForceResultsC2FA3ew (TestName, ShearForce) VALUES ('" + testName + "', " + shearForceComplex.getReal() + ")";
-                st.executeUpdate(insertQuery);
-                System.out.println("Record for TestName '" + testName + "' inserted into the table.");
 
                 if (waveName.equals("Random")) {
-                    random.add(i + 1, shearForceComplex.getReal());
+                    random.add(i + 1, neutralAxis.getReal());
                 } else if (waveName.equals("KMMH02")) {
-                    kumamoto.add(i + 1, shearForceComplex.getReal());
+                    kumamoto.add(i + 1, neutralAxis.getReal());
                 } else if (waveName.equals("FKS020")) {
-                    tohoku.add(i + 1, shearForceComplex.getReal());
-                } else if (waveName.startsWith("Kobe")) {
-                    kobe.add(i + 1, shearForceComplex.getReal());
+                    tohoku.add(i + 1, neutralAxis.getReal());
                 }
 
             }
-
-          
+            
             dataset.addSeries("Random", random.toArray());
             dataset.addSeries("tohoku", tohoku.toArray());
             dataset.addSeries("kumamoto", kumamoto.toArray());
-            dataset.addSeries("kobe", kobe.toArray());
-            
-                // Add the black line series to the dataset
-            dataset.addSeries("Analysis", blackLine.toArray());
-            
+
+
             // Create the chart
-            JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "Shearforce (kN/mm)",
+            JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "Neutral axis location (m)",
                     dataset, PlotOrientation.VERTICAL, true, true, false);
 
             // Customize the chart
@@ -160,12 +135,15 @@ public class A200BeamShearLABdiJwithanalysis {
             domainAxis.setTickLabelFont(domainAxis.getTickLabelFont().deriveFont(12f));
             domainAxis.setVerticalTickLabels(true);
             NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-            rangeAxis.setRange(0, 15); // Set the y-axis range
-            domainAxis.setLowerBound(0.1);
-            domainAxis.setUpperBound(24.9);
+            rangeAxis.setRange(0, 0.35); // Set the y-axis range
             rangeAxis.setStandardTickUnits(NumberAxis.createStandardTickUnits());
             plot.setOutlineStroke(new BasicStroke(2f)); // frame around the plot
             plot.setAxisOffset(RectangleInsets.ZERO_INSETS); // remove space between frame and axis.
+            rangeAxis.setInverted(true);
+            
+            domainAxis.setLowerBound(0.1);
+            domainAxis.setUpperBound(24.9);
+            
 
             
             // Prepare the mapping of test names to labels dynamically
@@ -181,65 +159,28 @@ public class A200BeamShearLABdiJwithanalysis {
             ChoiceFormat formatter = new ChoiceFormat(testValues, testNames);
             domainAxis.setNumberFormatOverride(formatter);
             
-            
-//            XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, false);
+
             XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
             renderer.setSeriesPaint(0, Color.RED);
             plot.setRenderer(renderer);
             
             
-            renderer.setSeriesShape(0, JunShapes.createUpTriangle(4));
-            renderer.setSeriesShape(1, JunShapes.createUpTriangle(4));
-            renderer.setSeriesShape(2, JunShapes.createUpTriangle(4));
-            renderer.setSeriesShape(3, JunShapes.createUpTriangle(4));
-//            renderer.setSeriesShape(4,null);
-            renderer.setSeriesShapesVisible(4, false);
-
-            
-            renderer.setSeriesPaint(0, Color.RED);
-            renderer.setSeriesPaint(1, Color.BLUE);
-            renderer.setSeriesPaint(2, Color.GREEN);
-            renderer.setSeriesPaint(3, Color.ORANGE);
-            renderer.setSeriesPaint(4, Color.BLACK);
-           
-            
-            BasicStroke newStroke = new BasicStroke(1.0f); // Creating a new stroke with thickness 2.0f
-            renderer.setSeriesStroke(4, newStroke); // Setting the new stroke for series at index 4
-
-            
-
-            
-//                // Add horizontal line y = 6
-//            double[] xValues = { 0, 24 }; // Adjust the range of x-values as needed
-//            double[] yValues = { 6, 6 };
-//            XYSeries horizontalLine = new XYSeries("Analysis");
-//            horizontalLine.add(xValues[0], yValues[0]);
-//            horizontalLine.add(xValues[1], yValues[1]);
-//            XYSeriesCollection hLineDataset = new XYSeriesCollection();
-//            hLineDataset.addSeries(horizontalLine);
-//            plot.setDataset(1, hLineDataset);
-//            plot.setRenderer(1, new XYLineAndShapeRenderer(true, false));
-//            plot.getRenderer(1).setSeriesPaint(0, Color.BLACK);
-//            plot.getRenderer(1).setSeriesStroke(0, new BasicStroke(2));
-            
-            
             // insert legend to the plot
             LegendTitle legend = chart.getLegend(); // obtain legend box
-            XYTitleAnnotation ta=new XYTitleAnnotation(0.95 ,0.05, legend, RectangleAnchor.BOTTOM_RIGHT);
+            XYTitleAnnotation ta=new XYTitleAnnotation(0.95 ,0.95, legend, RectangleAnchor.BOTTOM_RIGHT);
             legend.setBorder(1, 1, 1, 1); // frame around legend
             plot.addAnnotation(ta);
             chart.removeLegend();
             
-            
 
             // Export the chart as PNG
             int width = 650;
-            int height = 350;
+            int height = 300;
 //            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf_C2FA3ew.png";
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea02\\sf_LABwithanalysis.svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\neutralaxis\\na_LA3S2.svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame
@@ -251,7 +192,7 @@ public class A200BeamShearLABdiJwithanalysis {
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A200BeamShearLABdiJwithanalysis.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A700NeutralAxisLA3S2nk.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

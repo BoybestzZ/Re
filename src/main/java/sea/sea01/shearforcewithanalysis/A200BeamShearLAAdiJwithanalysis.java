@@ -57,7 +57,7 @@ public class A200BeamShearLAAdiJwithanalysis {
         try {
             String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
 
-            double distance = 1.24; // distance between Section 2 and Section 4;
+            double distance = 1.63; // distance between Section 2 and Section 4;
             double section = 0.23;
 
             // Connect to database

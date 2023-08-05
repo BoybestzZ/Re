@@ -74,25 +74,25 @@ public class A600FrequencydiLA3 {
             XYSeries tohoku = new XYSeries("tohoku");
             XYSeries kobe = new XYSeries("kobe");
 
-            // Create table to store results if it doesn't exist
-            st.executeUpdate("CREATE TABLE IF NOT EXISTS FrequencyLA3 (TestName VARCHAR(20), ShearForce DOUBLE)");
+//            // Create table to store results if it doesn't exist
+//            st.executeUpdate("CREATE TABLE IF NOT EXISTS FrequencyLA3 (TestName VARCHAR(20), ShearForce DOUBLE)");
 
             for (int i = 0; i < kasins.length; i++) {
                 String testName = kasins[i].getTestName();  //D01Q01
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    ResultSet rs = st.executeQuery("SELECT \"Freq[Hz]\" FROM \"A310SectionNM\" WHERE TESTNAME = '" + testName + "' and SECTION = 'LA3S1';");
+                    ResultSet rs = st.executeQuery("SELECT \"Freq[Hz]\" FROM \"A310SectionNM\" WHERE TESTNAME = '" + testName + "' and SECTION = 'LA3S2';");
                     rs.next();
 
                     double frequency = rs.getDouble(1);
 
 
 
-                // Insert the result into the table
-                String insertQuery = "INSERT INTO FrequencyLA3 (TestName, ShearForce) VALUES ('" + testName + "', " + frequency + ")";
-                st.executeUpdate(insertQuery);
-                System.out.println("Record for TestName '" + testName + "' inserted into the table.");
+//                // Insert the result into the table
+//                String insertQuery = "INSERT INTO FrequencyLA3 (TestName, ShearForce) VALUES ('" + testName + "', " + frequency + ")";
+//                st.executeUpdate(insertQuery);
+//                System.out.println("Record for TestName '" + testName + "' inserted into the table.");
 
                 if (waveName.equals("Random")) {
                     random.add(i + 1, frequency);
@@ -111,6 +111,8 @@ public class A600FrequencydiLA3 {
             dataset.addSeries("tohoku", tohoku.toArray());
             dataset.addSeries("kumamoto", kumamoto.toArray());
             dataset.addSeries("kobe", kobe.toArray());
+            
+            
             // Create the chart
             JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "Frequency (Hz)",
                     dataset, PlotOrientation.VERTICAL, true, true, false);
@@ -129,6 +131,9 @@ public class A600FrequencydiLA3 {
             rangeAxis.setStandardTickUnits(NumberAxis.createStandardTickUnits());
             plot.setOutlineStroke(new BasicStroke(2f)); // frame around the plot
             plot.setAxisOffset(RectangleInsets.ZERO_INSETS); // remove space between frame and axis.
+            
+            domainAxis.setLowerBound(0.1);
+            domainAxis.setUpperBound(24.9);
 
             
             // Prepare the mapping of test names to labels dynamically
@@ -161,7 +166,7 @@ public class A600FrequencydiLA3 {
             
 
             // Export the chart as PNG
-            int width = 500;
+            int width = 650;
             int height = 250;
 //            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf_C2FA3ew.png";
 //            File chartFile = new File(filePath);
