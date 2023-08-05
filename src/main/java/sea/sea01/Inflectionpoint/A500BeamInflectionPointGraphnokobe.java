@@ -7,7 +7,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea01;
+package sea.sea01.Inflectionpoint;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -54,7 +54,7 @@ import org.jfree.data.xy.XYSeries;
  *
  * @author 75496
  */
-public class A500BeamInflectionPointGraph {
+public class A500BeamInflectionPointGraphnokobe {
     
 
     public static void main(String[] args) throws IOException {
@@ -79,7 +79,7 @@ public class A500BeamInflectionPointGraph {
             XYSeries random = new XYSeries("random");
             XYSeries kumamoto = new XYSeries("kumamoto");
             XYSeries tohoku = new XYSeries("tohoku");
-            XYSeries kobe = new XYSeries("kobe");
+
 
             
 
@@ -102,10 +102,7 @@ public class A500BeamInflectionPointGraph {
                     kumamoto.add(i + 1, inflectionPoint);
                 } else if (waveName.equals("FKS020")) {
                     tohoku.add(i + 1, inflectionPoint);
-                } else if (waveName.startsWith("Kobe")) {
-                    kobe.add(i + 1, inflectionPoint);
-
-                }
+                } 
 
             }
 
@@ -113,7 +110,7 @@ public class A500BeamInflectionPointGraph {
             dataset.addSeries("Random", random.toArray());
             dataset.addSeries("tohoku", tohoku.toArray());
             dataset.addSeries("kumamoto", kumamoto.toArray());
-            dataset.addSeries("kobe", kobe.toArray());
+
             // Create the chart
             JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "Inflection point (m)",
                     dataset, PlotOrientation.VERTICAL, true, true, false);
@@ -197,7 +194,7 @@ public class A500BeamInflectionPointGraph {
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A500BeamInflectionPointGraph.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A500BeamInflectionPointGraphnokobe.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

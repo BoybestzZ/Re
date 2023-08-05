@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea01;
+package sea.sea01.Inflectionpoint;
 
 import jun.res23.ed.ed14分析UF.*;
 import java.awt.Color;

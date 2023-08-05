@@ -78,6 +78,8 @@ public class A200BeamShearLA3diJwithanalysis {
             XYSeries tohoku = new XYSeries("tohoku");
             XYSeries kobe = new XYSeries("kobe");
             
+            
+            
                 // Create series for y = 6 black line
             XYSeries blackLine = new XYSeries("Analysis");
             for (int i = 0; i < kasins.length; i++) {

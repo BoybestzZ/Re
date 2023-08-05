@@ -7,8 +7,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea01;
+package sea.sea01.Inflectionpoint.Column.ew;
 
+import sea.sea01.Inflectionpoint.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -54,7 +55,7 @@ import org.jfree.data.xy.XYSeries;
  *
  * @author 75496
  */
-public class A500ColumnInflectionPointGraph {
+public class A500ColumnInflectionPointC3FB3 {
     
 
     public static void main(String[] args) throws IOException {
@@ -88,7 +89,7 @@ public class A500ColumnInflectionPointGraph {
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    ResultSet rs = st.executeQuery("SELECT \"INFLECTIONPOINT\" FROM \"COLUMNINFLECTIONPOINTDATA\" where TESTNAME='" + testName + "' and COLUMNNAME='Column2F3Ans';");
+                    ResultSet rs = st.executeQuery("SELECT \"INFLECTIONPOINT\" FROM \"COLUMNINFLECTIONPOINTDATA\" where TESTNAME='" + testName + "' and COLUMNNAME='Column3F3Bew';");
                     rs.next();
 
                     // get results
@@ -172,7 +173,7 @@ public class A500ColumnInflectionPointGraph {
             
             // insert legend to the plot
             LegendTitle legend = chart.getLegend(); // obtain legend box
-            XYTitleAnnotation ta=new XYTitleAnnotation(0.95 ,0.05, legend, RectangleAnchor.BOTTOM_RIGHT);
+            XYTitleAnnotation ta=new XYTitleAnnotation(0.95 ,0.75, legend, RectangleAnchor.BOTTOM_RIGHT);
             legend.setBorder(1, 1, 1, 1); // frame around legend
             plot.addAnnotation(ta);
             chart.removeLegend();
@@ -180,12 +181,12 @@ public class A500ColumnInflectionPointGraph {
             // Export the chart as PNG
             int width = 650;
             int height = 250;
-//            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf_C2FA3ew.png";
+//            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\Inflectionpoint\\ip_LA3.png";
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-//              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf_C2FA3ew.svg";
-//              JunChartUtil.svg(filePath, width, height, chart);
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\Inflectionpoint\\ip_C3F3Bew.svg";
+              JunChartUtil.svg(filePath, width, height, chart);
 
 
             // Display the chart in a frame
@@ -197,7 +198,7 @@ public class A500ColumnInflectionPointGraph {
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A500ColumnInflectionPointGraph.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A500ColumnInflectionPointC3FB3.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

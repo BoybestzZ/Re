@@ -42,8 +42,25 @@ public class A200ColumnSFPC {
 
     public static void main(String[] args) {
         try {
-            columnShearForcePercentageGraph(EdefenseInfo.Column2FA3, "ns");
             columnShearForcePercentageGraph(EdefenseInfo.Column2FA3, "ew");
+            columnShearForcePercentageGraph(EdefenseInfo.Column2FA4, "ew");
+            columnShearForcePercentageGraph(EdefenseInfo.Column2FB3, "ew");
+            columnShearForcePercentageGraph(EdefenseInfo.Column2FB4, "ew");
+            columnShearForcePercentageGraph(EdefenseInfo.Column3FA3, "ew");
+            columnShearForcePercentageGraph(EdefenseInfo.Column3FA4, "ew");
+            columnShearForcePercentageGraph(EdefenseInfo.Column3FB3, "ew");
+            columnShearForcePercentageGraph(EdefenseInfo.Column3FB4, "ew");
+            
+            columnShearForcePercentageGraph(EdefenseInfo.Column2FA3, "ns");
+            columnShearForcePercentageGraph(EdefenseInfo.Column2FA4, "ns");
+            columnShearForcePercentageGraph(EdefenseInfo.Column2FB3, "ns");
+            columnShearForcePercentageGraph(EdefenseInfo.Column2FB4, "ns");
+            columnShearForcePercentageGraph(EdefenseInfo.Column3FA3, "ns");
+            columnShearForcePercentageGraph(EdefenseInfo.Column3FA4, "ns");
+            columnShearForcePercentageGraph(EdefenseInfo.Column3FB3, "ns");
+            columnShearForcePercentageGraph(EdefenseInfo.Column3FB4, "ns");
+            
+            
             
             
         } catch (IOException ex) {
@@ -53,8 +70,8 @@ public class A200ColumnSFPC {
         }
 
     }
-
-    public static void columnShearForcePercentageGraph(ColumnInfo columnInfo, String ns) throws IOException, SQLException {
+// direction - ew / ns
+    public static void columnShearForcePercentageGraph(ColumnInfo columnInfo, String direction) throws IOException, SQLException {
 
     
             String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
@@ -76,7 +93,7 @@ public class A200ColumnSFPC {
           //  st.executeUpdate("DROP TABLE IF EXISTS \"A200ColumnShearForce\"");
             st.executeUpdate("CREATE TABLE IF NOT EXISTS \"A200ColumnShearForce\" "
                     + "(\"TestName\"VARCHAR(20), \"ColumnName\"  varchar, \"Direction\" varchar,  \"StiffnessShearForce[N/m]\" DOUBLE)");
-            st.executeUpdate("delete from \"A200ColumnShearForce\" where \"ColumnName\"='"+columnInfo.getName()+"' and \"Direction\"='"+ns+"'");
+            st.executeUpdate("delete from \"A200ColumnShearForce\" where \"ColumnName\"='"+columnInfo.getName()+"' and \"Direction\"='"+direction+"'");
 
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
             DefaultCategoryDataset dataset2 = new DefaultCategoryDataset();
@@ -96,7 +113,7 @@ public class A200ColumnSFPC {
                 for (String testName : testNames) {
                     // Execute query and get result set
                     // bottom
-                    String bottomSection = columnInfo.getSections()[0].getName()+ns;  // CS2FA3Bns
+                    String bottomSection = columnInfo.getSections()[0].getName()+direction;  // CS2FA3Bns
                     ResultSet rs = st.executeQuery("SELECT \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" "
                             + "where testname='" + testName + "' and section like '"+bottomSection+"'");
 
@@ -107,7 +124,7 @@ public class A200ColumnSFPC {
 
                     // Execute query and get result set
                     // top
-                    String topSection = columnInfo.getSections()[2].getName()+ns;  // CS2FA3Tns
+                    String topSection = columnInfo.getSections()[2].getName()+direction;  // CS2FA3Tns
                     rs = st.executeQuery("SELECT \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" "
                             + "where testname='" + testName + "' and section like '"+topSection+"'");
 
@@ -123,7 +140,7 @@ public class A200ColumnSFPC {
 
                     // Insert the result into the table
                     st.executeUpdate("INSERT INTO \"A200ColumnShearForce\" (\"TestName\",\"ColumnName\", \"Direction\", \"StiffnessShearForce[N/m]\") " // it is a good practice always to add unit.
-                            + "VALUES ('" + testName + "', '"+columnInfo.getName()+"','"+ns+"'," + shearForceComplex.getReal() + ")");
+                            + "VALUES ('" + testName + "', '"+columnInfo.getName()+"','"+direction+"'," + shearForceComplex.getReal() + ")");
 
                     // Add shear force value to the dataset with line name as series
                     dataset.addValue(shearForceComplex.getReal(), lineNames[i], testName);
@@ -305,7 +322,7 @@ public class A200ColumnSFPC {
             //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
             //            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf%nokobe_C2FA3ew.svg";
-            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea02\\sf%nokobe_"+columnInfo.getName()+ns+".svg";
+            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sf%(実験)\\sf%nokobe_"+columnInfo.getName()+direction+".svg";
             JunChartUtil.svg(filePath, width, height, lineChart);
 
 //            // Customize the chart
