@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea03.NeutralAxis.Beam.BeamA;
+package sea.sea03.Neutralaxistointegration.Beam.BeamA;
 
 import sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate.*;
 import java.awt.BasicStroke;
@@ -78,8 +78,8 @@ public class A700NeutralAxisLAAS1nk {
             XYSeries tohoku = new XYSeries("tohoku");
             
             // Create table to store results if it doesn't exist
-            st.executeUpdate("DROP TABLE IF EXISTS NeutralaxisA");
-            st.executeUpdate("CREATE TABLE IF NOT EXISTS NeutralaxisA (TestName VARCHAR(20), Neutralaxis DOUBLE)");
+            st.executeUpdate("DROP TABLE IF EXISTS phiAS1");
+            st.executeUpdate("CREATE TABLE IF NOT EXISTS phiAS1 (TestName VARCHAR(20), phi DOUBLE)");
 
             for (int i = 0; i < kasins.length; i++) {
                 String testName = kasins[i].getTestName();  //D01Q01
@@ -107,19 +107,25 @@ public class A700NeutralAxisLAAS1nk {
                     Complex strainU = (strainUL.add(strainUR)).multiply(0.5);
                     Complex strainD = (strainDL.add(strainDR)).multiply(0.5);
                     Complex strainUD = strainU.subtract(strainD);
-                    Complex neutralAxis = ((strainU.multiply(distance)).divide(strainUD)).add(slab);
+                    Complex neutralAxis = ((strainU.multiply(distance)).divide(strainUD));
+                    
+                    Complex phi1 = (strainU.divide(neutralAxis));     //curvature
+                    double phi2 = (phi1.getReal());
+                    
 
                     // Insert the result into the table
-                String insertQuery = "INSERT INTO NeutralaxisA (TestName, Neutralaxis) VALUES ('" + testName + "', " + neutralAxis.getReal() + ")";
+                String insertQuery = "INSERT INTO phiAS1 (TestName, phi) VALUES ('" + testName + "', " + phi2 + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
+                
+                System.out.println(phi1);
 
                 if (waveName.equals("Random")) {
-                    random.add(i + 1, neutralAxis.getReal());
+                    random.add(i + 1, phi2);
                 } else if (waveName.equals("KMMH02")) {
-                    kumamoto.add(i + 1, neutralAxis.getReal());
+                    kumamoto.add(i + 1, phi2);
                 } else if (waveName.equals("FKS020")) {
-                    tohoku.add(i + 1, neutralAxis.getReal());
+                    tohoku.add(i + 1, phi2);
                 }
 
             }
@@ -143,7 +149,7 @@ public class A700NeutralAxisLAAS1nk {
             domainAxis.setTickLabelFont(domainAxis.getTickLabelFont().deriveFont(12f));
             domainAxis.setVerticalTickLabels(true);
             NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-            rangeAxis.setRange(0, 0.35); // Set the y-axis range
+            rangeAxis.setRange(-2000, 2000); // Set the y-axis range
             rangeAxis.setStandardTickUnits(NumberAxis.createStandardTickUnits());
             plot.setOutlineStroke(new BasicStroke(2f)); // frame around the plot
             plot.setAxisOffset(RectangleInsets.ZERO_INSETS); // remove space between frame and axis.
@@ -192,12 +198,13 @@ public class A700NeutralAxisLAAS1nk {
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame
-            ChartFrame frame = new ChartFrame("Shear Force Results", chart);
+            ChartFrame frame = new ChartFrame("Phi", chart);
             frame.setPreferredSize(new Dimension(1200, 800));
             frame.pack();
             frame.setVisible(true);
 
             con.close();
+            
 
         } catch (SQLException ex) {
             Logger.getLogger(A700NeutralAxisLAAS1nk.class.getName()).log(Level.SEVERE, null, ex);
