@@ -111,7 +111,7 @@ public class A700NeutralAxisLA3S1nk {
                     Complex neutralAxis = ((strainU.multiply(distance)).divide(strainUD));
                     
                     Complex phi1 = (strainU.divide(neutralAxis));     //curvature
-                    double phi2 = (phi1.getReal());
+                    double phi2 = (phi1.getReal());                             //phi2
                     
                     System.out.println(neutralAxis.getReal());
                     
