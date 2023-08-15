@@ -59,7 +59,7 @@ public class A700NeutralAxisLA3S1nk {
             double distance = 0.326; // distance between inner web (Beam3 = 350 - 2*12)
             double slab = 0.11;
             double section = 0.23;
-            double EIs = 33442650.81;
+            double EIs = 33442650.81;           //unit: Nm2
             double EIeq = 42389172.29;
 
 
@@ -83,8 +83,8 @@ public class A700NeutralAxisLA3S1nk {
             XYSeries tohoku = new XYSeries("tohoku");
             
                  // Create 'momentLA3' table if it doesn't exist
-                st2.executeUpdate("DROP TABLE IF EXISTS EI3");
-                String createTableQuery = "CREATE TABLE IF NOT EXISTS EI3 (TestName VARCHAR(20), EI DOUBLE)";
+                st2.executeUpdate("DROP TABLE IF EXISTS EI3S1");
+                String createTableQuery = "CREATE TABLE IF NOT EXISTS EI3S1 (TestName VARCHAR(20), EI DOUBLE)";
                 st2.executeUpdate(createTableQuery);
 
             for (int i = 0; i < kasins.length; i++) {
@@ -92,7 +92,7 @@ public class A700NeutralAxisLA3S1nk {
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    ResultSet rs = st.executeQuery("SELECT \"Strain1A[με*s]\", \"Strain1P[rad]\", \"Strain2A[με*s]\", \"Strain2P[rad]\",  \"Strain3A[με*s]\", \"Strain3P[rad]\",  \"Strain4A[με*s]\", \"Strain4P[rad]\", FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = 'LA3S3'");
+                    ResultSet rs = st.executeQuery("SELECT \"Strain1A[με*s]\", \"Strain1P[rad]\", \"Strain2A[με*s]\", \"Strain2P[rad]\",  \"Strain3A[με*s]\", \"Strain3P[rad]\",  \"Strain4A[με*s]\", \"Strain4P[rad]\", FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = 'LA3S1'");
                     rs.next();
                     
                     // get results
@@ -120,7 +120,7 @@ public class A700NeutralAxisLA3S1nk {
                     
                     ResultSet rs2 = st.executeQuery("SELECT TESTNAME, CASE ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) WHEN 1 THEN 0.435 WHEN 2 THEN 0.955 WHEN 3 THEN 1.575 WHEN 4 THEN 2.195 WHEN 5 THEN 2.715 END AS NewColumn,"
                         + "\"AxialA[N*s]\", \"AxialP[rad]\", \"MomentXA[Nm*s]\", \"MomentXP[rad]\" "
-                        + "FROM \"A310SectionNM\" WHERE TESTNAME = '" +testName+ "' AND SECTION LIKE 'LA3S3'");
+                        + "FROM \"A310SectionNM\" WHERE TESTNAME = '" +testName+ "' AND SECTION LIKE 'LA3S1'");
                     rs2.next();
                     
                     //  String testname=rs.getString(1);
@@ -148,7 +148,7 @@ public class A700NeutralAxisLA3S1nk {
                     
 
                     // Insert data into 'EI3' table
-                    String insertQuery = "INSERT INTO EI3 (TestName, EI) VALUES ('" + testName + "', '" + EIEIs + "')";
+                    String insertQuery = "INSERT INTO EI3S1 (TestName, EI) VALUES ('" + testName + "', '" + EIEIs + "')";
                     st2.executeUpdate(insertQuery);
                     System.out.println("Record for TestName '" + testName + "' inserted into the table.");
                 
@@ -184,7 +184,7 @@ public class A700NeutralAxisLA3S1nk {
             domainAxis.setTickLabelFont(domainAxis.getTickLabelFont().deriveFont(12f));
             domainAxis.setVerticalTickLabels(true);
             NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-            rangeAxis.setRange(-2,10); // Set the y-axis range
+            rangeAxis.setRange(0,4); // Set the y-axis range
             rangeAxis.setStandardTickUnits(NumberAxis.createStandardTickUnits());
             plot.setOutlineStroke(new BasicStroke(2f)); // frame around the plot
             plot.setAxisOffset(RectangleInsets.ZERO_INSETS); // remove space between frame and axis.
@@ -216,7 +216,7 @@ public class A700NeutralAxisLA3S1nk {
             
             // insert legend to the plot
             LegendTitle legend = chart.getLegend(); // obtain legend box
-            XYTitleAnnotation ta=new XYTitleAnnotation(0.95 ,0.95, legend, RectangleAnchor.BOTTOM_RIGHT);
+            XYTitleAnnotation ta=new XYTitleAnnotation(0.95 ,0.05, legend, RectangleAnchor.BOTTOM_RIGHT);
             legend.setBorder(1, 1, 1, 1); // frame around legend
             plot.addAnnotation(ta);
             chart.removeLegend();
@@ -229,7 +229,7 @@ public class A700NeutralAxisLA3S1nk {
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\neutralaxis\\na_LAAS1.svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\flexuralstiffness\\fs_LA3S1.svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame

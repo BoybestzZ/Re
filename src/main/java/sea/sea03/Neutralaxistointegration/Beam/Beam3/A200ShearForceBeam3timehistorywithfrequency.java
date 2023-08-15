@@ -2,9 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea03.Neutralaxistointegration.Beam.BeamA;
+package sea.sea03.Neutralaxistointegration.Beam.Beam3;
 
-import sea.sea03.Neutralaxistointegration.Beam.Beam3.*;
 import sea.sea03.Neutralaxistointegration.Beam.BeamA.*;
 import sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate.*;
 import java.awt.BasicStroke;
@@ -50,18 +49,18 @@ import org.jfree.data.xy.XYSeries;
  *
  * @author 75496
  */
-public class A700NeutralAxisLAAS5nk {
+public class A200ShearForceBeam3timehistorywithfrequency {
 
     public static void main(String[] args) throws IOException {
 
         try {
             String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
             
-            double distance = 0.326; // distance between inner web (Beam3 = 350 - 2*12)
-            double slab = 0.11;
-            double section = 0.23;
-            double EIs = 33442650.81;
-            double EIeq = 42389172.29;
+//            double distance = 0.326; // distance between inner web (Beam3 = 350 - 2*12)
+//            double slab = 0.11;
+//            double section = 0.23;
+//            double EIs = 33442650.81;           //unit: Nm2
+//            double EIeq = 42389172.29;
 
 
             // Connect to database
@@ -79,100 +78,93 @@ public class A700NeutralAxisLAAS5nk {
             // Prepare dataset
             DefaultXYDataset dataset = new DefaultXYDataset();
             
-            XYSeries random = new XYSeries("random");
-            XYSeries kumamoto = new XYSeries("kumamoto");
-            XYSeries tohoku = new XYSeries("tohoku");
+            XYSeries randomp = new XYSeries("random+");
+            XYSeries kumamotop = new XYSeries("kumamoto+");
+            XYSeries tohokup = new XYSeries("tohoku+");
             
-                 // Create 'momentLA3' table if it doesn't exist
-                st2.executeUpdate("DROP TABLE IF EXISTS EIAS5");
-                String createTableQuery = "CREATE TABLE IF NOT EXISTS EIAS5 (TestName VARCHAR(20), EI DOUBLE)";
-                st2.executeUpdate(createTableQuery);
+            XYSeries randomn = new XYSeries("random-");
+            XYSeries kumamoton = new XYSeries("kumamoto-");
+            XYSeries tohokun = new XYSeries("tohoku-");
+            
+//                 // Create 'momentLA3' table if it doesn't exist
+//                st2.executeUpdate("DROP TABLE IF EXISTS EI3S1");
+//                String createTableQuery = "CREATE TABLE IF NOT EXISTS EI3S1 (TestName VARCHAR(20), EI DOUBLE)";
+//                st2.executeUpdate(createTableQuery);
 
             for (int i = 0; i < kasins.length; i++) {
                 String testName = kasins[i].getTestName();  //D01Q01
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    ResultSet rs = st.executeQuery("SELECT \"Strain1A[με*s]\", \"Strain1P[rad]\", \"Strain2A[με*s]\", \"Strain2P[rad]\",  \"Strain3A[με*s]\", \"Strain3P[rad]\",  \"Strain4A[με*s]\", \"Strain4P[rad]\", FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = 'LAAS5'");
+                    ResultSet rs = st.executeQuery("SELECT TESTNAME, MAX(SHEARFORCE) AS SHEARFORCE, MAX(POSITIVE) AS POSITIVE, MAX(NEGATIVE) AS NEGATIVE FROM ShearForceResultsBeam3 WHERE TESTNAME = '" +testName+ "' GROUP BY TESTNAME;");
                     rs.next();
                     
                     // get results
-                    double UL = rs.getDouble(1);
-                    double phaseUL = rs.getDouble(2);
-                    double UR = rs.getDouble(3);
-                    double phaseUR = rs.getDouble(4);
-                    double DL = rs.getDouble(5);
-                    double phaseDL = rs.getDouble(6);
-                    double DR = rs.getDouble(7);
-                    double phaseDR = rs.getDouble(8);
+                    double shearforce = rs.getDouble(2);
+                    double positive = rs.getDouble(3);
+                    double negative = rs.getDouble(4);
+                    
+//                    double shearpositive = positive/shearforce;
+//                    double shearnegative = negative/shearforce;
 
-                    Complex strainUL = ComplexUtils.polar2Complex(UL, phaseUL);
-                    Complex strainUR = ComplexUtils.polar2Complex(UR, phaseUR);
-                    Complex strainDL = ComplexUtils.polar2Complex(DL, phaseDL);
-                    Complex strainDR = ComplexUtils.polar2Complex(DR, phaseDR);
-                    
-                    Complex strainU = (strainUL.add(strainUR)).multiply(0.5);
-                    Complex strainD = (strainDL.add(strainDR)).multiply(0.5);
-                    Complex strainUD = strainU.subtract(strainD);
-                    Complex neutralAxis = ((strainU.multiply(distance)).divide(strainUD));
-                    
-                    Complex phi1 = ((strainU.divide(neutralAxis))).multiply(1e-6);     //curvature
+                    double shearpositive = shearforce/positive;
+                    double shearnegative = shearforce/negative;
                     
                     
-                    ResultSet rs2 = st.executeQuery("SELECT TESTNAME, CASE ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) WHEN 1 THEN 0.435 WHEN 2 THEN 0.955 WHEN 3 THEN 1.575 WHEN 4 THEN 2.195 WHEN 5 THEN 2.715 END AS NewColumn,"
-                        + "\"AxialA[N*s]\", \"AxialP[rad]\", \"MomentXA[Nm*s]\", \"MomentXP[rad]\" "
-                        + "FROM \"A310SectionNM\" WHERE TESTNAME = '" +testName+ "' AND SECTION LIKE 'LAAS5'");
-                    rs2.next();
-                    
-                    //  String testname=rs.getString(1);
-                    double sectionNo = rs2.getDouble(2);
-                    double axialamplitude = rs2.getDouble(3);
-                    double axialphase = rs2.getDouble(4);
-                    double momentamplitude = rs2.getDouble(5);
-                    double momentphase = rs2.getDouble(6);
-                    Complex axialMoment = ComplexUtils.polar2Complex(axialamplitude, axialphase);
-                    Complex moment = ComplexUtils.polar2Complex(momentamplitude, momentphase);
 
-                    Complex allMoment = moment.add((axialMoment).multiply(section));
-                            
 
-                    //Calculate EI
-                    Complex EI = allMoment.divide(phi1);
-                    double EI2 = (EI.getReal());
-                    
-                    double EIEIs = EI2/EIs; // EI/EIs
-//                      double EIEIeq = EI2/EIeq; // EI/EIs
-                              
-//                    double phi2 = (phi1.getReal());                         //phi2
+//                            
+//
+//                    //Calculate EI
+//                    Complex EI = allMoment.divide(phi1);
+//                    double EI2 = (EI.getReal());
 //                    
-//                    System.out.println(neutralAxis.getReal());
-                    
-
-                    // Insert data into 'EI3' table
-                    String insertQuery = "INSERT INTO EIAS5 (TestName, EI) VALUES ('" + testName + "', '" + EIEIs + "')";
-                    st2.executeUpdate(insertQuery);
-                    System.out.println("Record for TestName '" + testName + "' inserted into the table.");
+//                    double EIEIs = EI2/EIs; // EI/EIs
+////                      double EIEIeq = EI2/EIeq; // EI/EIs
+//                              
+////                    double phi2 = (phi1.getReal());                         //phi2
+////                    
+////                    System.out.println(neutralAxis.getReal());
+//                    
+//
+//                    // Insert data into 'EI3' table
+//                    String insertQuery = "INSERT INTO EI3S1 (TestName, EI) VALUES ('" + testName + "', '" + EIEIs + "')";
+//                    st2.executeUpdate(insertQuery);
+//                    System.out.println("Record for TestName '" + testName + "' inserted into the table.");
                 
 //                System.out.println(strainU.getReal());
 //                System.out.println(phi1);
 
                 if (waveName.equals("Random")) {
-                    random.add(i + 1, EIEIs);
+                    randomp.add(i + 1, shearpositive);
                 } else if (waveName.equals("KMMH02")) {
-                    kumamoto.add(i + 1, EIEIs);
+                    kumamotop.add(i + 1, shearpositive);
                 } else if (waveName.equals("FKS020")) {
-                    tohoku.add(i + 1, EIEIs);
+                    tohokup.add(i + 1, shearpositive);
                 }
+                
+                if (waveName.equals("Random")) {
+                    randomn.add(i + 1, shearnegative);
+                } else if (waveName.equals("KMMH02")) {
+                    kumamoton.add(i + 1, shearnegative);
+                } else if (waveName.equals("FKS020")) {
+                    tohokun.add(i + 1, shearnegative);
+                }
+                
 
             }
             
-            dataset.addSeries("Random", random.toArray());
-            dataset.addSeries("tohoku", tohoku.toArray());
-            dataset.addSeries("kumamoto", kumamoto.toArray());
+            dataset.addSeries("Random+", randomp.toArray());
+            dataset.addSeries("tohoku+", tohokup.toArray());
+            dataset.addSeries("kumamoto+", kumamotop.toArray());
+            
+            dataset.addSeries("Random-", randomn.toArray());
+            dataset.addSeries("tohoku-", tohokun.toArray());
+            dataset.addSeries("kumamoto-", kumamoton.toArray());
 
 
             // Create the chart
-            JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "EI/EsIs",
+            JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "F/+ or F/-",
                     dataset, PlotOrientation.VERTICAL, true, true, false);
 
             // Customize the chart
@@ -230,7 +222,7 @@ public class A700NeutralAxisLAAS5nk {
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\flexuralstiffness\\fs_LAAS5.svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\flexuralstiffness\\fs_LA3S1.svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame
@@ -243,7 +235,7 @@ public class A700NeutralAxisLAAS5nk {
             
 
         } catch (SQLException ex) {
-            Logger.getLogger(A700NeutralAxisLAAS5nk.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A200ShearForceBeam3timehistorywithfrequency.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

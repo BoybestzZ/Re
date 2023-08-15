@@ -4,6 +4,8 @@
  */
 package sea.sea03.Neutralaxistointegration.Beam.BeamA;
 
+import sea.sea03.Neutralaxistointegration.Beam.Beam3.*;
+import sea.sea03.Neutralaxistointegration.Beam.BeamA.*;
 import sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -57,11 +59,15 @@ public class A700NeutralAxisLAAS4nk {
             
             double distance = 0.326; // distance between inner web (Beam3 = 350 - 2*12)
             double slab = 0.11;
+            double section = 0.23;
+            double EIs = 33442650.81;
+            double EIeq = 42389172.29;
 
 
             // Connect to database
             Connection con = DriverManager.getConnection(dburl, "junapp", "");
             Statement st = con.createStatement();
+            Statement st2 = con.createStatement();
 
 //            String[] testNames = {"D01Q01", "D01Q02", "D01Q03", "D01Q04", "D01Q05", "D01Q06", "D01Q08", "D01Q09",
 //                "D01Q10", "D01Q11", "D02Q01", "D02Q01", "D02Q02", "D02Q03", "D02Q05",
@@ -77,9 +83,10 @@ public class A700NeutralAxisLAAS4nk {
             XYSeries kumamoto = new XYSeries("kumamoto");
             XYSeries tohoku = new XYSeries("tohoku");
             
-            // Create table to store results if it doesn't exist
-            st.executeUpdate("DROP TABLE IF EXISTS phiAS4");
-            st.executeUpdate("CREATE TABLE IF NOT EXISTS phiAS4 (TestName VARCHAR(20), phi DOUBLE)");
+                 // Create 'momentLA3' table if it doesn't exist
+                st2.executeUpdate("DROP TABLE IF EXISTS EIAS4");
+                String createTableQuery = "CREATE TABLE IF NOT EXISTS EIAS4 (TestName VARCHAR(20), EI DOUBLE)";
+                st2.executeUpdate(createTableQuery);
 
             for (int i = 0; i < kasins.length; i++) {
                 String testName = kasins[i].getTestName();  //D01Q01
@@ -88,7 +95,7 @@ public class A700NeutralAxisLAAS4nk {
                 // Execute query and get result set
                     ResultSet rs = st.executeQuery("SELECT \"Strain1A[με*s]\", \"Strain1P[rad]\", \"Strain2A[με*s]\", \"Strain2P[rad]\",  \"Strain3A[με*s]\", \"Strain3P[rad]\",  \"Strain4A[με*s]\", \"Strain4P[rad]\", FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = 'LAAS4'");
                     rs.next();
-
+                    
                     // get results
                     double UL = rs.getDouble(1);
                     double phaseUL = rs.getDouble(2);
@@ -109,23 +116,52 @@ public class A700NeutralAxisLAAS4nk {
                     Complex strainUD = strainU.subtract(strainD);
                     Complex neutralAxis = ((strainU.multiply(distance)).divide(strainUD));
                     
-                    Complex phi1 = (strainU.divide(neutralAxis));     //curvature
-                    double phi2 = (phi1.getReal());
+                    Complex phi1 = ((strainU.divide(neutralAxis))).multiply(1e-6);     //curvature
+                    
+                    
+                    ResultSet rs2 = st.executeQuery("SELECT TESTNAME, CASE ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) WHEN 1 THEN 0.435 WHEN 2 THEN 0.955 WHEN 3 THEN 1.575 WHEN 4 THEN 2.195 WHEN 5 THEN 2.715 END AS NewColumn,"
+                        + "\"AxialA[N*s]\", \"AxialP[rad]\", \"MomentXA[Nm*s]\", \"MomentXP[rad]\" "
+                        + "FROM \"A310SectionNM\" WHERE TESTNAME = '" +testName+ "' AND SECTION LIKE 'LAAS4'");
+                    rs2.next();
+                    
+                    //  String testname=rs.getString(1);
+                    double sectionNo = rs2.getDouble(2);
+                    double axialamplitude = rs2.getDouble(3);
+                    double axialphase = rs2.getDouble(4);
+                    double momentamplitude = rs2.getDouble(5);
+                    double momentphase = rs2.getDouble(6);
+                    Complex axialMoment = ComplexUtils.polar2Complex(axialamplitude, axialphase);
+                    Complex moment = ComplexUtils.polar2Complex(momentamplitude, momentphase);
+
+                    Complex allMoment = moment.add((axialMoment).multiply(section));
+                            
+
+                    //Calculate EI
+                    Complex EI = allMoment.divide(phi1);
+                    double EI2 = (EI.getReal());
+                    
+                    double EIEIs = EI2/EIs; // EI/EIs
+//                      double EIEIeq = EI2/EIeq; // EI/EIs
+                              
+//                    double phi2 = (phi1.getReal());                         //phi2
+//                    
+//                    System.out.println(neutralAxis.getReal());
                     
 
-                    // Insert the result into the table
-                String insertQuery = "INSERT INTO phiAS4 (TestName, phi) VALUES ('" + testName + "', " + phi2 + ")";
-                st.executeUpdate(insertQuery);
-                System.out.println("Record for TestName '" + testName + "' inserted into the table.");
+                    // Insert data into 'EI3' table
+                    String insertQuery = "INSERT INTO EIAS4 (TestName, EI) VALUES ('" + testName + "', '" + EIEIs + "')";
+                    st2.executeUpdate(insertQuery);
+                    System.out.println("Record for TestName '" + testName + "' inserted into the table.");
                 
-                System.out.println(phi1);
+//                System.out.println(strainU.getReal());
+//                System.out.println(phi1);
 
                 if (waveName.equals("Random")) {
-                    random.add(i + 1, phi2);
+                    random.add(i + 1, EIEIs);
                 } else if (waveName.equals("KMMH02")) {
-                    kumamoto.add(i + 1, phi2);
+                    kumamoto.add(i + 1, EIEIs);
                 } else if (waveName.equals("FKS020")) {
-                    tohoku.add(i + 1, phi2);
+                    tohoku.add(i + 1, EIEIs);
                 }
 
             }
@@ -136,7 +172,7 @@ public class A700NeutralAxisLAAS4nk {
 
 
             // Create the chart
-            JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "Neutral axis location (m)",
+            JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "EI/EsIs",
                     dataset, PlotOrientation.VERTICAL, true, true, false);
 
             // Customize the chart
@@ -149,11 +185,11 @@ public class A700NeutralAxisLAAS4nk {
             domainAxis.setTickLabelFont(domainAxis.getTickLabelFont().deriveFont(12f));
             domainAxis.setVerticalTickLabels(true);
             NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-            rangeAxis.setRange(-2000, 2000); // Set the y-axis range
+            rangeAxis.setRange(0,4); // Set the y-axis range
             rangeAxis.setStandardTickUnits(NumberAxis.createStandardTickUnits());
             plot.setOutlineStroke(new BasicStroke(2f)); // frame around the plot
             plot.setAxisOffset(RectangleInsets.ZERO_INSETS); // remove space between frame and axis.
-            rangeAxis.setInverted(true);
+//            rangeAxis.setInverted(true);
             
             domainAxis.setLowerBound(0.1);
             domainAxis.setUpperBound(24.9);
@@ -181,7 +217,7 @@ public class A700NeutralAxisLAAS4nk {
             
             // insert legend to the plot
             LegendTitle legend = chart.getLegend(); // obtain legend box
-            XYTitleAnnotation ta=new XYTitleAnnotation(0.95 ,0.95, legend, RectangleAnchor.BOTTOM_RIGHT);
+            XYTitleAnnotation ta=new XYTitleAnnotation(0.95 ,0.05, legend, RectangleAnchor.BOTTOM_RIGHT);
             legend.setBorder(1, 1, 1, 1); // frame around legend
             plot.addAnnotation(ta);
             chart.removeLegend();
@@ -194,7 +230,7 @@ public class A700NeutralAxisLAAS4nk {
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\neutralaxis\\na_LAAS1.svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\flexuralstiffness\\fs_LAAS4.svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame
