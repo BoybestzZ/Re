@@ -113,12 +113,15 @@ public class A700NeutralAxisLA3S1nk {
                     Complex phi1 = (strainU.divide(neutralAxis));     //curvature
                     double phi2 = (phi1.getReal());
                     
+                    System.out.println(neutralAxis.getReal());
+                    
 
                     // Insert the result into the table
                 String insertQuery = "INSERT INTO phi3S1 (TestName, phi) VALUES ('" + testName + "', " + phi2 + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
                 
+                System.out.println(strainU.getReal());
                 System.out.println(phi1);
 
                 if (waveName.equals("Random")) {

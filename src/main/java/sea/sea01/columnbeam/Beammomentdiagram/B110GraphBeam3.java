@@ -4,6 +4,7 @@
  */
 package sea.sea01.columnbeam.Beammomentdiagram;
 
+import java.awt.BasicStroke;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,6 +18,8 @@ import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.complex.ComplexUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
+import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
@@ -29,9 +32,9 @@ import org.jfree.data.xy.XYSeriesCollection;
 public class B110GraphBeam3 {
 
     public static void main(String[] args) throws IOException {
-        String[] testnames = {"D01Q01", 
-            "D01Q02", "D01Q03", "D01Q04", "D01Q05", "D01Q06", "D01Q08", "D01Q09", 
-                                  "D01Q10", "D01Q11", "D02Q01", "D02Q02", "D02Q03", "D02Q05", 
+        String[] testnames = {"D01Q09", 
+//            "D01Q02", "D01Q03", "D01Q04", "D01Q05", "D01Q06", "D01Q08", "D01Q09", 
+//                                  "D01Q10", "D01Q11", "D02Q01", "D02Q02", "D02Q03", "D02Q05", 
 //                                  "D02Q06", "D02Q08", "D03Q01", "D03Q02", "D03Q03", "D03Q04", "D03Q05", 
 //                                  "D03Q06", "D03Q08", "D03Q09"
         };      
@@ -59,6 +62,10 @@ public class B110GraphBeam3 {
 
                 // Prepare storage for XY data
                 XYSeries series = new XYSeries(testname);
+//                
+//                 // Create 'momentLA3' table if it doesn't exist
+//                String createTableQuery = "CREATE TABLE IF NOT EXISTS momentLA3 (TestName VARCHAR(20), moment DOUBLE)";
+//                st.executeUpdate(createTableQuery);
 
                 // Extract data from ResultSet and store the data to the XYseries
                 while (rs.next()) {
@@ -76,16 +83,27 @@ public class B110GraphBeam3 {
                     series.add(sectionNo, allMomentReal); // Store X,Y data.
                     // Change the key of XYSeries
                     // series.setKey(testname);
+                    
+//                    // Insert data into 'momentLA3' table
+//                    String insertQuery = "INSERT INTO momentLA3 (TestName, moment) VALUES ('" + testname + "', '" + allMomentReal + "')";
+//                    st.executeUpdate(insertQuery);
+//                    System.out.println("Record for TestName '" + testname + "' inserted into the table.");
+//                    System.out.println(allMomentReal);
+//                    System.out.println("test");
+
+
                 }
 
                 // Add the series to the dataset               
                 dataset.addSeries(series);
+                
+
 
             }
             // Prepare X adn Y axis
             NumberAxis xaxis = new NumberAxis("Section No");
             NumberAxis yaxis = new NumberAxis("Stiffness");
-            yaxis.setRange(-20, 20); // Set the y-axis range from 0 to 20
+            yaxis.setRange(-20, 10); // Set the y-axis range from 0 to 20
 //            yaxis.setInverted(true);
 
             
@@ -98,6 +116,7 @@ public class B110GraphBeam3 {
 
             // Create CHart
             JFreeChart chart = new JFreeChart(plot);
+            
 
             // Show Chart
             JunChartUtil.show(chart);
@@ -107,6 +126,9 @@ public class B110GraphBeam3 {
             String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\Beammoment\\BM_3.svg";
             JunChartUtil.svg(filePath, width, height, chart);
 
+            // close the statement
+            st.close();
+            
             // close connection
             con.close();
 
