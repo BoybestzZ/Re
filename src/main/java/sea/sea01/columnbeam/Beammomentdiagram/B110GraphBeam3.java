@@ -32,7 +32,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 public class B110GraphBeam3 {
 
     public static void main(String[] args) throws IOException {
-        String[] testnames = {"D01Q09", 
+        String[] testnames = {"D01Q03", 
 //            "D01Q02", "D01Q03", "D01Q04", "D01Q05", "D01Q06", "D01Q08", "D01Q09", 
 //                                  "D01Q10", "D01Q11", "D02Q01", "D02Q02", "D02Q03", "D02Q05", 
 //                                  "D02Q06", "D02Q08", "D03Q01", "D03Q02", "D03Q03", "D03Q04", "D03Q05", 
@@ -48,13 +48,14 @@ public class B110GraphBeam3 {
             // Connect to database
             Connection con = DriverManager.getConnection(dburl, "junapp", "");
             Statement st = con.createStatement();
+            Statement st2 = con.createStatement();
 
             // Prepare Dataset
             XYSeriesCollection dataset = new XYSeriesCollection();
             for (String testname : testnames) {
 
                 String sql = "SELECT TESTNAME, CASE ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) WHEN 1 THEN 0.435 WHEN 2 THEN 0.955 WHEN 3 THEN 1.575 WHEN 4 THEN 2.195 WHEN 5 THEN 2.715 END AS NewColumn,"
-                        + "\"StiffnessAxialA[N/m]\"*0.000002, \"StiffnessAxialP[rad]\", \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" "
+                        + "\"StiffnessAxialA[N/m]\"*0.000001, \"StiffnessAxialP[rad]\", \"StiffnessMomentXA[Nm/m]\"*0.000001, \"StiffnessMomentXP[rad]\" "
                         + "FROM \"A310SectionNM\" WHERE TESTNAME = '" +testname+ "' AND SECTION LIKE 'LA3S%'";
 
                 // Execute query.
@@ -63,9 +64,10 @@ public class B110GraphBeam3 {
                 // Prepare storage for XY data
                 XYSeries series = new XYSeries(testname);
 //                
-//                 // Create 'momentLA3' table if it doesn't exist
-//                String createTableQuery = "CREATE TABLE IF NOT EXISTS momentLA3 (TestName VARCHAR(20), moment DOUBLE)";
-//                st.executeUpdate(createTableQuery);
+                 // Create 'momentLA3' table if it doesn't exist
+                st2.executeUpdate("DROP TABLE IF EXISTS momentLA3");
+                String createTableQuery = "CREATE TABLE IF NOT EXISTS momentLA3 (TestName VARCHAR(20), moment DOUBLE)";
+                st2.executeUpdate(createTableQuery);
 
                 // Extract data from ResultSet and store the data to the XYseries
                 while (rs.next()) {
@@ -84,10 +86,10 @@ public class B110GraphBeam3 {
                     // Change the key of XYSeries
                     // series.setKey(testname);
                     
-//                    // Insert data into 'momentLA3' table
-//                    String insertQuery = "INSERT INTO momentLA3 (TestName, moment) VALUES ('" + testname + "', '" + allMomentReal + "')";
-//                    st.executeUpdate(insertQuery);
-//                    System.out.println("Record for TestName '" + testname + "' inserted into the table.");
+                    // Insert data into 'momentLA3' table
+                    String insertQuery = "INSERT INTO momentLA3 (TestName, moment) VALUES ('" + testname + "', '" + allMomentReal + "')";
+                    st2.executeUpdate(insertQuery);
+                    System.out.println("Record for TestName '" + testname + "' inserted into the table.");
 //                    System.out.println(allMomentReal);
 //                    System.out.println("test");
 
