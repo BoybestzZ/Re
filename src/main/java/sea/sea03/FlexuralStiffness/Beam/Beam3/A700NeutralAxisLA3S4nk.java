@@ -2,9 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea03.Neutralaxistointegration.Beam.Beam3;
+package sea.sea03.FlexuralStiffness.Beam.Beam3;
 
-import sea.sea03.Neutralaxistointegration.Beam.BeamA.*;
 import sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate.*;
 import java.awt.BasicStroke;
 import java.awt.Color;

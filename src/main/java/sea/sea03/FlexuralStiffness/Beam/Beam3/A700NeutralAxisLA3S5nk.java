@@ -2,10 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea03.Neutralaxistointegration.Beam.BeamB;
+package sea.sea03.FlexuralStiffness.Beam.Beam3;
 
-import sea.sea03.Neutralaxistointegration.Beam.Beam3.*;
-import sea.sea03.Neutralaxistointegration.Beam.BeamA.*;
 import sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -50,17 +48,18 @@ import org.jfree.data.xy.XYSeries;
  *
  * @author 75496
  */
-public class A700NeutralAxisLABS2nk {
+public class A700NeutralAxisLA3S5nk {
 
     public static void main(String[] args) throws IOException {
 
         try {
             String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
             
-            double distance = 0.222; // distance between inner web (Beam3 = 350 - 2*12)
+            double distance = 0.326; // distance between inner web (Beam3 = 350 - 2*12)
             double slab = 0.11;
-            double section = 0.177;
-            double EIs = 12028223.57;
+            double section = 0.23;
+            double EIs = 33442650.81;
+            double EIeq = 42389172.29;
 
 
             // Connect to database
@@ -83,8 +82,8 @@ public class A700NeutralAxisLABS2nk {
             XYSeries tohoku = new XYSeries("tohoku");
             
                  // Create 'momentLA3' table if it doesn't exist
-                st2.executeUpdate("DROP TABLE IF EXISTS EIBS2");
-                String createTableQuery = "CREATE TABLE IF NOT EXISTS EIBS2 (TestName VARCHAR(20), EI DOUBLE)";
+                st2.executeUpdate("DROP TABLE IF EXISTS EI3S5");
+                String createTableQuery = "CREATE TABLE IF NOT EXISTS EI3S5 (TestName VARCHAR(20), EI DOUBLE)";
                 st2.executeUpdate(createTableQuery);
 
             for (int i = 0; i < kasins.length; i++) {
@@ -92,7 +91,7 @@ public class A700NeutralAxisLABS2nk {
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    ResultSet rs = st.executeQuery("SELECT \"Strain1A[με*s]\", \"Strain1P[rad]\", \"Strain2A[με*s]\", \"Strain2P[rad]\",  \"Strain3A[με*s]\", \"Strain3P[rad]\",  \"Strain4A[με*s]\", \"Strain4P[rad]\", FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = 'LABS2'");
+                    ResultSet rs = st.executeQuery("SELECT \"Strain1A[με*s]\", \"Strain1P[rad]\", \"Strain2A[με*s]\", \"Strain2P[rad]\",  \"Strain3A[με*s]\", \"Strain3P[rad]\",  \"Strain4A[με*s]\", \"Strain4P[rad]\", FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = 'LA3S5'");
                     rs.next();
                     
                     // get results
@@ -120,7 +119,7 @@ public class A700NeutralAxisLABS2nk {
                     
                     ResultSet rs2 = st.executeQuery("SELECT TESTNAME, CASE ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) WHEN 1 THEN 0.435 WHEN 2 THEN 0.955 WHEN 3 THEN 1.575 WHEN 4 THEN 2.195 WHEN 5 THEN 2.715 END AS NewColumn,"
                         + "\"AxialA[N*s]\", \"AxialP[rad]\", \"MomentXA[Nm*s]\", \"MomentXP[rad]\" "
-                        + "FROM \"A310SectionNM\" WHERE TESTNAME = '" +testName+ "' AND SECTION LIKE 'LABS2'");
+                        + "FROM \"A310SectionNM\" WHERE TESTNAME = '" +testName+ "' AND SECTION LIKE 'LA3S5'");
                     rs2.next();
                     
                     //  String testname=rs.getString(1);
@@ -148,7 +147,7 @@ public class A700NeutralAxisLABS2nk {
                     
 
                     // Insert data into 'EI3' table
-                    String insertQuery = "INSERT INTO EIBS2 (TestName, EI) VALUES ('" + testName + "', '" + EIEIs + "')";
+                    String insertQuery = "INSERT INTO EI3S5 (TestName, EI) VALUES ('" + testName + "', '" + EIEIs + "')";
                     st2.executeUpdate(insertQuery);
                     System.out.println("Record for TestName '" + testName + "' inserted into the table.");
                 
@@ -229,7 +228,7 @@ public class A700NeutralAxisLABS2nk {
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\flexuralstiffness\\fs_LABS2.svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\flexuralstiffness\\fs_LA3S5.svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame
@@ -242,7 +241,7 @@ public class A700NeutralAxisLABS2nk {
             
 
         } catch (SQLException ex) {
-            Logger.getLogger(A700NeutralAxisLABS2nk.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A700NeutralAxisLA3S5nk.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

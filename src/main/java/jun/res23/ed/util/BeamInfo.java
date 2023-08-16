@@ -10,6 +10,10 @@ package jun.res23.ed.util;
  */
 public class BeamInfo implements ElementInfo {
 
+    public static String[] getSection() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
     private final BeamSectionInfo[] sections;
     private final double[] locations;
     private final String name;

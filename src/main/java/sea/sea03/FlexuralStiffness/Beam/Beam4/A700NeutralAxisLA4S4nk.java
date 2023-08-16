@@ -2,9 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea03.Neutralaxistointegration.Beam.Beam3;
+package sea.sea03.FlexuralStiffness.Beam.Beam4;
 
-import sea.sea03.Neutralaxistointegration.Beam.BeamA.*;
 import sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -49,7 +48,7 @@ import org.jfree.data.xy.XYSeries;
  *
  * @author 75496
  */
-public class A700NeutralAxisLA3S3nk {
+public class A700NeutralAxisLA4S4nk {
 
     public static void main(String[] args) throws IOException {
 
@@ -83,8 +82,8 @@ public class A700NeutralAxisLA3S3nk {
             XYSeries tohoku = new XYSeries("tohoku");
             
                  // Create 'momentLA3' table if it doesn't exist
-                st2.executeUpdate("DROP TABLE IF EXISTS EI3S3");
-                String createTableQuery = "CREATE TABLE IF NOT EXISTS EI3S3 (TestName VARCHAR(20), EI DOUBLE)";
+                st2.executeUpdate("DROP TABLE IF EXISTS EI4S4");
+                String createTableQuery = "CREATE TABLE IF NOT EXISTS EI4S4 (TestName VARCHAR(20), EI DOUBLE)";
                 st2.executeUpdate(createTableQuery);
 
             for (int i = 0; i < kasins.length; i++) {
@@ -92,7 +91,7 @@ public class A700NeutralAxisLA3S3nk {
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    ResultSet rs = st.executeQuery("SELECT \"Strain1A[με*s]\", \"Strain1P[rad]\", \"Strain2A[με*s]\", \"Strain2P[rad]\",  \"Strain3A[με*s]\", \"Strain3P[rad]\",  \"Strain4A[με*s]\", \"Strain4P[rad]\", FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = 'LA3S3'");
+                    ResultSet rs = st.executeQuery("SELECT \"Strain1A[με*s]\", \"Strain1P[rad]\", \"Strain2A[με*s]\", \"Strain2P[rad]\",  \"Strain3A[με*s]\", \"Strain3P[rad]\",  \"Strain4A[με*s]\", \"Strain4P[rad]\", FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = 'LA4S4'");
                     rs.next();
                     
                     // get results
@@ -120,7 +119,7 @@ public class A700NeutralAxisLA3S3nk {
                     
                     ResultSet rs2 = st.executeQuery("SELECT TESTNAME, CASE ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) WHEN 1 THEN 0.435 WHEN 2 THEN 0.955 WHEN 3 THEN 1.575 WHEN 4 THEN 2.195 WHEN 5 THEN 2.715 END AS NewColumn,"
                         + "\"AxialA[N*s]\", \"AxialP[rad]\", \"MomentXA[Nm*s]\", \"MomentXP[rad]\" "
-                        + "FROM \"A310SectionNM\" WHERE TESTNAME = '" +testName+ "' AND SECTION LIKE 'LA3S3'");
+                        + "FROM \"A310SectionNM\" WHERE TESTNAME = '" +testName+ "' AND SECTION LIKE 'LA4S4'");
                     rs2.next();
                     
                     //  String testname=rs.getString(1);
@@ -148,7 +147,7 @@ public class A700NeutralAxisLA3S3nk {
                     
 
                     // Insert data into 'EI3' table
-                    String insertQuery = "INSERT INTO EI3S3 (TestName, EI) VALUES ('" + testName + "', '" + EIEIs + "')";
+                    String insertQuery = "INSERT INTO EI4S4 (TestName, EI) VALUES ('" + testName + "', '" + EIEIs + "')";
                     st2.executeUpdate(insertQuery);
                     System.out.println("Record for TestName '" + testName + "' inserted into the table.");
                 
@@ -229,7 +228,7 @@ public class A700NeutralAxisLA3S3nk {
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\flexuralstiffness\\fs_LA3S3.svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\flexuralstiffness\\fs_LA4S4.svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame
@@ -242,7 +241,7 @@ public class A700NeutralAxisLA3S3nk {
             
 
         } catch (SQLException ex) {
-            Logger.getLogger(A700NeutralAxisLA3S3nk.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A700NeutralAxisLA4S4nk.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
