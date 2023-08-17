@@ -36,10 +36,13 @@ public class T232GraphNeutralAxis {
 
     public static void main(String[] args) {
         try {
-            final BeamSectionInfo[] sections = {EdefenseInfo.LA3S1, EdefenseInfo.LA3S2, EdefenseInfo.LA3S3, EdefenseInfo.LA3S4, EdefenseInfo.LA3S5};
-            final String dburl = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res22/ed/ed06分析T/res22ed06";
+            final BeamSectionInfo[] sections = {EdefenseInfo.LA3S1, EdefenseInfo.LA3S2, EdefenseInfo.LA3S3, EdefenseInfo.LA3S4, EdefenseInfo.LA3S5, 
+                                                EdefenseInfo.LA4S1, EdefenseInfo.LA4S2, EdefenseInfo.LA4S3, EdefenseInfo.LA4S4, EdefenseInfo.LA4S5,
+                                                EdefenseInfo.LAAS1, EdefenseInfo.LAAS2, EdefenseInfo.LAAS3, EdefenseInfo.LAAS4, EdefenseInfo.LAAS5,
+                                                EdefenseInfo.LABS1, EdefenseInfo.LABS2, EdefenseInfo.LABS3, EdefenseInfo.LABS4, EdefenseInfo.LABS5};
+            final String dburl = "jdbc:h2:C:\\Users\\75496\\Documents\\E-Defense\\test/res22ed06v230815J";
 
-            boolean directionPositive = false;
+            boolean directionPositive = true;
             final Path svgfile = null;// Path.of("/home/jun/Dropbox (SSLUoT)/res22/ed/ed06分析T/T232NeutralAxis/beam3" + (directionPositive ? "Positive" : "Negative") + ".svg");
 
             Connection con = DriverManager.getConnection(dburl, "junapp", "");
