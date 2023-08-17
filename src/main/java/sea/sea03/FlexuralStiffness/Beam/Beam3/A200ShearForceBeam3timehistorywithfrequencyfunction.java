@@ -96,6 +96,10 @@ public class A200ShearForceBeam3timehistorywithfrequencyfunction {
             XYSeries kumamoton = new XYSeries("kumamoto-");
             XYSeries tohokun = new XYSeries("tohoku-");
             
+            XYSeries randoma = new XYSeries("random(a)");
+            XYSeries kumamotoa = new XYSeries("kumamoto(a)");
+            XYSeries tohokua = new XYSeries("tohoku(a)");
+            
             String beamName = beamInfo.getName();
             
 //                 // Create 'momentLA3' table if it doesn't exist
@@ -108,19 +112,21 @@ public class A200ShearForceBeam3timehistorywithfrequencyfunction {
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    ResultSet rs = st.executeQuery("SELECT TESTNAME, MAX(SHEARFORCE) AS SHEARFORCE, MAX(POSITIVE) AS POSITIVE, MAX(NEGATIVE) AS NEGATIVE FROM allshearforce"+beamName+" WHERE TESTNAME = '" +testName+ "' GROUP BY TESTNAME;");
+                    ResultSet rs = st.executeQuery("SELECT TESTNAME, MAX(SHEARFORCE) AS SHEARFORCE, MAX(POSITIVE) AS POSITIVE, MAX(NEGATIVE) AS NEGATIVE, MAX(ANALYSIS) AS ANALYSIS FROM allshearforce"+beamName+" WHERE TESTNAME = '" +testName+ "' GROUP BY TESTNAME;");
                     rs.next();
                     
                     // get results
                     double shearforce = rs.getDouble(2);
                     double positive = rs.getDouble(3);
                     double negative = rs.getDouble(4);
+                    double analysis = rs.getDouble(5);
                     
 //                    double shearpositive = positive/shearforce;
 //                    double shearnegative = negative/shearforce;
 
                     double shearpositive = shearforce/positive;
                     double shearnegative = shearforce/negative;
+                    double shearanalysis = shearforce/analysis;
                     
                     
 
@@ -163,6 +169,14 @@ public class A200ShearForceBeam3timehistorywithfrequencyfunction {
                     tohokun.add(i + 1, shearnegative);
                 }
                 
+                if (waveName.equals("Random")) {
+                    randoma.add(i + 1, shearanalysis);
+                } else if (waveName.equals("KMMH02")) {
+                    kumamotoa.add(i + 1, shearanalysis);
+                } else if (waveName.equals("FKS020")) {
+                    tohokua.add(i + 1, shearanalysis);
+                }
+                
 
             }
             
@@ -173,6 +187,11 @@ public class A200ShearForceBeam3timehistorywithfrequencyfunction {
             dataset.addSeries("Random-", randomn.toArray());
             dataset.addSeries("tohoku-", tohokun.toArray());
             dataset.addSeries("kumamoto-", kumamoton.toArray());
+            
+            dataset.addSeries("Random(a)", randoma.toArray());
+            dataset.addSeries("tohoku(a)", tohokua.toArray());
+            dataset.addSeries("kumamoto(a)", kumamotoa.toArray());
+            
 
 
             // Create the chart
@@ -218,10 +237,20 @@ public class A200ShearForceBeam3timehistorywithfrequencyfunction {
             renderer.setSeriesPaint(0, Color.RED);
             plot.setRenderer(renderer);
             
+            renderer.setSeriesShapesVisible(6, false);
+            renderer.setSeriesShapesVisible(7, false);
+            renderer.setSeriesShapesVisible(8, false);
+            renderer.setSeriesShapesVisible(9, false);
+            
+            renderer.setSeriesPaint(6, Color.BLACK);
+            renderer.setSeriesPaint(7, Color.RED);
+            renderer.setSeriesPaint(8, Color.ORANGE);
+            renderer.setSeriesPaint(9, Color.BLACK);   
+            
             
             // insert legend to the plot
             LegendTitle legend = chart.getLegend(); // obtain legend box
-            XYTitleAnnotation ta=new XYTitleAnnotation(0.95 ,0.05, legend, RectangleAnchor.BOTTOM_RIGHT);
+            XYTitleAnnotation ta=new XYTitleAnnotation(1 ,0.05, legend, RectangleAnchor.BOTTOM_RIGHT);
             legend.setBorder(1, 1, 1, 1); // frame around legend
             plot.addAnnotation(ta);
             chart.removeLegend();
@@ -229,12 +258,12 @@ public class A200ShearForceBeam3timehistorywithfrequencyfunction {
 
             // Export the chart as PNG
             int width = 650;
-            int height = 300;
+            int height = 450;
 //            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf_C2FA3ew.png";
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea02\\sfp_"+beamName+".svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\beamshearforce(f)\\sfp_"+beamName+".svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame

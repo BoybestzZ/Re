@@ -110,6 +110,11 @@ public class A200BeamShearLA3diJwithtimehistoryanalysisfunction {
             XYSeries tohokun = new XYSeries("tohoku-");
             XYSeries koben = new XYSeries("kobe-");
             
+            XYSeries randoma = new XYSeries("random(a)");
+            XYSeries kumamotoa = new XYSeries("kumamoto(a)");
+            XYSeries tohokua = new XYSeries("tohoku(a)");
+            XYSeries kobea = new XYSeries("kobe(a)");
+            
             
             
 //                // Create series for y = 6 black line
@@ -296,30 +301,39 @@ public class A200BeamShearLA3diJwithtimehistoryanalysisfunction {
                 
             XYSeries blackLine = new XYSeries("Analysis");
             for (int i = 0; i < kasins.length; i++) {
+                String testName = kasins3[i].getTestName();  //D01Q01
+                String waveName = kasins3[i].getWaveName();  // Random
                 
                 ResultSet rs08 = st.executeQuery("SELECT \"stiffness(kN/mm)\" FROM \"beamshearforceanalysis\" where SECTION = '" + beamName + "'");
                 rs08.next();
-                
-                int testno = i + 1;
                 
                     
 
                 // get results
                 double analysisValue = rs08.getDouble(1);
                 
-                
-                blackLine.add(testno, analysisValue);
-                
-                
-                String insertQuery = "INSERT INTO allshearforce"+beamName+" (analysis) VALUES (" + analysisValue + ")";
+                String insertQuery = "INSERT INTO allshearforce"+beamName+" (TestName, analysis) VALUES ('" + testName + "'," + analysisValue + ")";
                 st.executeUpdate(insertQuery);
-            }
-            
+                System.out.println("Record for TestName '" + testName + "' inserted into the table.");
 
-    
+
+                if (waveName.equals("Random")) {
+                    randoma.add(i + 1, analysisValue);
+                } else if (waveName.equals("KMMH02")) {
+                    kumamotoa.add(i + 1, analysisValue);
+                } else if (waveName.equals("FKS020")) {
+                    tohokua.add(i + 1, analysisValue);
+                } else if (waveName.startsWith("Kobe")) {
+                    kobea.add(i + 1, analysisValue);
+                }
                 
-                // Add the black line series to the dataset
-                dataset.addSeries("Analysis", blackLine.toArray());
+
+                System.out.println("anlaysis value is " + analysisValue);
+            }
+                dataset.addSeries("Random(a)", randoma.toArray());
+                dataset.addSeries("tohoku(a)", tohokua.toArray());
+                dataset.addSeries("kumamoto(a)", kumamotoa.toArray());
+                dataset.addSeries("kobetime(a)", kobea.toArray());
 
                 
             
@@ -375,6 +389,9 @@ public class A200BeamShearLA3diJwithtimehistoryanalysisfunction {
             renderer.setSeriesShape(3, JunShapes.createUpTriangle(4));
 //            renderer.setSeriesShape(4,null);
             renderer.setSeriesShapesVisible(12, false);
+            renderer.setSeriesShapesVisible(13, false);
+            renderer.setSeriesShapesVisible(14, false);
+            renderer.setSeriesShapesVisible(15, false);
 
             
             renderer.setSeriesPaint(0, Color.RED);
@@ -382,6 +399,9 @@ public class A200BeamShearLA3diJwithtimehistoryanalysisfunction {
             renderer.setSeriesPaint(2, Color.GREEN);
             renderer.setSeriesPaint(3, Color.ORANGE);
             renderer.setSeriesPaint(12, Color.BLACK);
+            renderer.setSeriesPaint(13, Color.BLACK);
+            renderer.setSeriesPaint(14, Color.BLACK);
+            renderer.setSeriesPaint(15, Color.BLACK);  
            
             
             BasicStroke newStroke = new BasicStroke(1.0f); // Creating a new stroke with thickness 2.0f
@@ -406,7 +426,7 @@ public class A200BeamShearLA3diJwithtimehistoryanalysisfunction {
             
             // insert legend to the plot
             LegendTitle legend = chart.getLegend(); // obtain legend box
-            XYTitleAnnotation ta=new XYTitleAnnotation(0.95 ,0.05, legend, RectangleAnchor.BOTTOM_RIGHT);
+            XYTitleAnnotation ta=new XYTitleAnnotation(1.0 ,-0.05, legend, RectangleAnchor.BOTTOM_RIGHT);
             legend.setBorder(1, 1, 1, 1); // frame around legend
             plot.addAnnotation(ta);
             chart.removeLegend();
@@ -415,12 +435,12 @@ public class A200BeamShearLA3diJwithtimehistoryanalysisfunction {
 
             // Export the chart as PNG
             int width = 650;
-            int height = 350;
+            int height = 600;
 //            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf_C2FA3ew.png";
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea02\\sf_"+beamName+".svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\beamshearforce(f)\\sf_"+beamName+".svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame

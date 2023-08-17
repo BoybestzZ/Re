@@ -261,7 +261,7 @@ public class A200ShearForceColumntimehistorywithfrequencyfunction {
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea02\\sfp_"+columnInfo.getName()+direction+".svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\columnshearforce(f)\\sfp_"+columnInfo.getName()+direction+".svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame
