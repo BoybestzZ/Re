@@ -19,6 +19,7 @@ import java.text.ChoiceFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jun.chart.JunChartUtil;
+import jun.res23.ed.util.BeamInfo;
 import jun.res23.ed.util.EdefenseInfo;
 import jun.res23.ed.util.EdefenseKasinInfo;
 import org.apache.commons.math3.complex.Complex;
@@ -48,18 +49,32 @@ import org.jfree.data.xy.XYSeries;
  *
  * @author 75496
  */
-public class A700NeutralAxisLA3S1nk {
+public class A800FlexuralStiffnessLA3S1nkfunction {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException{
+        
+        double distance1 = 0.326; // distance between inner web (Beam3 = 350 - 2*12)
+        double distance2 = 1.63;  // distance between inner web (BeamB = 244 - 2*...)
+        double section1 = 0.23;
+        double EIs = 33442650.81;           //unit: Nm2
+        double EIeq = 42389172.29;
+           createFlexuralStiffnessGraph(EdefenseInfo.Beam3, distance1, section1, 0, EIs);
+//           createFlexuralStiffnessGraph(EdefenseInfo.Beam3, distance1, 1);
+//           createFlexuralStiffnessGraph(EdefenseInfo.Beam3, distance1, 2);
+//           createFlexuralStiffnessGraph(EdefenseInfo.Beam3, distance1, 3);
+//           createFlexuralStiffnessGraph(EdefenseInfo.Beam3, distance1, 4);
+
+    }
+
+    public static void createFlexuralStiffnessGraph(BeamInfo beamInfo, double distance, double section, int sectionnb, double EIs) throws IOException, SQLException {
 
         try {
             String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
             
-            double distance = 0.326; // distance between inner web (Beam3 = 350 - 2*12)
-            double slab = 0.11;
-            double section = 0.23;
-            double EIs = 33442650.81;           //unit: Nm2
-            double EIeq = 42389172.29;
+//            double distance = 0.326; // distance between inner web (Beam3 = 350 - 2*12)
+//            double slab = 0.11;
+//            double section = 0.23;
+
 
 
             // Connect to database
@@ -81,9 +96,11 @@ public class A700NeutralAxisLA3S1nk {
             XYSeries kumamoto = new XYSeries("kumamoto");
             XYSeries tohoku = new XYSeries("tohoku");
             
+            String sectionNB = beamInfo.getSections()[sectionnb].getName();
+            
                  // Create 'momentLA3' table if it doesn't exist
-                st2.executeUpdate("DROP TABLE IF EXISTS EI3S1");
-                String createTableQuery = "CREATE TABLE IF NOT EXISTS EI3S1 (TestName VARCHAR(20), EI DOUBLE)";
+                st2.executeUpdate("DROP TABLE IF EXISTS EI"+sectionNB+"");
+                String createTableQuery = "CREATE TABLE IF NOT EXISTS EI"+sectionNB+" (TestName VARCHAR(20), EI DOUBLE)";
                 st2.executeUpdate(createTableQuery);
 
             for (int i = 0; i < kasins.length; i++) {
@@ -91,7 +108,7 @@ public class A700NeutralAxisLA3S1nk {
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    ResultSet rs = st.executeQuery("SELECT \"Strain1A[με*s]\", \"Strain1P[rad]\", \"Strain2A[με*s]\", \"Strain2P[rad]\",  \"Strain3A[με*s]\", \"Strain3P[rad]\",  \"Strain4A[με*s]\", \"Strain4P[rad]\", FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = 'LA3S1'");
+                    ResultSet rs = st.executeQuery("SELECT \"Strain1A[με*s]\", \"Strain1P[rad]\", \"Strain2A[με*s]\", \"Strain2P[rad]\",  \"Strain3A[με*s]\", \"Strain3P[rad]\",  \"Strain4A[με*s]\", \"Strain4P[rad]\", FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = '"+sectionNB+"'");
                     rs.next();
                     
                     // get results
@@ -119,7 +136,7 @@ public class A700NeutralAxisLA3S1nk {
                     
                     ResultSet rs2 = st.executeQuery("SELECT TESTNAME, CASE ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) WHEN 1 THEN 0.435 WHEN 2 THEN 0.955 WHEN 3 THEN 1.575 WHEN 4 THEN 2.195 WHEN 5 THEN 2.715 END AS NewColumn,"
                         + "\"AxialA[N*s]\", \"AxialP[rad]\", \"MomentXA[Nm*s]\", \"MomentXP[rad]\" "
-                        + "FROM \"A310SectionNM\" WHERE TESTNAME = '" +testName+ "' AND SECTION LIKE 'LA3S1'");
+                        + "FROM \"A310SectionNM\" WHERE TESTNAME = '" +testName+ "' AND SECTION LIKE '"+sectionNB+"'");
                     rs2.next();
                     
                     //  String testname=rs.getString(1);
@@ -147,7 +164,7 @@ public class A700NeutralAxisLA3S1nk {
                     
 
                     // Insert data into 'EI3' table
-                    String insertQuery = "INSERT INTO EI3S1 (TestName, EI) VALUES ('" + testName + "', '" + EIEIs + "')";
+                    String insertQuery = "INSERT INTO EI"+sectionNB+" (TestName, EI) VALUES ('" + testName + "', '" + EIEIs + "')";
                     st2.executeUpdate(insertQuery);
                     System.out.println("Record for TestName '" + testName + "' inserted into the table.");
                 
@@ -228,7 +245,7 @@ public class A700NeutralAxisLA3S1nk {
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\flexuralstiffness\\fs_LA3S1.svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\flexuralstiffness(f)\\fs%_"+sectionNB+".svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame
@@ -241,7 +258,7 @@ public class A700NeutralAxisLA3S1nk {
             
 
         } catch (SQLException ex) {
-            Logger.getLogger(A700NeutralAxisLA3S1nk.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A800FlexuralStiffnessLA3S1nkfunction.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

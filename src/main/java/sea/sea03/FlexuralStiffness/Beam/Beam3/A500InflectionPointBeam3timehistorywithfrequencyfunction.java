@@ -20,7 +20,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import jun.chart.JunChartUtil;
 import jun.res23.ed.util.BeamInfo;
-import jun.res23.ed.util.ColumnInfo;
 import jun.res23.ed.util.EdefenseInfo;
 import jun.res23.ed.util.EdefenseKasinInfo;
 import org.apache.commons.math3.complex.Complex;
@@ -44,22 +43,22 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
 
-
 /**
  * modified by Iyama. Use XYdataset. THe xaxisl will be number.
  *
  *
  * @author 75496
  */
-public class A200ShearForceColumntimehistorywithfrequencyfunction {
-    
-        public static void main(String[] args) throws IOException, SQLException{
-           createShearForceColumnPercentage(EdefenseInfo.Column2FA3, "ew");
+public class A500InflectionPointBeam3timehistorywithfrequencyfunction {
+
+            public static void main(String[] args) throws IOException, SQLException{
+           createInflectionPointPercentage(EdefenseInfo.Beam3);
 //           createShearForceBeamTable(EdefenseInfo.BeamB);
 
     }
 
-    public static void createShearForceColumnPercentage(ColumnInfo columnInfo, String direction) throws IOException, SQLException {
+
+    public static void createInflectionPointPercentage(BeamInfo beamInfo) throws IOException, SQLException {
 
         try {
             String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
@@ -94,12 +93,8 @@ public class A200ShearForceColumntimehistorywithfrequencyfunction {
             XYSeries kumamoton = new XYSeries("kumamoto-");
             XYSeries tohokun = new XYSeries("tohoku-");
             
-            XYSeries randoma = new XYSeries("random(a)");
-            XYSeries kumamotoa = new XYSeries("kumamoto(a)");
-            XYSeries tohokua = new XYSeries("tohoku(a)");
             
-            String columnName = columnInfo.getName();
-            
+            String beamName = beamInfo.getName();
 //                 // Create 'momentLA3' table if it doesn't exist
 //                st2.executeUpdate("DROP TABLE IF EXISTS EI3S1");
 //                String createTableQuery = "CREATE TABLE IF NOT EXISTS EI3S1 (TestName VARCHAR(20), EI DOUBLE)";
@@ -110,21 +105,19 @@ public class A200ShearForceColumntimehistorywithfrequencyfunction {
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    ResultSet rs = st.executeQuery("SELECT TESTNAME, MAX(SHEARFORCE) AS SHEARFORCE, MAX(POSITIVE) AS POSITIVE, MAX(NEGATIVE) AS NEGATIVE, MAX(ANALYSIS) AS ANALYSIS FROM allshearforce"+columnInfo.getName()+direction+" WHERE TESTNAME = '" +testName+ "' GROUP BY TESTNAME;");
+                    ResultSet rs = st.executeQuery("SELECT TESTNAME, MAX(Inflectionpoint) AS Inflectionpoint, MAX(POSITIVE) AS POSITIVE, MAX(NEGATIVE) AS NEGATIVE FROM InflPoi"+beamName+" WHERE TESTNAME = '" +testName+ "' GROUP BY TESTNAME;");
                     rs.next();
                     
                     // get results
                     double shearforce = rs.getDouble(2);
                     double positive = rs.getDouble(3);
                     double negative = rs.getDouble(4);
-                    double analysis = rs.getDouble(5);
                     
 //                    double shearpositive = positive/shearforce;
 //                    double shearnegative = negative/shearforce;
 
                     double shearpositive = shearforce/positive;
                     double shearnegative = shearforce/negative;
-                    double shearanalysis = shearforce/analysis;
                     
                     
 
@@ -167,14 +160,6 @@ public class A200ShearForceColumntimehistorywithfrequencyfunction {
                     tohokun.add(i + 1, shearnegative);
                 }
                 
-                if (waveName.equals("Random")) {
-                    randoma.add(i + 1, shearanalysis);
-                } else if (waveName.equals("KMMH02")) {
-                    kumamotoa.add(i + 1, shearanalysis);
-                } else if (waveName.equals("FKS020")) {
-                    tohokua.add(i + 1, shearanalysis);
-                }
-                
 
             }
             
@@ -185,14 +170,10 @@ public class A200ShearForceColumntimehistorywithfrequencyfunction {
             dataset.addSeries("Random-", randomn.toArray());
             dataset.addSeries("tohoku-", tohokun.toArray());
             dataset.addSeries("kumamoto-", kumamoton.toArray());
-            
-            dataset.addSeries("Random(a)", randoma.toArray());
-            dataset.addSeries("tohoku(a)", tohokua.toArray());
-            dataset.addSeries("kumamoto(a)", kumamotoa.toArray());
 
 
             // Create the chart
-            JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "F/+ or F/-",
+            JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "InfPoi(F/+ or F/-)",
                     dataset, PlotOrientation.VERTICAL, true, true, false);
 
             // Customize the chart
@@ -205,7 +186,7 @@ public class A200ShearForceColumntimehistorywithfrequencyfunction {
             domainAxis.setTickLabelFont(domainAxis.getTickLabelFont().deriveFont(12f));
             domainAxis.setVerticalTickLabels(true);
             NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-            rangeAxis.setRange(-3,3); // Set the y-axis range
+            rangeAxis.setRange(0,4); // Set the y-axis range
             rangeAxis.setStandardTickUnits(NumberAxis.createStandardTickUnits());
             plot.setOutlineStroke(new BasicStroke(2f)); // frame around the plot
             plot.setAxisOffset(RectangleInsets.ZERO_INSETS); // remove space between frame and axis.
@@ -235,17 +216,6 @@ public class A200ShearForceColumntimehistorywithfrequencyfunction {
             plot.setRenderer(renderer);
             
             
-            renderer.setSeriesShapesVisible(6, false);
-            renderer.setSeriesShapesVisible(7, false);
-            renderer.setSeriesShapesVisible(8, false);
-            renderer.setSeriesShapesVisible(9, false);
-            
-            renderer.setSeriesPaint(6, Color.BLACK);
-            renderer.setSeriesPaint(7, Color.RED);
-            renderer.setSeriesPaint(8, Color.ORANGE);
-            renderer.setSeriesPaint(9, Color.BLACK);   
-            
-            
             // insert legend to the plot
             LegendTitle legend = chart.getLegend(); // obtain legend box
             XYTitleAnnotation ta=new XYTitleAnnotation(0.95 ,0.05, legend, RectangleAnchor.BOTTOM_RIGHT);
@@ -261,7 +231,7 @@ public class A200ShearForceColumntimehistorywithfrequencyfunction {
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea02\\sfp_"+columnInfo.getName()+direction+".svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\Inflectionpoint\\ip%_"+beamName+".svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame
@@ -274,7 +244,7 @@ public class A200ShearForceColumntimehistorywithfrequencyfunction {
             
 
         } catch (SQLException ex) {
-            Logger.getLogger(A200ShearForceColumntimehistorywithfrequencyfunction.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A500InflectionPointBeam3timehistorywithfrequencyfunction.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

@@ -106,6 +106,11 @@ public class A200BeamShearColumnwithtimehistoryanalysisfunction {
             XYSeries tohokun = new XYSeries("tohoku-");
             XYSeries koben = new XYSeries("kobe-");
             
+            XYSeries randoma = new XYSeries("random(a)");
+            XYSeries kumamotoa = new XYSeries("kumamoto(a)");
+            XYSeries tohokua = new XYSeries("tohoku(a)");
+            XYSeries kobea = new XYSeries("kobe(a)");
+            
             
             
 //                // Create series for y = 6 black line
@@ -288,32 +293,42 @@ public class A200BeamShearColumnwithtimehistoryanalysisfunction {
             st.executeUpdate("Alter table allshearforce"+columnInfo.getName()+direction+" add analysis double;");
             
                 
-//            XYSeries blackLine = new XYSeries("Analysis");
-//            for (int i = 0; i < kasins.length; i++) {
-//                
-//                ResultSet rs08 = st.executeQuery("SELECT \"stiffness(kN/mm)\" FROM \"beamshearforceanalysis\" where SECTION = '" + columnName + "'");
-//                rs08.next();
-//                
-//                int testno = i + 1;
-//                
-//                    
-//
-//                // get results
-//                double analysisValue = rs08.getDouble(1);
-//                
-//                
-//                blackLine.add(testno, analysisValue);
-//                
-//                
-//                String insertQuery = "INSERT INTO allshearforce"+columnName+" (analysis) VALUES (" + analysisValue + ")";
-//                st.executeUpdate(insertQuery);
-//            }
-//            
-//
-//    
-//                
-//                // Add the black line series to the dataset
-//                dataset.addSeries("Analysis", blackLine.toArray());
+            XYSeries blackLine = new XYSeries("Analysis");
+            for (int i = 0; i < kasins.length; i++) {
+                String testName = kasins3[i].getTestName();  //D01Q01
+                String waveName = kasins3[i].getWaveName();  // Random
+                
+                ResultSet rs08 = st.executeQuery("SELECT \"stiffness(kN/mm)\" FROM \"columnshearforceanalysis\" where SECTION = '" + columnName + "' and Direction = '" + direction + "'");
+                rs08.next();
+                
+                    
+
+                // get results
+                double analysisValue = rs08.getDouble(1);
+                
+                String insertQuery = "INSERT INTO allshearforce"+columnInfo.getName()+direction+" (TestName, analysis) VALUES ('" + testName + "'," + analysisValue + ")";
+                st.executeUpdate(insertQuery);
+                System.out.println("Record for TestName '" + testName + "' inserted into the table.");
+
+
+                if (waveName.equals("Random")) {
+                    randoma.add(i + 1, analysisValue);
+                } else if (waveName.equals("KMMH02")) {
+                    kumamotoa.add(i + 1, analysisValue);
+                } else if (waveName.equals("FKS020")) {
+                    tohokua.add(i + 1, analysisValue);
+                } else if (waveName.startsWith("Kobe")) {
+                    kobea.add(i + 1, analysisValue);
+                }
+                
+
+                System.out.println("anlaysis value is " + analysisValue);
+            }
+                dataset.addSeries("Random(a)", randoma.toArray());
+                dataset.addSeries("tohoku(a)", tohokua.toArray());
+                dataset.addSeries("kumamoto(a)", kumamotoa.toArray());
+                dataset.addSeries("kobetime(a)", kobea.toArray());
+
 
                 
             
@@ -369,6 +384,9 @@ public class A200BeamShearColumnwithtimehistoryanalysisfunction {
             renderer.setSeriesShape(3, JunShapes.createUpTriangle(4));
 //            renderer.setSeriesShape(4,null);
             renderer.setSeriesShapesVisible(12, false);
+            renderer.setSeriesShapesVisible(13, false);
+            renderer.setSeriesShapesVisible(14, false);
+            renderer.setSeriesShapesVisible(15, false);
 
             
             renderer.setSeriesPaint(0, Color.RED);
@@ -376,6 +394,9 @@ public class A200BeamShearColumnwithtimehistoryanalysisfunction {
             renderer.setSeriesPaint(2, Color.GREEN);
             renderer.setSeriesPaint(3, Color.ORANGE);
             renderer.setSeriesPaint(12, Color.BLACK);
+            renderer.setSeriesPaint(13, Color.BLACK);
+            renderer.setSeriesPaint(14, Color.BLACK);
+            renderer.setSeriesPaint(15, Color.BLACK);            
            
             
             BasicStroke newStroke = new BasicStroke(1.0f); // Creating a new stroke with thickness 2.0f

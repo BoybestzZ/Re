@@ -19,6 +19,7 @@ import java.text.ChoiceFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jun.chart.JunChartUtil;
+import jun.res23.ed.util.BeamInfo;
 import jun.res23.ed.util.EdefenseInfo;
 import jun.res23.ed.util.EdefenseKasinInfo;
 import org.apache.commons.math3.complex.Complex;
@@ -48,15 +49,27 @@ import org.jfree.data.xy.XYSeries;
  *
  * @author 75496
  */
-public class A700NeutralAxisLA3S1withtimehistoryanalysis {
+public class A700NeutralAxisLA3S1withtimehistoryanalysisfunction {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException{
+        
+        double distance1 = 0.326; // distance between inner web (Beam3 = 350 - 2*12)
+        double distance2 = 1.63;  // distance between inner web (BeamB = 244 - 2*...)
+        double slab = 0.11;
+           createNeutralAxisTable(EdefenseInfo.Beam3, distance1, 0);
+           createNeutralAxisTable(EdefenseInfo.Beam3, distance1, 1);
+           createNeutralAxisTable(EdefenseInfo.Beam3, distance1, 2);
+           createNeutralAxisTable(EdefenseInfo.Beam3, distance1, 3);
+           createNeutralAxisTable(EdefenseInfo.Beam3, distance1, 4);
+
+    }
+
+    public static void createNeutralAxisTable(BeamInfo beamInfo, double distance, int section) throws IOException, SQLException {
 
         try {
             String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
             String ed06dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/res22ed06v230815J";
-            
-            double distance = 0.326; // distance between inner web (Beam3 = 350 - 2*12)
+
             double slab = 0.11;
 
 
@@ -91,11 +104,13 @@ public class A700NeutralAxisLA3S1withtimehistoryanalysis {
             XYSeries randomn = new XYSeries("random-");
             XYSeries kumamoton = new XYSeries("kumamoto-");
             XYSeries tohokun = new XYSeries("tohoku-");
+            
+            String sectionNB = beamInfo.getSections()[section].getName();
 
             
             // Create table to store results if it doesn't exist
-            st.executeUpdate("DROP TABLE IF EXISTS NeuAxisLA3S1");
-            st.executeUpdate("CREATE TABLE IF NOT EXISTS NeuAxisLA3S1 (TestName VARCHAR(20), NeutralAxis DOUBLE)");
+            st.executeUpdate("DROP TABLE IF EXISTS NeuAxis"+sectionNB+"");
+            st.executeUpdate("CREATE TABLE IF NOT EXISTS NeuAxis"+sectionNB+" (TestName VARCHAR(20), NeutralAxis DOUBLE)");
 
 
             for (int i = 0; i < kasins.length; i++) {
@@ -103,7 +118,7 @@ public class A700NeutralAxisLA3S1withtimehistoryanalysis {
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    ResultSet rs = st.executeQuery("SELECT \"Strain1A[με*s]\", \"Strain1P[rad]\", \"Strain2A[με*s]\", \"Strain2P[rad]\",  \"Strain3A[με*s]\", \"Strain3P[rad]\",  \"Strain4A[με*s]\", \"Strain4P[rad]\", FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = 'LA3S1'");
+                    ResultSet rs = st.executeQuery("SELECT \"Strain1A[με*s]\", \"Strain1P[rad]\", \"Strain2A[με*s]\", \"Strain2P[rad]\",  \"Strain3A[με*s]\", \"Strain3P[rad]\",  \"Strain4A[με*s]\", \"Strain4P[rad]\", FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = '"+sectionNB+"'");
                     rs.next();
 
                     // get results
@@ -127,7 +142,7 @@ public class A700NeutralAxisLA3S1withtimehistoryanalysis {
                     Complex neutralAxis = ((strainU.multiply(distance)).divide(strainUD)).add(slab);
                 
                 // Insert the result into the table
-                String insertQuery = "INSERT INTO NeuAxisLA3S1 (TestName, NeutralAxis) VALUES ('" + testName + "', " + neutralAxis.getReal() + ")";
+                String insertQuery = "INSERT INTO NeuAxis"+sectionNB+" (TestName, NeutralAxis) VALUES ('" + testName + "', " + neutralAxis.getReal() + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
 
@@ -148,20 +163,20 @@ public class A700NeutralAxisLA3S1withtimehistoryanalysis {
              EdefenseKasinInfo[] kasins2 = EdefenseInfo.alltests;
             
             // Create table to store results if it doesn't exist
-            st.executeUpdate("Alter table NeuAxisLA3S1 add positive double;");
+            st.executeUpdate("Alter table NeuAxis"+sectionNB+" add positive double;");
             
             for (int i = 0; i < kasins2.length; i++) {
                 String testName = kasins2[i].getTestName();  //D01Q01
                 String waveName = kasins2[i].getWaveName();  // Random
                 
-                ResultSet rs08 = st08.executeQuery("SELECT \"NeutralAxis[mm]\"*0.001 FROM \"T232NeutralAxis\" where TESTNAME = '" + testName + "' and \"SECTION\" = 'LA3S1' and \"DirectionPositive\" = TRUE;");
+                ResultSet rs08 = st08.executeQuery("SELECT \"NeutralAxis[mm]\"*0.001 FROM \"T232NeutralAxis\" where TESTNAME = '" + testName + "' and \"SECTION\" = '"+sectionNB+"' and \"DirectionPositive\" = TRUE;");
                 rs08.next();
                     
 
                 // get results
                 double shearforcestiffnesspositive = rs08.getDouble(1);
                 
-                String insertQuery = "INSERT INTO NeuAxisLA3S1 (TestName, positive) VALUES ('" + testName + "'," + shearforcestiffnesspositive + ")";
+                String insertQuery = "INSERT INTO NeuAxis"+sectionNB+" (TestName, positive) VALUES ('" + testName + "'," + shearforcestiffnesspositive + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
                 
@@ -180,7 +195,7 @@ public class A700NeutralAxisLA3S1withtimehistoryanalysis {
 
                 
            // Create table to store results if it doesn't exist
-            st.executeUpdate("Alter table NeuAxisLA3S1 add negative double;");
+            st.executeUpdate("Alter table NeuAxis"+sectionNB+" add negative double;");
                 
                 EdefenseKasinInfo[] kasins3 = EdefenseInfo.alltests;
             
@@ -188,13 +203,13 @@ public class A700NeutralAxisLA3S1withtimehistoryanalysis {
                 String testName = kasins3[i].getTestName();  //D01Q01
                 String waveName = kasins3[i].getWaveName();  // Random
                 
-                ResultSet rs08 = st08.executeQuery("SELECT \"NeutralAxis[mm]\"*0.001 FROM \"T232NeutralAxis\" where TESTNAME = '" + testName + "' and \"SECTION\" = 'LA3S1' and \"DirectionPositive\" = FALSE;");
+                ResultSet rs08 = st08.executeQuery("SELECT \"NeutralAxis[mm]\"*0.001 FROM \"T232NeutralAxis\" where TESTNAME = '" + testName + "' and \"SECTION\" = '"+sectionNB+"' and \"DirectionPositive\" = FALSE;");
                 rs08.next();
                 
                                 // get results
                 double shearforcestiffnessnegative = rs08.getDouble(1);
                 
-                String insertQuery = "INSERT INTO NeuAxisLA3S1 (TestName, negative) VALUES ('" + testName + "'," + shearforcestiffnessnegative + ")";
+                String insertQuery = "INSERT INTO NeuAxis"+sectionNB+" (TestName, negative) VALUES ('" + testName + "'," + shearforcestiffnessnegative + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
 
@@ -274,7 +289,7 @@ public class A700NeutralAxisLA3S1withtimehistoryanalysis {
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\neutralaxis\\na_LA3S1.svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\neutralaxis\\allna_"+sectionNB+".svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame
@@ -286,7 +301,7 @@ public class A700NeutralAxisLA3S1withtimehistoryanalysis {
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A700NeutralAxisLA3S1withtimehistoryanalysis.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A700NeutralAxisLA3S1withtimehistoryanalysisfunction.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

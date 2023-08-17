@@ -1,10 +1,15 @@
+
+/**
+ *
+ * @author 75496
+ */
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea03.NeutralAxis.Beam.BeamLA3;
+package sea.sea01.Inflectionpoint.Beam;
 
-import sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate.*;
+import sea.sea01.Inflectionpoint.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -16,9 +21,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ChoiceFormat;
+import java.text.NumberFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jun.chart.JunChartUtil;
+import static jun.res23.ed.ed14分析UF.A310SectionNM.outputTable;
+import jun.res23.ed.util.BeamInfo;
 import jun.res23.ed.util.EdefenseInfo;
 import jun.res23.ed.util.EdefenseKasinInfo;
 import org.apache.commons.math3.complex.Complex;
@@ -48,19 +56,25 @@ import org.jfree.data.xy.XYSeries;
  *
  * @author 75496
  */
-public class A700NeutralAxisLA3S1withtimehistoryanalysis {
+public class A500BeamInflectionPointLA3withtimehistoryanalysisfunction {
+    
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException{
+        
+        double distance1 = 0.326; // distance between inner web (Beam3 = 350 - 2*12)
+        double distance2 = 1.63;  // distance between inner web (BeamB = 244 - 2*...)
+        double slab = 0.11;
+           createInflectionPointTable(EdefenseInfo.Beam3);
+    }
+
+    public static void createInflectionPointTable(BeamInfo beamInfo) throws IOException, SQLException {
 
         try {
             String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
             String ed06dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/res22ed06v230815J";
+
             
-            double distance = 0.326; // distance between inner web (Beam3 = 350 - 2*12)
-            double slab = 0.11;
-
-
-             // Connect to database
+            // Connect to database
             Connection con = DriverManager.getConnection(dburl, "junapp", "");
             Statement st = con.createStatement();
             Connection con08 = DriverManager.getConnection(ed06dburl, "junapp", "");
@@ -85,83 +99,77 @@ public class A700NeutralAxisLA3S1withtimehistoryanalysis {
             XYSeries randomp = new XYSeries("random+");
             XYSeries kumamotop = new XYSeries("kumamoto+");
             XYSeries tohokup = new XYSeries("tohoku+");
-
+            XYSeries kobep = new XYSeries("kobe+");
             
 
             XYSeries randomn = new XYSeries("random-");
             XYSeries kumamoton = new XYSeries("kumamoto-");
             XYSeries tohokun = new XYSeries("tohoku-");
-
+            XYSeries koben = new XYSeries("kobe-");
+            
+            String beamName = beamInfo.getName();
             
             // Create table to store results if it doesn't exist
-            st.executeUpdate("DROP TABLE IF EXISTS NeuAxisLA3S1");
-            st.executeUpdate("CREATE TABLE IF NOT EXISTS NeuAxisLA3S1 (TestName VARCHAR(20), NeutralAxis DOUBLE)");
+            st.executeUpdate("DROP TABLE IF EXISTS InflPoi"+beamName+"");
+            st.executeUpdate("CREATE TABLE IF NOT EXISTS InflPoi"+beamName+" (TestName VARCHAR(20), Inflectionpoint DOUBLE)");
 
+            
 
             for (int i = 0; i < kasins.length; i++) {
                 String testName = kasins[i].getTestName();  //D01Q01
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    ResultSet rs = st.executeQuery("SELECT \"Strain1A[με*s]\", \"Strain1P[rad]\", \"Strain2A[με*s]\", \"Strain2P[rad]\",  \"Strain3A[με*s]\", \"Strain3P[rad]\",  \"Strain4A[με*s]\", \"Strain4P[rad]\", FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = 'LA3S1'");
+                    ResultSet rs = st.executeQuery("SELECT \"INFLECTIONPOINT\" FROM \"INFLECTIONPOINTDATA\" where TESTNAME='" + testName + "' and BEAMNAME='"+beamName+"';");
                     rs.next();
 
                     // get results
-                    double UL = rs.getDouble(1);
-                    double phaseUL = rs.getDouble(2);
-                    double UR = rs.getDouble(3);
-                    double phaseUR = rs.getDouble(4);
-                    double DL = rs.getDouble(5);
-                    double phaseDL = rs.getDouble(6);
-                    double DR = rs.getDouble(7);
-                    double phaseDR = rs.getDouble(8);
-
-                    Complex strainUL = ComplexUtils.polar2Complex(UL, phaseUL);
-                    Complex strainUR = ComplexUtils.polar2Complex(UR, phaseUR);
-                    Complex strainDL = ComplexUtils.polar2Complex(DL, phaseDL);
-                    Complex strainDR = ComplexUtils.polar2Complex(DR, phaseDR);
+                    double inflectionPoint = rs.getDouble(1);
                     
-                    Complex strainU = (strainUL.add(strainUR)).multiply(0.5);
-                    Complex strainD = (strainDL.add(strainDR)).multiply(0.5);
-                    Complex strainUD = strainU.subtract(strainD);
-                    Complex neutralAxis = ((strainU.multiply(distance)).divide(strainUD)).add(slab);
-                
+                    
                 // Insert the result into the table
-                String insertQuery = "INSERT INTO NeuAxisLA3S1 (TestName, NeutralAxis) VALUES ('" + testName + "', " + neutralAxis.getReal() + ")";
+                String insertQuery = "INSERT INTO InflPoi"+beamName+" (TestName, Inflectionpoint) VALUES ('" + testName + "', " + inflectionPoint + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
 
+
+
                 if (waveName.equals("Random")) {
-                    random.add(i + 1, neutralAxis.getReal());
+                    random.add(i + 1, inflectionPoint);
                 } else if (waveName.equals("KMMH02")) {
-                    kumamoto.add(i + 1, neutralAxis.getReal());
+                    kumamoto.add(i + 1, inflectionPoint);
                 } else if (waveName.equals("FKS020")) {
-                    tohoku.add(i + 1, neutralAxis.getReal());
+                    tohoku.add(i + 1, inflectionPoint);
+                } else if (waveName.startsWith("Kobe")) {
+                    kobe.add(i + 1, inflectionPoint);
+
                 }
 
             }
-            
+
+          
             dataset.addSeries("Random", random.toArray());
             dataset.addSeries("tohoku", tohoku.toArray());
             dataset.addSeries("kumamoto", kumamoto.toArray());
-
+//            dataset.addSeries("kobe", kobe.toArray());
+            
              EdefenseKasinInfo[] kasins2 = EdefenseInfo.alltests;
             
             // Create table to store results if it doesn't exist
-            st.executeUpdate("Alter table NeuAxisLA3S1 add positive double;");
+            st.executeUpdate("Alter table InflPoi"+beamName+" add positive double;");
             
             for (int i = 0; i < kasins2.length; i++) {
                 String testName = kasins2[i].getTestName();  //D01Q01
                 String waveName = kasins2[i].getWaveName();  // Random
                 
-                ResultSet rs08 = st08.executeQuery("SELECT \"NeutralAxis[mm]\"*0.001 FROM \"T232NeutralAxis\" where TESTNAME = '" + testName + "' and \"SECTION\" = 'LA3S1' and \"DirectionPositive\" = TRUE;");
+                ResultSet rs08 = st08.executeQuery("SELECT \"InflectionPoint[m]\" FROM \"T122BeamInflectionPoint\" where TESTNAME = '" + testName + "t' and \"BEAMNAME\" = '"+beamName+"' and \"DIRECTION\" = 'POSITIVE';");
                 rs08.next();
                     
 
                 // get results
                 double shearforcestiffnesspositive = rs08.getDouble(1);
                 
-                String insertQuery = "INSERT INTO NeuAxisLA3S1 (TestName, positive) VALUES ('" + testName + "'," + shearforcestiffnesspositive + ")";
+                String insertQuery = "INSERT INTO InflPoi"+beamName+" (TestName, positive) VALUES ('" + testName + "'," + shearforcestiffnesspositive + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
                 
@@ -171,16 +179,19 @@ public class A700NeutralAxisLA3S1withtimehistoryanalysis {
                     kumamotop.add(i + 1, shearforcestiffnesspositive);
                 } else if (waveName.equals("FKS020")) {
                     tohokup.add(i + 1, shearforcestiffnesspositive);
+                } else if (waveName.startsWith("Kobe")) {
+                    kobep.add(i + 1, shearforcestiffnesspositive);
                 }
 
             }
                 dataset.addSeries("Random+", randomp.toArray());
                 dataset.addSeries("tohoku+", tohokup.toArray());
                 dataset.addSeries("kumamoto+", kumamotop.toArray());
-
+//                dataset.addSeries("kobe+", kobep.toArray());
                 
-           // Create table to store results if it doesn't exist
-            st.executeUpdate("Alter table NeuAxisLA3S1 add negative double;");
+                
+            // Create table to store results if it doesn't exist
+            st.executeUpdate("Alter table InflPoi"+beamName+" add negative double;");
                 
                 EdefenseKasinInfo[] kasins3 = EdefenseInfo.alltests;
             
@@ -188,13 +199,14 @@ public class A700NeutralAxisLA3S1withtimehistoryanalysis {
                 String testName = kasins3[i].getTestName();  //D01Q01
                 String waveName = kasins3[i].getWaveName();  // Random
                 
-                ResultSet rs08 = st08.executeQuery("SELECT \"NeutralAxis[mm]\"*0.001 FROM \"T232NeutralAxis\" where TESTNAME = '" + testName + "' and \"SECTION\" = 'LA3S1' and \"DirectionPositive\" = FALSE;");
+                ResultSet rs08 = st08.executeQuery("SELECT \"InflectionPoint[m]\" FROM \"T122BeamInflectionPoint\" where TESTNAME = '" + testName + "t' and \"BEAMNAME\" = '"+beamName+"' and \"DIRECTION\" = 'NEGATIVE';");
                 rs08.next();
-                
-                                // get results
+                    
+
+                // get results
                 double shearforcestiffnessnegative = rs08.getDouble(1);
                 
-                String insertQuery = "INSERT INTO NeuAxisLA3S1 (TestName, negative) VALUES ('" + testName + "'," + shearforcestiffnessnegative + ")";
+                String insertQuery = "INSERT INTO InflPoi"+beamName+" (TestName, negative) VALUES ('" + testName + "'," + shearforcestiffnessnegative + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
 
@@ -205,18 +217,25 @@ public class A700NeutralAxisLA3S1withtimehistoryanalysis {
                     kumamoton.add(i + 1, shearforcestiffnessnegative);
                 } else if (waveName.equals("FKS020")) {
                     tohokun.add(i + 1, shearforcestiffnessnegative);
-                } 
+                } else if (waveName.startsWith("Kobe")) {
+                    koben.add(i + 1, shearforcestiffnessnegative);
+                }
+
             }
                 dataset.addSeries("Random-", randomn.toArray());
                 dataset.addSeries("tohoku-", tohokun.toArray());
                 dataset.addSeries("kumamoto-", kumamoton.toArray());
-
+//                dataset.addSeries("kobetime-", koben.toArray());
                 
                 
                 
-
+                
+            
+            
+            
+            
             // Create the chart
-            JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "Neutral axis location (m)",
+            JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "Inflection point (m)",
                     dataset, PlotOrientation.VERTICAL, true, true, false);
 
             // Customize the chart
@@ -225,20 +244,21 @@ public class A700NeutralAxisLA3S1withtimehistoryanalysis {
             plot.setRangeGridlinePaint(Color.BLACK);
             plot.setDomainGridlinesVisible(true);
             plot.setDomainGridlinePaint(Color.BLACK);
+           
             NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
-            domainAxis.setTickLabelFont(domainAxis.getTickLabelFont().deriveFont(12f));
+            domainAxis.setTickLabelFont(domainAxis.getTickLabelFont().deriveFont((int) 12f));
             domainAxis.setVerticalTickLabels(true);
-            NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-            rangeAxis.setRange(0, 0.35); // Set the y-axis range
-            rangeAxis.setStandardTickUnits(NumberAxis.createStandardTickUnits());
-            plot.setOutlineStroke(new BasicStroke(2f)); // frame around the plot
-            plot.setAxisOffset(RectangleInsets.ZERO_INSETS); // remove space between frame and axis.
-            rangeAxis.setInverted(true);
-            
             domainAxis.setLowerBound(0.1);
             domainAxis.setUpperBound(24.9);
-            
+            plot.setOutlinePaint(Color.BLACK);
+            plot.setOutlineStroke(new BasicStroke(2f)); // frame around the plot
+            plot.setAxisOffset(RectangleInsets.ZERO_INSETS); // remove space between frame and axis.
 
+//            double lowerBound = 0.1; // Set the lower bound for the x-axis
+//            double upperBound = kasins.length + 0.9; // Set the upper bound for the x-axis
+//
+//            domainAxis.setLowerBound(lowerBound);
+//            domainAxis.setUpperBound(upperBound);
             
             // Prepare the mapping of test names to labels dynamically
             String[] testNames = new String[kasins.length];
@@ -251,34 +271,45 @@ public class A700NeutralAxisLA3S1withtimehistoryanalysis {
 
             // Create the ChoiceFormat
             ChoiceFormat formatter = new ChoiceFormat(testValues, testNames);
+
+
+//            NumberFormat formatter=new ChoiceFormat(
+//                    new double[] {1.0,2.0,3.0}, 
+//                        new String[]{"D01Q01random", "D02Q02kumamoto","D03Q03tohoku"});
+
+
             domainAxis.setNumberFormatOverride(formatter);
             
+            
+            
+            NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+            rangeAxis.setRange(1, 3); // Set the y-axis range
+            rangeAxis.setStandardTickUnits(NumberAxis.createStandardTickUnits());
 
             XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
             renderer.setSeriesPaint(0, Color.RED);
             plot.setRenderer(renderer);
             
-            
             // insert legend to the plot
             LegendTitle legend = chart.getLegend(); // obtain legend box
-            XYTitleAnnotation ta=new XYTitleAnnotation(0.95 ,0.95, legend, RectangleAnchor.BOTTOM_RIGHT);
+            XYTitleAnnotation ta=new XYTitleAnnotation(0.95 ,0.05, legend, RectangleAnchor.BOTTOM_RIGHT);
             legend.setBorder(1, 1, 1, 1); // frame around legend
             plot.addAnnotation(ta);
             chart.removeLegend();
-            
 
             // Export the chart as PNG
             int width = 650;
-            int height = 300;
-//            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf_C2FA3ew.png";
+            int height = 250;
+//            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\Inflectionpoint\\ip_LA3.png";
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\neutralaxis\\na_LA3S1.svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\Inflectionpoint\\allip_"+beamName+".svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
-//            // Display the chart in a frame
-            ChartFrame frame = new ChartFrame("Shear Force Results", chart);
+
+            // Display the chart in a frame
+            ChartFrame frame = new ChartFrame("Inflection Point", chart);
             frame.setPreferredSize(new Dimension(1200, 800));
             frame.pack();
             frame.setVisible(true);
@@ -286,8 +317,16 @@ public class A700NeutralAxisLA3S1withtimehistoryanalysis {
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A700NeutralAxisLA3S1withtimehistoryanalysis.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A500BeamInflectionPointLA3withtimehistoryanalysisfunction.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
 }
+    
+
+
+
+
+//                // Execute query and get result set
+//                    ResultSet rs = st.executeQuery("SELECT \"INFLECTIONPOINT\" FROM \"INFLECTIONPOINTDATA\" where TESTNAME='" + testName + "' and BEAMNAME='Beam3';");
+//                    rs.next();
