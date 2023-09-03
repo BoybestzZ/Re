@@ -435,7 +435,7 @@ public class A200BeamShearwithtimehistoryanalysisfunction {
 
             // Export the chart as PNG
             int width = 650;
-            int height = 600;
+            int height = 500;
 //            String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\sea01\\sf_C2FA3ew.png";
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);

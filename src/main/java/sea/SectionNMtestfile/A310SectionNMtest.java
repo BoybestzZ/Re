@@ -33,8 +33,8 @@ public class A310SectionNMtest {
     public static String driftTable = "R176StoryDriftU";
     // ↑これは U のフーリエ変換による層間変形を示している。ここのなかでは (k01+k02-k03-k04)*0.5 として相対加速度を計算している。すなわち、2層分の相対加速度である。
     // なお、R175は k01とk02のEW方向の符号が逆転していることを考慮している。
-    public static String dburl = "jdbc:h2:C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230721";
-    public static String outputTable = "A310SectionNMtest22";
+    public static String dburl = "jdbc:h2:C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
+    public static String outputTable = "A310SectionNM";
 
     public static String[] testnames = {"D01Q01", "D01Q02", "D01Q03", "D01Q04", "D01Q05", "D01Q06", "D01Q08", "D01Q09", "D01Q10", "D01Q11",
         "D02Q01", "D02Q02", "D02Q03", "D02Q05", "D02Q06", "D02Q07", "D02Q08",
@@ -55,6 +55,7 @@ public class A310SectionNMtest {
                         + "\"StoryDriftA[gal*s]\" real,\"StoryDriftP[rad]\" real,"
                         + "\"StoryDriftA2[gal*s]\" real,\"StoryDriftP2[rad]\" real,"
                         + "\"StoryDriftA3[gal*s]\" real,\"StoryDriftP3[rad]\" real,"
+                        + "\"StoryDrift2F[mm]\" real, \"StoryDrift3F[mm]\" real,"
                         + "\"StoryDriftRatio(3/2)\" real,"
                         + " \"NMsatio[m]\" real,"
                         + "\"StiffnessAxialA[N/m]\" real, \"StiffnessAxialP[rad]\" real, "
@@ -78,10 +79,15 @@ public class A310SectionNMtest {
                     Complex storyDriftEW2 = storyDrift[3];
                     Complex storyDriftNS3 = storyDrift[4];
                     Complex storyDriftEW3 = storyDrift[5];
+                    
                     for (BeamSectionInfo section : EdefenseInfo.beamSectionsNS) {
 //                        logger.log(Level.INFO, section.getName());
-                        Complex[] nm = getBeamNM(testname, freqNS, fourierTable, section);
+
                         double omega2 = 4 * Math.PI * Math.PI * freqNS * freqNS;
+                        Complex storyDriftNS2mm = storyDrift[2].divide(omega2*0.1);
+                        Complex storyDriftNS3mm = storyDrift[4].divide(omega2*0.1);
+
+                        Complex[] nm = getBeamNM(testname, freqNS, fourierTable, section);
                         Complex stiffnessAxial = nm[0].divide(storyDriftNS).multiply(omega2 * 100); // [N/(cm/s2)  * (100/s2) = N/m]
                         Complex stiffnessMomentX = nm[1].divide(storyDriftNS).multiply(omega2 * 100); //[Nm/(cm/s2) * (100/s2) = [Nm/m]
                         Complex stiffnessMomentY = nm[2].divide(storyDriftNS).multiply(omega2 * 100);
@@ -94,6 +100,7 @@ public class A310SectionNMtest {
                                 + "\"StoryDriftA[gal*s]\",\"StoryDriftP[rad]\","
                                 + "\"StoryDriftA2[gal*s]\",\"StoryDriftP2[rad]\","
                                 + "\"StoryDriftA3[gal*s]\",\"StoryDriftP3[rad]\","
+                                + "\"StoryDrift2F[mm]\", \"StoryDrift3F[mm]\","
                                 + "\"StoryDriftRatio(3/2)\","
                                 + "\"StiffnessAxialA[N/m]\", \"StiffnessAxialP[rad]\", "
                                 + "\"StiffnessMomentXA[Nm/m]\", \"StiffnessMomentXP[rad]\", "
@@ -106,6 +113,7 @@ public class A310SectionNMtest {
                                 + "," + storyDriftNS.abs() + "," + storyDriftNS.getArgument()
                                 + "," + storyDriftNS2.abs() + "," + storyDriftNS2.getArgument()
                                 + "," + storyDriftNS3.abs() + "," + storyDriftNS3.getArgument()
+                                + "," + storyDriftNS2mm.abs() + "," + storyDriftNS3mm.abs()
                                 + "," + (storyDriftNS3.abs() / storyDriftNS2.abs())
                                 + "," + stiffnessAxial.abs() + "," + stiffnessAxial.getArgument() + ","
                                 + stiffnessMomentX.abs() + "," + stiffnessMomentX.getArgument() + ","
@@ -114,8 +122,11 @@ public class A310SectionNMtest {
                     }
                     for (BeamSectionInfo section : EdefenseInfo.beamSectionsEW) {
 //                        logger.log(Level.INFO, section.getName());
-                        Complex[] nm = getBeamNM(testname, freqEW, fourierTable/* "R152FourierS"*/, section);
                         double omega2 = 4 * Math.PI * Math.PI * freqEW * freqEW;
+                        Complex storyDriftEW2mm = storyDrift[3].divide(omega2*0.1);
+                        Complex storyDriftEW3mm = storyDrift[5].divide(omega2*0.1);
+
+                        Complex[] nm = getBeamNM(testname, freqEW, fourierTable/* "R152FourierS"*/, section);
                         Complex stiffnessAxial = nm[0].divide(storyDriftEW).multiply(omega2 * 100); // [N/(cm/s2)  * (100/s2) = N/m]
                         Complex stiffnessMomentX = nm[1].divide(storyDriftEW).multiply(omega2 * 100); // [Nm/(cm/s2)  * (100/s2) = Nm/m]
                         Complex stiffnessMomentY = nm[2].divide(storyDriftEW).multiply(omega2 * 100); // [Nm/(cm/s2)  * (100/s2) = Nm/m]
@@ -128,6 +139,7 @@ public class A310SectionNMtest {
                                 + "\"StoryDriftA[gal*s]\",\"StoryDriftP[rad]\","
                                 + "\"StoryDriftA2[gal*s]\",\"StoryDriftP2[rad]\","
                                 + "\"StoryDriftA3[gal*s]\",\"StoryDriftP3[rad]\","
+                                + "\"StoryDrift2F[mm]\",\"StoryDrift3F[mm]\","
                                 + "\"StoryDriftRatio(3/2)\","
                                 + "\"StiffnessAxialA[N/m]\", \"StiffnessAxialP[rad]\", "
                                 + "\"StiffnessMomentXA[Nm/m]\", \"StiffnessMomentXP[rad]\", "
@@ -140,6 +152,7 @@ public class A310SectionNMtest {
                                 + "," + storyDriftEW.abs() + "," + storyDriftEW.getArgument()
                                 + "," + storyDriftEW2.abs() + "," + storyDriftEW2.getArgument()
                                 + "," + storyDriftEW3.abs() + "," + storyDriftEW3.getArgument() 
+                                + "," + storyDriftEW2mm.abs() + "," + storyDriftEW3mm.abs()
                                 + "," + (storyDriftEW3.abs() / storyDriftEW2.abs())
                                 + "," + stiffnessAxial.abs() + "," + stiffnessAxial.getArgument() + ","
                                 + stiffnessMomentX.abs() + "," + stiffnessMomentX.getArgument() + ","
@@ -151,9 +164,12 @@ public class A310SectionNMtest {
                         //                        logger.log(Level.INFO, section.getName());
                         {
                             Complex strains[] = getColumnStrainsEW(testname, freqEW, fourierTable/* "R152FourierS"*/, section);
+                            
+                            double omega2 = 4 * Math.PI * Math.PI * freqEW * freqEW;
+                            Complex storyDriftEW2mm = storyDrift[3].divide(omega2*0.1);
+                            Complex storyDriftEW3mm = storyDrift[5].divide(omega2*0.1);
 
                             Complex[] nm = convertColumnStrainsToNM(strains, section.getE(), section.getA(), section.getZew(), section.getZns());
-                            double omega2 = 4 * Math.PI * Math.PI * freqEW * freqEW;
                             Complex stiffnessAxial = nm[0].divide(storyDriftEW).multiply(omega2 * 100); // [N/(cm/s2)  * (100/s2) = N/m]
                             Complex stiffnessMomentX = nm[1].divide(storyDriftEW).multiply(omega2 * 100); // [Nm/(cm/s2)  * (100/s2) = Nm/m]
                             Complex stiffnessMomentY = nm[2].divide(storyDriftEW).multiply(omega2 * 100); // [Nm/(cm/s2)  * (100/s2) = Nm/m]
@@ -166,6 +182,7 @@ public class A310SectionNMtest {
                                     + "\"StoryDriftA[gal*s]\",\"StoryDriftP[rad]\","
                                     + "\"StoryDriftA2[gal*s]\",\"StoryDriftP2[rad]\","
                                     + "\"StoryDriftA3[gal*s]\",\"StoryDriftP3[rad]\","
+                                    + "\"StoryDrift2F[mm]\" ,\"StoryDrift3F[mm]\","
                                     + "\"StoryDriftRatio(3/2)\","
                                     + "\"StiffnessAxialA[N/m]\", \"StiffnessAxialP[rad]\", "
                                     + "\"StiffnessMomentXA[Nm/m]\", \"StiffnessMomentXP[rad]\", "
@@ -182,6 +199,7 @@ public class A310SectionNMtest {
                                     + "," + storyDriftEW.abs() + "," + storyDriftEW.getArgument()
                                     + "," + storyDriftEW2.abs() + "," + storyDriftEW2.getArgument()
                                     + "," + storyDriftEW3.abs() + "," + storyDriftEW3.getArgument()
+                                    + "," + storyDriftEW2mm.abs() + "," + storyDriftEW3mm.abs()
                                     + "," + (storyDriftEW3.abs() / storyDriftEW2.abs())
                                     + "," + stiffnessAxial.abs() + "," + stiffnessAxial.getArgument() + ","
                                     + stiffnessMomentX.abs() + "," + stiffnessMomentX.getArgument() + ","
@@ -196,6 +214,9 @@ public class A310SectionNMtest {
                             Complex strains[] = getColumnStrainsNS(testname, freqNS, fourierTable/* "R152FourierS"*/, section);
                             Complex[] nm = convertColumnStrainsToNM(strains, section.getE(), section.getA(), section.getZns(), section.getZew());
                             double omega2 = 4 * Math.PI * Math.PI * freqNS * freqNS;
+                            Complex storyDriftNS2mm = storyDrift[2].divide(omega2*0.1);
+                            Complex storyDriftNS3mm = storyDrift[4].divide(omega2*0.1);
+                            
                             Complex stiffnessAxial = nm[0].divide(storyDriftNS).multiply(omega2 * 100); // [N/(cm/s2)  * (100/s2) = N/m]
                             Complex stiffnessMomentX = nm[1].divide(storyDriftNS).multiply(omega2 * 100); // [Nm/(cm/s2)  * (100/s2) = Nm/m]
                             Complex stiffnessMomentY = nm[2].divide(storyDriftNS).multiply(omega2 * 100); // [Nm/(cm/s2)  * (100/s2) = Nm/m]
@@ -208,6 +229,7 @@ public class A310SectionNMtest {
                                     + "\"StoryDriftA[gal*s]\",\"StoryDriftP[rad]\","
                                     + "\"StoryDriftA2[gal*s]\",\"StoryDriftP2[rad]\","
                                     + "\"StoryDriftA3[gal*s]\",\"StoryDriftP3[rad]\","
+                                    + "\"StoryDrift2F[mm]\",\"StoryDrift3F[mm]\","
                                     + "\"StoryDriftRatio(3/2)\","
                                     + "\"StiffnessAxialA[N/m]\", \"StiffnessAxialP[rad]\", "
                                     + "\"StiffnessMomentXA[Nm/m]\", \"StiffnessMomentXP[rad]\", "
@@ -224,6 +246,7 @@ public class A310SectionNMtest {
                                     + "," + storyDriftNS.abs() + "," + storyDriftNS.getArgument()
                                     + "," + storyDriftNS2.abs() + "," + storyDriftNS2.getArgument()
                                     + "," + storyDriftNS3.abs() + "," + storyDriftNS3.getArgument()
+                                    + "," + storyDriftNS2mm.abs() + "," + storyDriftNS3mm.abs()
                                     + "," + (storyDriftNS3.abs() / storyDriftNS2.abs())
                                     + "," + stiffnessAxial.abs() + "," + stiffnessAxial.getArgument() + ","
                                     + stiffnessMomentX.abs() + "," + stiffnessMomentX.getArgument() + ","

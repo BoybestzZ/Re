@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea04.NeutralAxis;
+package sea.sea06.Beam;
 
+import sea.sea04.NeutralAxis.*;
 import sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -42,14 +43,13 @@ import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
-
 /**
  * modified by Iyama. Use XYdataset. THe xaxisl will be number.
  *
  *
  * @author 75496
  */
-public class A700NeutralAxiswithtimehistoryanalysisfunction {
+public class A800BeamStoryDriftwithtimehistoryanalysisfunction {
 
     public static void main(String[] args) throws IOException, SQLException{
         
@@ -57,37 +57,37 @@ public class A700NeutralAxiswithtimehistoryanalysisfunction {
         double distance2 = 0.222;  // distance between inner web (BeamB = 244 - 2*11)
         double slab = 0.11;
         
-           createNeutralAxisPercentage(EdefenseInfo.Beam3, distance1, 0);
-           createNeutralAxisPercentage(EdefenseInfo.Beam3, distance1, 1);
-           createNeutralAxisPercentage(EdefenseInfo.Beam3, distance1, 2);
-           createNeutralAxisPercentage(EdefenseInfo.Beam3, distance1, 3);
-           createNeutralAxisPercentage(EdefenseInfo.Beam3, distance1, 4);
+           createStoryDriftPercentage(EdefenseInfo.Beam3, 0);
+           createStoryDriftPercentage(EdefenseInfo.Beam3, 1);
+           createStoryDriftPercentage(EdefenseInfo.Beam3, 2);
+           createStoryDriftPercentage(EdefenseInfo.Beam3, 3);
+           createStoryDriftPercentage(EdefenseInfo.Beam3, 4);
            
-           createNeutralAxisPercentage(EdefenseInfo.Beam4, distance1, 0);
-           createNeutralAxisPercentage(EdefenseInfo.Beam4, distance1, 1);
-           createNeutralAxisPercentage(EdefenseInfo.Beam4, distance1, 2);
-           createNeutralAxisPercentage(EdefenseInfo.Beam4, distance1, 3);
-           createNeutralAxisPercentage(EdefenseInfo.Beam4, distance1, 4);
+           createStoryDriftPercentage(EdefenseInfo.Beam4, 0);
+           createStoryDriftPercentage(EdefenseInfo.Beam4, 1);
+           createStoryDriftPercentage(EdefenseInfo.Beam4, 2);
+           createStoryDriftPercentage(EdefenseInfo.Beam4, 3);
+           createStoryDriftPercentage(EdefenseInfo.Beam4, 4);
            
-           createNeutralAxisPercentage(EdefenseInfo.BeamA, distance1, 0);
-           createNeutralAxisPercentage(EdefenseInfo.BeamA, distance1, 1);
-           createNeutralAxisPercentage(EdefenseInfo.BeamA, distance1, 2);
-           createNeutralAxisPercentage(EdefenseInfo.BeamA, distance1, 3);
-           createNeutralAxisPercentage(EdefenseInfo.BeamA, distance1, 4);
+           createStoryDriftPercentage(EdefenseInfo.BeamA, 0);
+           createStoryDriftPercentage(EdefenseInfo.BeamA, 1);
+           createStoryDriftPercentage(EdefenseInfo.BeamA, 2);
+           createStoryDriftPercentage(EdefenseInfo.BeamA, 3);
+           createStoryDriftPercentage(EdefenseInfo.BeamA, 4);
            
-           createNeutralAxisPercentage(EdefenseInfo.BeamB, distance2, 0);
-           createNeutralAxisPercentage(EdefenseInfo.BeamB, distance2, 1);
-           createNeutralAxisPercentage(EdefenseInfo.BeamB, distance2, 2);
-           createNeutralAxisPercentage(EdefenseInfo.BeamB, distance2, 3);
-           createNeutralAxisPercentage(EdefenseInfo.BeamB, distance2, 4);
+           createStoryDriftPercentage(EdefenseInfo.BeamB, 0);
+           createStoryDriftPercentage(EdefenseInfo.BeamB, 1);
+           createStoryDriftPercentage(EdefenseInfo.BeamB, 2);
+           createStoryDriftPercentage(EdefenseInfo.BeamB, 3);
+           createStoryDriftPercentage(EdefenseInfo.BeamB, 4);
 
     }
 
-    public static void createNeutralAxisPercentage(BeamInfo beamInfo, double distance, int section) throws IOException, SQLException {
+    public static void createStoryDriftPercentage(BeamInfo beamInfo, int section) throws IOException, SQLException {
 
         try {
             String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
-            String ed06dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/res22ed06v230815J";
+            String ed08dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/res22ed08v230815J";
 
             double slab = 0.11;
 
@@ -95,7 +95,7 @@ public class A700NeutralAxiswithtimehistoryanalysisfunction {
              // Connect to database
             Connection con = DriverManager.getConnection(dburl, "junapp", "");
             Statement st = con.createStatement();
-            Connection con08 = DriverManager.getConnection(ed06dburl, "junapp", "");
+            Connection con08 = DriverManager.getConnection(ed08dburl, "junapp", "");
             Statement st08 = con08.createStatement();
             Statement st09 = con.createStatement();
 
@@ -125,11 +125,12 @@ public class A700NeutralAxiswithtimehistoryanalysisfunction {
             XYSeries tohokun = new XYSeries("tohoku-");
             
             String sectionNB = beamInfo.getSections()[section].getName();
+            String beamName = beamInfo.getName();
 
             
             // Create table to store results if it doesn't exist
-            st.executeUpdate("DROP TABLE IF EXISTS NeuAxis"+sectionNB+"");
-            st.executeUpdate("CREATE TABLE IF NOT EXISTS NeuAxis"+sectionNB+" (TestName VARCHAR(20), NeutralAxis DOUBLE)");
+            st.executeUpdate("DROP TABLE IF EXISTS StoryDrift"+sectionNB+"");
+            st.executeUpdate("CREATE TABLE IF NOT EXISTS StoryDrift"+sectionNB+" (TestName VARCHAR(20), StoryDrift2F DOUBLE)");
 
 
             for (int i = 0; i < kasins.length; i++) {
@@ -137,42 +138,24 @@ public class A700NeutralAxiswithtimehistoryanalysisfunction {
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    ResultSet rs = st.executeQuery("SELECT \"Strain1A[με*s]\", \"Strain1P[rad]\", \"Strain2A[με*s]\", \"Strain2P[rad]\",  \"Strain3A[με*s]\", \"Strain3P[rad]\",  \"Strain4A[με*s]\", \"Strain4P[rad]\", FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = '"+sectionNB+"'");
+                    ResultSet rs = st.executeQuery("SELECT \"StoryDrift2F[mm]\" FROM \"A310SectionNM\" where TESTNAME = '" + testName + "' and SECTION = '"+sectionNB+"'");
                     rs.next();
 
                     // get results
-                    double UL = rs.getDouble(1);
-                    double phaseUL = rs.getDouble(2);
-                    double UR = rs.getDouble(3);
-                    double phaseUR = rs.getDouble(4);
-                    double DL = rs.getDouble(5);
-                    double phaseDL = rs.getDouble(6);
-                    double DR = rs.getDouble(7);
-                    double phaseDR = rs.getDouble(8);
-
-                    Complex strainUL = ComplexUtils.polar2Complex(UL, phaseUL);
-                    Complex strainUR = ComplexUtils.polar2Complex(UR, phaseUR);
-                    Complex strainDL = ComplexUtils.polar2Complex(DL, phaseDL);
-                    Complex strainDR = ComplexUtils.polar2Complex(DR, phaseDR);
-                    
-                    Complex strainU = (strainUL.add(strainUR)).multiply(0.5);
-                    Complex strainD = (strainDL.add(strainDR)).multiply(0.5);
-                    Complex strainUD = strainU.subtract(strainD);
-                    Complex neutralAxis = ((strainU.multiply(distance)).divide(strainUD)).add(slab);
+                    double storyDrift2F = rs.getDouble(1);
                 
                 // Insert the result into the table
-                String insertQuery = "INSERT INTO NeuAxis"+sectionNB+" (TestName, NeutralAxis) VALUES ('" + testName + "', " + neutralAxis.getReal() + ")";
+                String insertQuery = "INSERT INTO StoryDrift"+sectionNB+" (TestName, StoryDrift2F) VALUES ('" + testName + "', " + storyDrift2F + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
-
+                
                 if (waveName.equals("Random")) {
-                    random.add(i + 1, neutralAxis.getReal());
+                    random.add(i + 1, storyDrift2F);
                 } else if (waveName.equals("KMMH02")) {
-                    kumamoto.add(i + 1, neutralAxis.getReal());
+                    random.add(i + 1, storyDrift2F);
                 } else if (waveName.equals("FKS020")) {
-                    tohoku.add(i + 1, neutralAxis.getReal());
+                    random.add(i + 1, storyDrift2F);
                 }
-
             }
             
             dataset.addSeries("Random", random.toArray());
@@ -182,29 +165,29 @@ public class A700NeutralAxiswithtimehistoryanalysisfunction {
              EdefenseKasinInfo[] kasins2 = EdefenseInfo.alltests;
             
             // Create table to store results if it doesn't exist
-            st.executeUpdate("Alter table NeuAxis"+sectionNB+" add positive double;");
+            st.executeUpdate("Alter table StoryDrift"+sectionNB+" add positive double;");
             
             for (int i = 0; i < kasins2.length; i++) {
                 String testName = kasins2[i].getTestName();  //D01Q01
                 String waveName = kasins2[i].getWaveName();  // Random
                 
-                ResultSet rs08 = st08.executeQuery("SELECT \"NeutralAxis[mm]\"*0.001 FROM \"T232NeutralAxis\" where TESTNAME = '" + testName + "' and \"SECTION\" = '"+sectionNB+"' and \"DirectionPositive\" = TRUE;");
+                ResultSet rs08 = st08.executeQuery("SELECT \"2ndStoryDrift[mm]\" FROM \"B230ElementShearLocalStiffness\" where TESTNAME = '" + testName + "' and \"ElementName\" = '"+beamName+"' and \"PositiveDirection\" = TRUE;");
                 rs08.next();
                     
 
                 // get results
-                double shearforcestiffnesspositive = rs08.getDouble(1);
+                double storyDrift2Fpostive = rs08.getDouble(1);
                 
-                String insertQuery = "INSERT INTO NeuAxis"+sectionNB+" (TestName, positive) VALUES ('" + testName + "'," + shearforcestiffnesspositive + ")";
+                String insertQuery = "INSERT INTO StoryDrift"+sectionNB+" (TestName, positive) VALUES ('" + testName + "'," + storyDrift2Fpostive + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
                 
                 if (waveName.equals("Random")) {
-                    randomp.add(i + 1, shearforcestiffnesspositive);
+                    randomp.add(i + 1, storyDrift2Fpostive);
                 } else if (waveName.equals("KMMH02")) {
-                    kumamotop.add(i + 1, shearforcestiffnesspositive);
+                    kumamotop.add(i + 1, storyDrift2Fpostive);
                 } else if (waveName.equals("FKS020")) {
-                    tohokup.add(i + 1, shearforcestiffnesspositive);
+                    tohokup.add(i + 1, storyDrift2Fpostive);
                 }
 
             }
@@ -214,7 +197,7 @@ public class A700NeutralAxiswithtimehistoryanalysisfunction {
 
                 
            // Create table to store results if it doesn't exist
-            st.executeUpdate("Alter table NeuAxis"+sectionNB+" add negative double;");
+            st.executeUpdate("Alter table StoryDrift"+sectionNB+" add negative double;");
                 
                 EdefenseKasinInfo[] kasins3 = EdefenseInfo.alltests;
             
@@ -222,23 +205,23 @@ public class A700NeutralAxiswithtimehistoryanalysisfunction {
                 String testName = kasins3[i].getTestName();  //D01Q01
                 String waveName = kasins3[i].getWaveName();  // Random
                 
-                ResultSet rs08 = st08.executeQuery("SELECT \"NeutralAxis[mm]\"*0.001 FROM \"T232NeutralAxis\" where TESTNAME = '" + testName + "' and \"SECTION\" = '"+sectionNB+"' and \"DirectionPositive\" = FALSE;");
+                ResultSet rs08 = st08.executeQuery("SELECT \"2ndStoryDrift[mm]\" FROM \"B230ElementShearLocalStiffness\" where TESTNAME = '" + testName + "' and \"ElementName\" = '"+beamName+"' and \"PositiveDirection\" = FALSE;");
                 rs08.next();
                 
                                 // get results
-                double shearforcestiffnessnegative = rs08.getDouble(1);
+                double storyDrift2Fnegative = rs08.getDouble(1);
                 
-                String insertQuery = "INSERT INTO NeuAxis"+sectionNB+" (TestName, negative) VALUES ('" + testName + "'," + shearforcestiffnessnegative + ")";
+                String insertQuery = "INSERT INTO StoryDrift"+sectionNB+" (TestName, negative) VALUES ('" + testName + "'," + storyDrift2Fnegative + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
 
 
                 if (waveName.equals("Random")) {
-                    randomn.add(i + 1, shearforcestiffnessnegative);
+                    randomn.add(i + 1, storyDrift2Fnegative);
                 } else if (waveName.equals("KMMH02")) {
-                    kumamoton.add(i + 1, shearforcestiffnessnegative);
+                    kumamoton.add(i + 1, storyDrift2Fnegative);
                 } else if (waveName.equals("FKS020")) {
-                    tohokun.add(i + 1, shearforcestiffnessnegative);
+                    tohokun.add(i + 1, storyDrift2Fnegative);
                 } 
             }
                 dataset.addSeries("Random-", randomn.toArray());
@@ -263,11 +246,11 @@ public class A700NeutralAxiswithtimehistoryanalysisfunction {
             domainAxis.setTickLabelFont(domainAxis.getTickLabelFont().deriveFont(12f));
             domainAxis.setVerticalTickLabels(true);
             NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-            rangeAxis.setRange(0, 0.35); // Set the y-axis range
+            rangeAxis.setRange(-20, 20); // Set the y-axis range
             rangeAxis.setStandardTickUnits(NumberAxis.createStandardTickUnits());
             plot.setOutlineStroke(new BasicStroke(2f)); // frame around the plot
             plot.setAxisOffset(RectangleInsets.ZERO_INSETS); // remove space between frame and axis.
-            rangeAxis.setInverted(true);
+//            rangeAxis.setInverted(true);
             
             domainAxis.setLowerBound(0.1);
             domainAxis.setUpperBound(24.9);
@@ -308,7 +291,7 @@ public class A700NeutralAxiswithtimehistoryanalysisfunction {
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\neutralaxis(f)\\allna_"+sectionNB+".svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\storydrift(f)\\allsd_"+sectionNB+".svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame
@@ -320,7 +303,7 @@ public class A700NeutralAxiswithtimehistoryanalysisfunction {
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A700NeutralAxiswithtimehistoryanalysisfunction.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A800BeamStoryDriftwithtimehistoryanalysisfunction.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

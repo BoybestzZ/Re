@@ -42,7 +42,7 @@ public class T232GraphNeutralAxis {
                                                 EdefenseInfo.LABS1, EdefenseInfo.LABS2, EdefenseInfo.LABS3, EdefenseInfo.LABS4, EdefenseInfo.LABS5};
             final String dburl = "jdbc:h2:C:\\Users\\75496\\Documents\\E-Defense\\test/res22ed06v230815J";
 
-            boolean directionPositive = true;
+            boolean directionPositive = false;
             final Path svgfile = null;// Path.of("/home/jun/Dropbox (SSLUoT)/res22/ed/ed06分析T/T232NeutralAxis/beam3" + (directionPositive ? "Positive" : "Negative") + ".svg");
 
             Connection con = DriverManager.getConnection(dburl, "junapp", "");

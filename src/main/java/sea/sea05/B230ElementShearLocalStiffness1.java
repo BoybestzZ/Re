@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package jun.res23.ed.ed08;
+package sea.sea05;
 
+import jun.res23.ed.ed08.*;
 import java.awt.Color;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,22 +42,22 @@ import org.jfree.data.xy.XYSeries;
  * @author jun
  *
  */
-public class B230ElementShearLocalStiffness {
+public class B230ElementShearLocalStiffness1 {
 
     //  private static final String T300Schema = T300Integ2StoryDisp.outputSchema;//"T300Integ2StoryDisp"
-    public static final String dburl = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res23/ed/ed06分析T/res22ed06";
+    public static final String dburl = "jdbc:h2:C:\\Users\\75496\\Documents\\E-Defense\\test/res22ed06v230815J";
     public static final String nmtable = "T400TimeHistoryNM";
-    public static final String ed08dburl = "jdbc:h2:tcp://localhost///home/jun/Dropbox (SSLUoT)/res23/ed/ed08防災科研/res22ed08;IFEXISTS=TRUE";
+    public static final String ed08dburl = "jdbc:h2:C:\\Users\\75496\\Documents\\E-Defense\\test/res22ed08v230815J;IFEXISTS=TRUE";
     public static final String outputTable = "B230ElementShearLocalStiffness";
     public static final Path svgdir = Path.of("/home/jun/Dropbox (SSLUoT)/res23/ed/ed08防災科研/B230ElementShearLocalStiffness");
 
-    private static final Logger logger = Logger.getLogger(B230ElementShearLocalStiffness.class.getName());
+    private static final Logger logger = Logger.getLogger(B230ElementShearLocalStiffness1.class.getName());
 
     public static void main(String[] args) {
-//        main(EdefenseInfo.BeamA, "ew");
-//        main(EdefenseInfo.BeamB, "ew");
-//        main(EdefenseInfo.Beam3, "ns");
-//        main(EdefenseInfo.Beam4, "ns");
+        main(EdefenseInfo.BeamA, "ew");
+        main(EdefenseInfo.BeamB, "ew");
+        main(EdefenseInfo.Beam3, "ns");
+        main(EdefenseInfo.Beam4, "ns");
 
         main(EdefenseInfo.Column2FA3, "ew");
         main(EdefenseInfo.Column2FA4, "ew");
@@ -106,13 +107,13 @@ public class B230ElementShearLocalStiffness {
                     //            JunChartUtil.show(chart);
                     JunChartUtil.svg(svgfile, 500, 350, new JFreeChart[][]{positiveCharts, negativeCharts});
                 } catch (IOException ex) {
-                    Logger.getLogger(B230ElementShearLocalStiffness.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(B230ElementShearLocalStiffness1.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
                 JunChartUtil.show(new JFreeChart[][]{positiveCharts, negativeCharts});
             }
         } catch (SQLException ex) {
-            Logger.getLogger(B230ElementShearLocalStiffness.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(B230ElementShearLocalStiffness1.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -125,7 +126,7 @@ public class B230ElementShearLocalStiffness {
             st08.executeUpdate("drop table if exists \"" + outputTable + "\"");
         }
         st08.executeUpdate("create table if not exists \"" + outputTable + "\" (TIMESTAMP timestamp,\"ElementName\" varchar, DIRECTION varchar,  \"TESTNAME\" varchar, \"PositiveDirection\" boolean, "
-                + "\"TimePerTest[s]\" real , \"MomentS2[kNm]\" real,\"MomentS3[kNm]\" real, \"ShearForce[kN]\" real,\"Story2Drift[mm]\"real,\"LocalStiffness[kN/mm]\" real)");
+                + "\"TimePerTest[s]\" real , \"MomentS2[kNm]\" real,\"MomentS3[kNm]\" real, \"ShearForce[kN]\" real,\"Story2Drift[mm]\" real, \"2ndStoryDrift[mm]\" real, \"3rdStoryDrift[mm]\" real, \"LocalStiffness[kN/mm]\" real)");
         st08.executeUpdate("delete \"" + outputTable + "\" where \"ElementName\"='" + element.getName() + "' and DIRECTION='"+ns+"'");
         con08.close();
 
@@ -189,7 +190,7 @@ public class B230ElementShearLocalStiffness {
         DefaultCategoryDataset datasetForceAbs = new DefaultCategoryDataset();
 
         st08.executeUpdate("create table if not exists \"" + outputTable + "\" (TIMESTAMP timestamp,\"ElementName\" varchar, DIRECTION varchar,  \"TESTNAME\" varchar, \"PositiveDirection\" boolean, "
-                + "\"TimePerTest[s]\" real , \"MomentS2[kNm]\" real,\"MomentS3[kNm]\" real, \"ShearForce[kN]\" real,\"Story2Drift[mm]\"real,\"LocalStiffness[kN/mm]\" real)");
+                + "\"TimePerTest[s]\" real , \"MomentS2[kNm]\" real,\"MomentS3[kNm]\" real, \"ShearForce[kN]\" real,\"Story2Drift[mm]\" real, \"2ndStoryDrift[mm]\" real, \"3rdStoryDrift[mm]\" real, \"LocalStiffness[kN/mm]\" real)");
 
         String timestamp = LocalDateTime.now().toString();
         double firstStiffness = Double.NaN;
@@ -226,7 +227,7 @@ public class B230ElementShearLocalStiffness {
 
             rs = st08.executeQuery(sql = "select"
                     + " avg(\"Story2DispW_" + XY + "[mm]\"+\"Story3DispW_" + XY + "[mm]\")*0.5, "
-                             + " avg(\"Story2DispW_" + XY + "[mm]\"), avg(\"Story3DispW_" + XY + "[mm]\"), "
+                             + "avg(\"Story2DispW_" + XY + "[mm]\"), avg(\"Story3DispW_" + XY + "[mm]\"), "
                     + " from \"" + test.getTestName() + "\" where \"Time[s]\"<2.0");
             rs.next();
             double niedavg = rs.getDouble(1);
@@ -239,9 +240,7 @@ public class B230ElementShearLocalStiffness {
             // 前後 プラスマイナス 0.02秒の範囲での絶対値が最大となるものを探してくる。
             rs = st08.executeQuery(sql = "select \"Time[s]\", "
                     + "(\"Story2DispW_" + XY + "[mm]\"+\"Story3DispW_" + XY + "[mm]\")*0.5," // Calculate the average of the two inter story disp.
-                    + "(\"Story2DispW_" + XY + "[mm]\"), (\"Story3DispW_" + XY + "[mm]\") " // Output separately the 2nd and 3rd interstory drift.
-                            
-                            
+                    + " \"Story2DispW_" + XY + "[mm]\", \"Story3DispW_" + XY + "[mm]\"" // Output separately the 2nd and 3rd interstory drift.
                     + " from \"" + test.getTestName() + "\" where \"Time[s]\" between " + (time + test.getNiedTimeDiffSeconds() - 0.02) + " and " + (time + test.getNiedTimeDiffSeconds() + 0.02)
                     + " order by abs((\"Story2DispW_" + XY + "[mm]\"+\"Story3DispW_" + XY + "[mm]\")*0.5) desc limit 1;");
 
@@ -282,9 +281,9 @@ public class B230ElementShearLocalStiffness {
 //            }
             st08.executeUpdate("insert into \"" + outputTable + "\" "
                     + "(TIMESTAMP,\"ElementName\", DIRECTION, TESTNAME,\"PositiveDirection\",\"TimePerTest[s]\", \"MomentS2[kNm]\", \"MomentS3[kNm]\", \"ShearForce[kN]\","
-                    + "\"Story2Drift[mm]\",\"LocalStiffness[kN/mm]\") "
+                    + "\"Story2Drift[mm]\",\"2ndStoryDrift[mm]\", \"3rdStoryDrift[mm]\", \"LocalStiffness[kN/mm]\") "
                     + "values ('" + timestamp + "','" + elementName + "','" + ns + "','" + test.getTestName() + "'," + directionPositive + "," + time + "," + momentS2 + "," + momentS3
-                    + "," + shearTotal + "," + disp + "," + shearTotal / disp
+                    + "," + shearTotal + "," + disp + ", " + disp2 + ", " + disp3 + ", " + shearTotal / disp
                     + ")");
 
         }

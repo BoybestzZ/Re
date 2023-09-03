@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea04.Columnshearforce;
+package sea.sea05;
 
+import sea.sea04.Beamshearforce.*;
 import sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -47,8 +48,6 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import jun.res23.ed.util.ColumnInfo;
-import jun.res23.ed.util.EdefenseInfo;
 
 
 /**
@@ -57,36 +56,26 @@ import jun.res23.ed.util.EdefenseInfo;
  *
  * @author 75496
  */
-public class A300ColumnShearwithtimehistoryanalysisfunction {
+public class A600StoryDriftwithtimehistoryanalysisfunction {
     
     
     public static void main(String[] args) throws IOException, SQLException{
         
-        double distance = 1.15; // distance between Section 2 and Section 4;
+        double distance1 = 1.24;
+        double distance2 = 1.63;
+        double section1 = 0.23;
+        double section2 = 0.177;
+           createShearForceBeamTable(EdefenseInfo.Beam3, distance1, section1);
+           createShearForceBeamTable(EdefenseInfo.Beam4, distance1, section1);
+           createShearForceBeamTable(EdefenseInfo.BeamA, distance2, section1);
+           createShearForceBeamTable(EdefenseInfo.BeamB, distance2, section2);
 
-           createShearForceColumnPercentage(EdefenseInfo.Column2FA3, distance, "ew");
-           createShearForceColumnPercentage(EdefenseInfo.Column2FA4, distance, "ew");
-           createShearForceColumnPercentage(EdefenseInfo.Column2FB3, distance, "ew");
-           createShearForceColumnPercentage(EdefenseInfo.Column2FB4, distance, "ew");
-           createShearForceColumnPercentage(EdefenseInfo.Column3FA3, distance, "ew");
-           createShearForceColumnPercentage(EdefenseInfo.Column3FA4, distance, "ew");
-           createShearForceColumnPercentage(EdefenseInfo.Column3FB3, distance, "ew");
-           createShearForceColumnPercentage(EdefenseInfo.Column3FB4, distance, "ew");
-           
-           createShearForceColumnPercentage(EdefenseInfo.Column2FA3, distance, "ns");
-           createShearForceColumnPercentage(EdefenseInfo.Column2FA4, distance, "ns");
-           createShearForceColumnPercentage(EdefenseInfo.Column2FB3, distance, "ns");
-           createShearForceColumnPercentage(EdefenseInfo.Column2FB4, distance, "ns");
-           createShearForceColumnPercentage(EdefenseInfo.Column3FA3, distance, "ns");
-           createShearForceColumnPercentage(EdefenseInfo.Column3FA4, distance, "ns");
-           createShearForceColumnPercentage(EdefenseInfo.Column3FB3, distance, "ns");
-           createShearForceColumnPercentage(EdefenseInfo.Column3FB4, distance, "ns");
     }
 
-    public static void createShearForceColumnPercentage(ColumnInfo columnInfo, double distance, String direction) throws IOException, SQLException {
+    public static void createShearForceBeamTable(BeamInfo beamInfo, double distance, double section) throws IOException, SQLException {
 
         try {
-            String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
+            String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230721";
             String ed08dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/res22ed08v230815J";
 
             // Connect to database
@@ -137,50 +126,52 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
             
 
 
-//              String section2 = columnInfo.getSections()[1].getName();
-//              String section4 = columnInfo.getSections()[3].getName();
-              String columnName = columnInfo.getName();
+              String section2 = beamInfo.getSections()[1].getName();
+              String section4 = beamInfo.getSections()[3].getName();
+              String beamName = beamInfo.getName();
               
             
 
 
 
             // Create table to store results if it doesn't exist
-            st.executeUpdate("DROP TABLE IF EXISTS allshearforce"+columnInfo.getName()+direction+"");
-            st.executeUpdate("CREATE TABLE IF NOT EXISTS allshearforce"+columnInfo.getName()+direction+" (TestName VARCHAR(20), ShearForce DOUBLE)");
+            st.executeUpdate("DROP TABLE IF EXISTS allshearforce"+beamName+"");
+            st.executeUpdate("CREATE TABLE IF NOT EXISTS allshearforce"+beamName+" (TestName VARCHAR(20), ShearForce DOUBLE)");
 
             for (int i = 0; i < kasins.length; i++) {
                 String testName = kasins[i].getTestName();  //D01Q01
                 String waveName = kasins[i].getWaveName();  // Random
 
                 // Execute query and get result set
-                    String bottomSection = columnInfo.getSections()[0].getName()+direction;  // CS2FA3Bns
-                    ResultSet rs = st.executeQuery("SELECT \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" "
-                            + "where testname='" + testName + "' and section like '"+bottomSection+"'");
+                    ResultSet rs = st.executeQuery("SELECT \"StoryDrift2F[mm]\" FROM \"A310SectionNMtest22\" where TESTNAME='" + testName + "' and SECTION='"+section2+"';");
                     rs.next();
 
                     // get results
-                    double amplitudeS2 = rs.getDouble(1);
-                    double phaseS2 = rs.getDouble(2);
+                    double axialAmplitudeS2 = rs.getDouble(1);
+                    double axialPhaseS2 = rs.getDouble(2);
+                    double momentAmplitudeS2 = rs.getDouble(3);
+                    double momentPhaseS2 = rs.getDouble(4);
 
                     // Execute query and get result set
-                                        // top
-                    String topSection = columnInfo.getSections()[2].getName()+direction;  // CS2FA3Tns
-                    rs = st.executeQuery("SELECT \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" "
-                            + "where testname='" + testName + "' and section like '"+topSection+"'");
+                    rs = st.executeQuery("SELECT \"StiffnessAxialA[N/m]\"*0.000002, \"StiffnessAxialP[rad]\", \"StiffnessMomentXA[Nm/m]\"*0.000002, \"StiffnessMomentXP[rad]\" FROM \"A310SectionNM\" where TESTNAME='" + testName + "' and SECTION='"+section4+"';");
 
                     rs.next();
 
-                    double amplitudeS4 = rs.getDouble(1);
-                    double phaseS4 = rs.getDouble(2);
+                    double axialAmplitudeS4 = rs.getDouble(1);
+                    double axialPhaseS4 = rs.getDouble(2);
+                    double momentAmplitudeS4 = rs.getDouble(3);
+                    double momentPhaseS4 = rs.getDouble(4);
 
-                    // if you want to consider phase
-                    Complex momentS2 = ComplexUtils.polar2Complex(amplitudeS2, phaseS2);
-                    Complex momentS4 = ComplexUtils.polar2Complex(amplitudeS4, phaseS4);
-                    Complex shearForceComplex = (momentS2.subtract(momentS4)).divide(distance);
+                    Complex momentS2 = ComplexUtils.polar2Complex(momentAmplitudeS2, momentPhaseS2);
+                    Complex momentS4 = ComplexUtils.polar2Complex(momentAmplitudeS4, momentPhaseS4);
+                    Complex axialMomentS2 = ComplexUtils.polar2Complex(axialAmplitudeS2, axialPhaseS2);
+                    Complex axialMomentS4 = ComplexUtils.polar2Complex(axialAmplitudeS4, axialPhaseS4);
+                    Complex allmoment2 = momentS2.add((axialMomentS2).multiply(section));
+                    Complex allmoment4 = momentS4.add((axialMomentS4).multiply(section));
+                    Complex shearForceComplex = (allmoment4.subtract(allmoment2)).divide(distance);
 //
                 // Insert the result into the table
-                String insertQuery = "INSERT INTO allshearforce"+columnInfo.getName()+direction+" (TestName, ShearForce) VALUES ('" + testName + "', " + shearForceComplex.getReal() + ")";
+                String insertQuery = "INSERT INTO allshearforce"+beamName+" (TestName, ShearForce) VALUES ('" + testName + "', " + shearForceComplex.getReal() + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
 
@@ -206,7 +197,7 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
             EdefenseKasinInfo[] kasins2 = EdefenseInfo.alltests;
             
             // Create table to store results if it doesn't exist
-            st.executeUpdate("Alter table allshearforce"+columnInfo.getName()+direction+" add positive double;");
+            st.executeUpdate("Alter table allshearforce"+beamName+" add positive double;");
             
             for (int i = 0; i < kasins2.length; i++) {
                 String testName = kasins2[i].getTestName();  //D01Q01
@@ -217,7 +208,7 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
 
                 
 
-                    ResultSet rs08 = st08.executeQuery("SELECT \"LocalStiffness[kN/mm]\" FROM \"B230ElementShearLocalStiffness\" where TESTNAME = '" + testName + "' and \"ElementName\" = '"+columnName+"' and \"PositiveDirection\" = TRUE and Direction = '"+direction+"';");
+                    ResultSet rs08 = st08.executeQuery("SELECT \"LocalStiffness[kN/mm]\" FROM \"B230ElementShearLocalStiffness\" where TESTNAME = '" + testName + "' and \"ElementName\" = '"+beamName+"' and \"PositiveDirection\" = TRUE;");
                     rs08.next();
                     
 
@@ -232,8 +223,7 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
 //                    double axialAmplitudeS4 = rs.getDouble(1);
 //                    double axialPhaseS4 = rs.getDouble(2);
 
-              //  String insertQuery = "INSERT INTO allshearforce"+columnInfo.getName()+direction+" (TestName, positive) VALUES ('" + testName + "'," + shearforcestiffnesspositive + ")";
-                  String insertQuery = "UPDATE  allshearforce"+columnInfo.getName()+direction+" SET POSITIVE="+shearforcestiffnesspositive+" where TESTNAME='"+testName+"'"; //, positive) VALUES ('" + testName + "'," + shearforcestiffnesspositive + ")";
+                String insertQuery = "INSERT INTO allshearforce"+beamName+" (TestName, positive) VALUES ('" + testName + "'," + shearforcestiffnesspositive + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
 
@@ -256,7 +246,7 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
                 
                 
             // Create table to store results if it doesn't exist
-            st.executeUpdate("Alter table allshearforce"+columnInfo.getName()+direction+" add negative double;");
+            st.executeUpdate("Alter table allshearforce"+beamName+" add negative double;");
                 
                 EdefenseKasinInfo[] kasins3 = EdefenseInfo.alltests;
             
@@ -269,7 +259,7 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
 
                 
 
-                    ResultSet rs08 = st08.executeQuery("SELECT \"LocalStiffness[kN/mm]\" FROM \"B230ElementShearLocalStiffness\" where TESTNAME = '" + testName + "' and \"ElementName\" = '"+columnName+"' and \"PositiveDirection\" = FALSE and Direction = '"+direction+"';");
+                    ResultSet rs08 = st08.executeQuery("SELECT \"LocalStiffness[kN/mm]\" FROM \"B230ElementShearLocalStiffness\" where TESTNAME = '" + testName + "' and \"ElementName\" = '"+beamName+"' and \"PositiveDirection\" = FALSE;");
                     rs08.next();
                     
 
@@ -283,9 +273,8 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
 //
 //                    double axialAmplitudeS4 = rs.getDouble(1);
 //                    double axialPhaseS4 = rs.getDouble(2);
-//
-//                String insertQuery = "INSERT INTO allshearforce"+columnInfo.getName()+direction+" (TestName, negative) VALUES ('" + testName + "'," + shearforcestiffnessnegative + ")";
-                String insertQuery = "UPDATE  allshearforce"+columnInfo.getName()+direction+" SET NEGATIVE="+shearforcestiffnessnegative+" where TESTNAME='"+testName+"'"; //, positive) VALUES ('" + testName + "'," + shearforcestiffnesspositive + ")";
+
+                String insertQuery = "INSERT INTO allshearforce"+beamName+" (TestName, negative) VALUES ('" + testName + "'," + shearforcestiffnessnegative + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
 
@@ -308,7 +297,7 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
                 
                 
             // Create table to store results if it doesn't exist
-            st.executeUpdate("Alter table allshearforce"+columnInfo.getName()+direction+" add analysis double;");
+            st.executeUpdate("Alter table allshearforce"+beamName+" add analysis double;");
             
                 
             XYSeries blackLine = new XYSeries("Analysis");
@@ -316,7 +305,7 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
                 String testName = kasins3[i].getTestName();  //D01Q01
                 String waveName = kasins3[i].getWaveName();  // Random
                 
-                ResultSet rs08 = st.executeQuery("SELECT \"stiffness(kN/mm)\" FROM \"columnshearforceanalysis\" where SECTION = '" + columnName + "' and Direction = '" + direction + "'");
+                ResultSet rs08 = st.executeQuery("SELECT \"stiffness(kN/mm)\" FROM \"beamshearforceanalysis\" where SECTION = '" + beamName + "'");
                 rs08.next();
                 
                     
@@ -324,8 +313,7 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
                 // get results
                 double analysisValue = rs08.getDouble(1);
                 
-//                String insertQuery = "INSERT INTO allshearforce"+columnInfo.getName()+direction+" (TestName, analysis) VALUES ('" + testName + "'," + analysisValue + ")";
-                String insertQuery = "UPDATE  allshearforce"+columnInfo.getName()+direction+" SET ANALYSIS="+analysisValue+" where TESTNAME='"+testName+"'"; //, positive) VALUES ('" + testName + "'," + shearforcestiffnesspositive + ")";
+                String insertQuery = "INSERT INTO allshearforce"+beamName+" (TestName, analysis) VALUES ('" + testName + "'," + analysisValue + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
 
@@ -348,7 +336,6 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
                 dataset.addSeries("kumamoto(a)", kumamotoa.toArray());
                 dataset.addSeries("kobetime(a)", kobea.toArray());
 
-
                 
             
             
@@ -369,7 +356,7 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
             domainAxis.setTickLabelFont(domainAxis.getTickLabelFont().deriveFont(12f));
             domainAxis.setVerticalTickLabels(true);
             NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-            rangeAxis.setRange(-18, 18); // Set the y-axis range
+            rangeAxis.setRange(0, 15); // Set the y-axis range
             domainAxis.setLowerBound(0.1);
             domainAxis.setUpperBound(24.9);
             rangeAxis.setStandardTickUnits(NumberAxis.createStandardTickUnits());
@@ -415,7 +402,7 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
             renderer.setSeriesPaint(12, Color.BLACK);
             renderer.setSeriesPaint(13, Color.BLACK);
             renderer.setSeriesPaint(14, Color.BLACK);
-            renderer.setSeriesPaint(15, Color.BLACK);            
+            renderer.setSeriesPaint(15, Color.BLACK);  
            
             
             BasicStroke newStroke = new BasicStroke(1.0f); // Creating a new stroke with thickness 2.0f
@@ -440,7 +427,7 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
             
             // insert legend to the plot
             LegendTitle legend = chart.getLegend(); // obtain legend box
-            XYTitleAnnotation ta=new XYTitleAnnotation(1 ,0.05, legend, RectangleAnchor.BOTTOM_RIGHT);
+            XYTitleAnnotation ta=new XYTitleAnnotation(1.0 ,-0.05, legend, RectangleAnchor.BOTTOM_RIGHT);
             legend.setBorder(1, 1, 1, 1); // frame around legend
             plot.addAnnotation(ta);
             chart.removeLegend();
@@ -454,7 +441,7 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\columnshearforce(f)\\sf_"+columnInfo.getName()+direction+".svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\beamshearforce(f)\\sf_"+beamName+".svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame
@@ -466,7 +453,7 @@ public class A300ColumnShearwithtimehistoryanalysisfunction {
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A300ColumnShearwithtimehistoryanalysisfunction.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A600StoryDriftwithtimehistoryanalysisfunction.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

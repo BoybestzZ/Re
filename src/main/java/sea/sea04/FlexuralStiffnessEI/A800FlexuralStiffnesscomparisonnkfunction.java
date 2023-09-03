@@ -60,6 +60,7 @@ public class A800FlexuralStiffnesscomparisonnkfunction {
         double EIs = 33442650.81;           //beamA unit: Nm2 (steel only)
         double EIeq = 42389172.29;          // for composite beam
         double EIs2 = 12028223.57;         // beamB only unit: Nm2 (steel only)
+        
            createFlexuralStiffnessGraph(EdefenseInfo.Beam3, distance1, section1, 0, EIs);
            createFlexuralStiffnessGraph(EdefenseInfo.Beam3, distance1, section1, 1, EIs);
            createFlexuralStiffnessGraph(EdefenseInfo.Beam3, distance1, section1, 2, EIs);
