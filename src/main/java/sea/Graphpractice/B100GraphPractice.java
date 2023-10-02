@@ -31,10 +31,12 @@ public class B100GraphPractice {
 
         try {
             
+            String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
+            
             String TESTNAME="D01Q05";
             String sql = "SELECT TESTNAME,substring(SECTION,5,1), \"StiffnessMomentXA[Nm/m]\",\"StiffnessMomentXP[rad]\" "
-                    + "FROM \"A100SectionNM\" where TESTNAME='"+TESTNAME+"' and SECTION like 'LA3S%'";
-            String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
+                    + "FROM \"A120SectionNM\" where TESTNAME='"+TESTNAME+"' and SECTION like 'LA3S%'";
+            
 
             // Connect to database
             Connection con = DriverManager.getConnection(dburl, "junapp", "");

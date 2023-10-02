@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sea.sea04.NeutralAxis;
+package sea.sea04.NeutralAxis.NeutralAxisfreqonly;
 
+import sea.sea04.NeutralAxis.*;
 import sea.sea01.columnbeam.beamcolumnshearforcedifferentiate.beamdifferentiate.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -23,6 +24,7 @@ import jun.chart.JunChartUtil;
 import jun.res23.ed.util.BeamInfo;
 import jun.res23.ed.util.EdefenseInfo;
 import jun.res23.ed.util.EdefenseKasinInfo;
+import jun.util.JunShapes;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.complex.ComplexUtils;
 import org.jfree.chart.ChartFactory;
@@ -50,7 +52,7 @@ import org.jfree.data.xy.XYSeries;
  *
  * @author 75496
  */
-public class A700NeutralAxiswithtimehistoryanalysisfunction {
+public class A700NeutralAxiswithtimehistoryanalysisfunction1 {
 
     public static void main(String[] args) throws IOException, SQLException{
         
@@ -109,22 +111,13 @@ public class A700NeutralAxiswithtimehistoryanalysisfunction {
 
             // Prepare dataset
             DefaultXYDataset dataset = new DefaultXYDataset();
-            XYSeries random = new XYSeries("random");
-            XYSeries kumamoto = new XYSeries("kumamoto");
-            XYSeries tohoku = new XYSeries("tohoku");
-            XYSeries kobe = new XYSeries("kobe");
-            
-            DefaultXYDataset dataset2 = new DefaultXYDataset();
-            XYSeries randomp = new XYSeries("random+");
-            XYSeries kumamotop = new XYSeries("kumamoto+");
-            XYSeries tohokup = new XYSeries("tohoku+");
-
+            XYSeries random = new XYSeries("Random");
+            XYSeries kumamoto = new XYSeries("Kumamoto");
+            XYSeries tohoku = new XYSeries("Tohoku");
+            XYSeries kobe = new XYSeries("Kobe");
             
 
-            XYSeries randomn = new XYSeries("random-");
-            XYSeries kumamoton = new XYSeries("kumamoto-");
-            XYSeries tohokun = new XYSeries("tohoku-");
-            
+           
             String sectionNB = beamInfo.getSections()[section].getName();
 
             
@@ -160,97 +153,30 @@ public class A700NeutralAxiswithtimehistoryanalysisfunction {
                     Complex strainD = (strainDL.add(strainDR)).multiply(0.5);
                     Complex strainUD = strainU.subtract(strainD);
                     Complex neutralAxis = ((strainU.multiply(distance)).divide(strainUD)).add(slab);
-
+                
                 // Insert the result into the table
                 String insertQuery = "INSERT INTO NeuAxis"+sectionNB+" (TestName, NeutralAxis) VALUES ('" + testName + "', " + neutralAxis.getReal() + ")";
                 st.executeUpdate(insertQuery);
                 System.out.println("Record for TestName '" + testName + "' inserted into the table.");
-                
-                
+
                 if (waveName.equals("Random")) {
                     random.add(i + 1, neutralAxis.getReal());
                 } else if (waveName.equals("KMMH02")) {
                     kumamoto.add(i + 1, neutralAxis.getReal());
                 } else if (waveName.equals("FKS020")) {
                     tohoku.add(i + 1, neutralAxis.getReal());
+                }else if (waveName.startsWith("Kobe")) {
+                    kobe.add(i + 1, neutralAxis.getReal());
                 }
 
             }
             
             dataset.addSeries("Random", random.toArray());
-            dataset.addSeries("tohoku", tohoku.toArray());
-            dataset.addSeries("kumamoto", kumamoto.toArray());
+            dataset.addSeries("Tohoku", tohoku.toArray());
+            dataset.addSeries("Kumamoto", kumamoto.toArray());
+            dataset.addSeries("Kobe", kobe.toArray());
 
-             EdefenseKasinInfo[] kasins2 = EdefenseInfo.alltests;
-            
-            // Create table to store results if it doesn't exist
-            st.executeUpdate("Alter table NeuAxis"+sectionNB+" add positive double;");
-            
-            for (int i = 0; i < kasins2.length; i++) {
-                String testName = kasins2[i].getTestName();  //D01Q01
-                String waveName = kasins2[i].getWaveName();  // Random
-                
-                ResultSet rs08 = st08.executeQuery("SELECT \"NeutralAxis[mm]\"*0.001 FROM \"T232NeutralAxis\" where TESTNAME = '" + testName + "' and \"SECTION\" = '"+sectionNB+"' and \"DirectionPositive\" = TRUE;");
-                rs08.next();
-                    
-
-                // get results
-                double shearforcestiffnesspositive = rs08.getDouble(1);
-                
-                String insertQuery = "INSERT INTO NeuAxis"+sectionNB+" (TestName, positive) VALUES ('" + testName + "'," + shearforcestiffnesspositive + ")";
-                st.executeUpdate(insertQuery);
-                System.out.println("Record for TestName '" + testName + "' inserted into the table.");
-                
-                if (waveName.equals("Random")) {
-                    randomp.add(i + 1, shearforcestiffnesspositive);
-                } else if (waveName.equals("KMMH02")) {
-                    kumamotop.add(i + 1, shearforcestiffnesspositive);
-                } else if (waveName.equals("FKS020")) {
-                    tohokup.add(i + 1, shearforcestiffnesspositive);
-                }
-
-            }
-                dataset.addSeries("Random+", randomp.toArray());
-                dataset.addSeries("tohoku+", tohokup.toArray());
-                dataset.addSeries("kumamoto+", kumamotop.toArray());
-
-                
-           // Create table to store results if it doesn't exist
-            st.executeUpdate("Alter table NeuAxis"+sectionNB+" add negative double;");
-                
-                EdefenseKasinInfo[] kasins3 = EdefenseInfo.alltests;
-            
-            for (int i = 0; i < kasins3.length; i++) {
-                String testName = kasins3[i].getTestName();  //D01Q01
-                String waveName = kasins3[i].getWaveName();  // Random
-                
-                ResultSet rs08 = st08.executeQuery("SELECT \"NeutralAxis[mm]\"*0.001 FROM \"T232NeutralAxis\" where TESTNAME = '" + testName + "' and \"SECTION\" = '"+sectionNB+"' and \"DirectionPositive\" = FALSE;");
-                rs08.next();
-                
-                                // get results
-                double shearforcestiffnessnegative = rs08.getDouble(1);
-                
-                String insertQuery = "INSERT INTO NeuAxis"+sectionNB+" (TestName, negative) VALUES ('" + testName + "'," + shearforcestiffnessnegative + ")";
-                st.executeUpdate(insertQuery);
-                System.out.println("Record for TestName '" + testName + "' inserted into the table.");
-
-
-                if (waveName.equals("Random")) {
-                    randomn.add(i + 1, shearforcestiffnessnegative);
-                } else if (waveName.equals("KMMH02")) {
-                    kumamoton.add(i + 1, shearforcestiffnessnegative);
-                } else if (waveName.equals("FKS020")) {
-                    tohokun.add(i + 1, shearforcestiffnessnegative);
-                } 
-            }
-                dataset.addSeries("Random-", randomn.toArray());
-                dataset.addSeries("tohoku-", tohokun.toArray());
-                dataset.addSeries("kumamoto-", kumamoton.toArray());
-
-                
-                
-                
-
+           
             // Create the chart
             JFreeChart chart = ChartFactory.createXYLineChart("", "Test No.", "Neutral axis location (m)",
                     dataset, PlotOrientation.VERTICAL, true, true, false);
@@ -294,10 +220,29 @@ public class A700NeutralAxiswithtimehistoryanalysisfunction {
             renderer.setSeriesPaint(0, Color.RED);
             plot.setRenderer(renderer);
             
+            renderer.setSeriesShape(0, JunShapes.createUpTriangle(4));
+            renderer.setSeriesShape(1, JunShapes.createUpTriangle(4));
+            renderer.setSeriesShape(2, JunShapes.createUpTriangle(4));
+            renderer.setSeriesShape(3, JunShapes.createUpTriangle(4));
+//            renderer.setSeriesShape(4,null);
+            renderer.setSeriesShapesVisible(12, false);
+            renderer.setSeriesShapesVisible(13, false);
+            renderer.setSeriesShapesVisible(14, false);
+            renderer.setSeriesShapesVisible(15, false);
+
+            
+            renderer.setSeriesPaint(0, Color.RED);
+            renderer.setSeriesPaint(1, Color.BLUE);
+            renderer.setSeriesPaint(2, Color.GREEN);
+            renderer.setSeriesPaint(3, Color.ORANGE);
+            renderer.setSeriesPaint(12, Color.BLACK);
+            renderer.setSeriesPaint(13, Color.BLACK);
+            renderer.setSeriesPaint(14, Color.BLACK);
+            renderer.setSeriesPaint(15, Color.BLACK);  
             
             // insert legend to the plot
             LegendTitle legend = chart.getLegend(); // obtain legend box
-            XYTitleAnnotation ta=new XYTitleAnnotation(1 ,0.95, legend, RectangleAnchor.BOTTOM_RIGHT);
+            XYTitleAnnotation ta=new XYTitleAnnotation(0.85 ,0.95, legend, RectangleAnchor.BOTTOM_RIGHT);
             legend.setBorder(1, 1, 1, 1); // frame around legend
             plot.addAnnotation(ta);
             chart.removeLegend();
@@ -310,7 +255,7 @@ public class A700NeutralAxiswithtimehistoryanalysisfunction {
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\neutralaxis(f)\\allna_"+sectionNB+".svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\neutralaxis(freqonly)\\allna_"+sectionNB+".svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 //            // Display the chart in a frame
@@ -322,7 +267,7 @@ public class A700NeutralAxiswithtimehistoryanalysisfunction {
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A700NeutralAxiswithtimehistoryanalysisfunction.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A700NeutralAxiswithtimehistoryanalysisfunction1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

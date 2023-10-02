@@ -53,7 +53,7 @@ public class A700NeutralAxisLAAS1nk {
     public static void main(String[] args) throws IOException {
 
         try {
-            String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
+            String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230721";
             
             double distance = 0.326; // distance between inner web (Beam3 = 350 - 2*12)
             double slab = 0.11;
