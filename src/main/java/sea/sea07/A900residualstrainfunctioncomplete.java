@@ -92,7 +92,7 @@ public class A900residualstrainfunctioncomplete {
            createResidualStrain("a03/07", "23");
            createResidualStrain("a03/08", "24");
            
-                      createResidualStrain("b01/01", "25");
+           createResidualStrain("b01/01", "25");
            createResidualStrain("b01/02", "26");
            createResidualStrain("b01/03", "27");
            createResidualStrain("b01/04", "28");
@@ -119,7 +119,7 @@ public class A900residualstrainfunctioncomplete {
            createResidualStrain("b03/07", "47");
            createResidualStrain("b03/08", "48");
            
-                      createResidualStrain("c01/01", "49");
+           createResidualStrain("c01/01", "49");
            createResidualStrain("c01/02", "50");
            createResidualStrain("c01/03", "51");
            createResidualStrain("c01/04", "52");
@@ -146,7 +146,7 @@ public class A900residualstrainfunctioncomplete {
            createResidualStrain("c03/07", "71");
            createResidualStrain("c03/08", "72");
            
-                      createResidualStrain("d01/01", "73");
+           createResidualStrain("d01/01", "73");
            createResidualStrain("d01/02", "74");
            createResidualStrain("d01/03", "75");
            createResidualStrain("d01/04", "76");
@@ -173,7 +173,7 @@ public class A900residualstrainfunctioncomplete {
            createResidualStrain("d03/07", "95");
            createResidualStrain("d03/08", "96");
            
-                      createResidualStrain("e01/01", "97");
+           createResidualStrain("e01/01", "97");
            createResidualStrain("e01/02", "98");
            createResidualStrain("e01/03", "99");
            createResidualStrain("e01/04", "100");
@@ -200,7 +200,7 @@ public class A900residualstrainfunctioncomplete {
            createResidualStrain("e03/07", "119");
            createResidualStrain("e03/08", "120");
            
-                      createResidualStrain("f01/01", "121");
+           createResidualStrain("f01/01", "121");
            createResidualStrain("f01/02", "122");
            createResidualStrain("f01/03", "123");
            createResidualStrain("f01/04", "124");
@@ -227,7 +227,7 @@ public class A900residualstrainfunctioncomplete {
            createResidualStrain("f03/07", "143");
            createResidualStrain("f03/08", "144");
            
-                      createResidualStrain("a01/01", "145");
+           createResidualStrain("a01/01", "145");
            createResidualStrain("g01/02", "146");
            createResidualStrain("g01/03", "147");
            createResidualStrain("g01/04", "148");
@@ -254,7 +254,7 @@ public class A900residualstrainfunctioncomplete {
            createResidualStrain("g03/07", "167");
            createResidualStrain("g03/08", "168");
            
-                      createResidualStrain("h01/01", "169");
+           createResidualStrain("h01/01", "169");
            createResidualStrain("h01/02", "170");
            createResidualStrain("h01/03", "171");
            createResidualStrain("h01/04", "172");
@@ -281,7 +281,7 @@ public class A900residualstrainfunctioncomplete {
            createResidualStrain("h03/07", "191");
            createResidualStrain("h03/08", "192");
           
-                      createResidualStrain("i01/01", "193");
+           createResidualStrain("i01/01", "193");
            createResidualStrain("i01/02", "194");
            createResidualStrain("i01/03", "195");
            createResidualStrain("i01/04", "196");
@@ -308,7 +308,7 @@ public class A900residualstrainfunctioncomplete {
            createResidualStrain("i03/07", "215");
            createResidualStrain("i03/08", "216");
            
-                      createResidualStrain("j01/01", "217");
+           createResidualStrain("j01/01", "217");
            createResidualStrain("j01/02", "218");
            createResidualStrain("j01/03", "219");
            createResidualStrain("j01/04", "220");
