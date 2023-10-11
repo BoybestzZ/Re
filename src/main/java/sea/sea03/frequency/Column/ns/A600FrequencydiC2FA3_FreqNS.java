@@ -50,7 +50,7 @@ import org.jfree.data.xy.XYSeries;
  *
  * @author 75496
  */
-public class A600FrequencydiC2FA3 {
+public class A600FrequencydiC2FA3_FreqNS {
 
     public static void main(String[] args) throws IOException {
 
@@ -76,8 +76,9 @@ public class A600FrequencydiC2FA3 {
             XYSeries tohoku = new XYSeries("tohoku");
             XYSeries kobe = new XYSeries("kobe");
 
-//            // Create table to store results if it doesn't exist
-//            st.executeUpdate("CREATE TABLE IF NOT EXISTS FrequencyLA3 (TestName VARCHAR(20), ShearForce DOUBLE)");
+            // Create table to store results if it doesn't exist
+            st.executeUpdate("DROP TABLE IF EXISTS FrequencyNS");
+            st.executeUpdate("CREATE TABLE IF NOT EXISTS FrequencyNS (TestName VARCHAR(20), Frequency DOUBLE)");
 
             for (int i = 0; i < kasins.length; i++) {
                 String testName = kasins[i].getTestName();  //D01Q01
@@ -91,10 +92,10 @@ public class A600FrequencydiC2FA3 {
 
 
 
-//                // Insert the result into the table
-//                String insertQuery = "INSERT INTO FrequencyLA3 (TestName, ShearForce) VALUES ('" + testName + "', " + frequency + ")";
-//                st.executeUpdate(insertQuery);
-//                System.out.println("Record for TestName '" + testName + "' inserted into the table.");
+                // Insert the result into the table
+                String insertQuery = "INSERT INTO FrequencyNS (TestName, Frequency) VALUES ('" + testName + "', " + frequency + ")";
+                st.executeUpdate(insertQuery);
+                System.out.println("Record for TestName '" + testName + "' inserted into the table.");
 
                 if (waveName.equals("Random")) {
                     random.add(i + 1, frequency);
@@ -186,7 +187,7 @@ public class A600FrequencydiC2FA3 {
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A600FrequencydiC2FA3.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A600FrequencydiC2FA3_FreqNS.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

@@ -83,6 +83,8 @@ public class A200ColumnFreP {
             // Connect to database
             Connection con = DriverManager.getConnection(dburl, "junapp", "");
             Statement st = con.createStatement();
+            
+            
 
             String[][] testNamesArray = {
                 {"D01Q01", "D01Q09", "D01Q11", "D02Q05", "D03Q01", "D03Q09"},
