@@ -50,7 +50,6 @@ import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
-import static sea.sea07.A900residualstrainfunctioncompleteshift.createResidualStrain;
 
 /**
  * modified by Iyama. Use XYdataset. THe xaxisl will be number.
@@ -58,7 +57,7 @@ import static sea.sea07.A900residualstrainfunctioncompleteshift.createResidualSt
  *
  * @author 75496
  */
-public class A900residualstrainfunctioncomplete {
+public class A900residualstrainfunctioncompleteshift {
     
 
     public static void main(String[] args) throws IOException, SQLException{
@@ -66,276 +65,6 @@ public class A900residualstrainfunctioncomplete {
 //        double distance1 = 0.326; // distance between inner web (Beam3 = 350 - 2*12)
 //        double distance2 = 1.63;  // distance between inner web (BeamB = 244 - 2*...)
 //        double slab = 0.11;
-//           createResidualStrain("a01/01", "1");
-//           createResidualStrain("a01/02", "2");
-//           createResidualStrain("a01/03", "3");
-//           createResidualStrain("a01/04", "4");
-//           createResidualStrain("a01/05", "5");
-//           createResidualStrain("a01/06", "6");
-//           createResidualStrain("a01/07", "7");
-//           createResidualStrain("a01/08", "8");
-//           
-//           createResidualStrain("a02/01", "9");
-//           createResidualStrain("a02/02", "10");
-//           createResidualStrain("a02/03", "11");
-//           createResidualStrain("a02/04", "12");
-//           createResidualStrain("a02/05", "13");
-//           createResidualStrain("a02/06", "14");
-//           createResidualStrain("a02/07", "15");
-//           createResidualStrain("a02/08", "16");
-//           
-//           createResidualStrain("a03/01", "17");
-//           createResidualStrain("a03/02", "18");
-//           createResidualStrain("a03/03", "19");
-//           createResidualStrain("a03/04", "20");
-//           createResidualStrain("a03/05", "21");
-//           createResidualStrain("a03/06", "22");
-//           createResidualStrain("a03/07", "23");
-//           createResidualStrain("a03/08", "24");
-//           
-//           createResidualStrain("b01/01", "25");
-//           createResidualStrain("b01/02", "26");
-//           createResidualStrain("b01/03", "27");
-//           createResidualStrain("b01/04", "28");
-//           createResidualStrain("b01/05", "29");
-//           createResidualStrain("b01/06", "30");
-//           createResidualStrain("b01/07", "31");
-//           createResidualStrain("b01/08", "32");
-//           
-//           createResidualStrain("b02/01", "33");
-//           createResidualStrain("b02/02", "34");
-//           createResidualStrain("b02/03", "35");
-//           createResidualStrain("b02/04", "36");
-//           createResidualStrain("b02/05", "37");
-//           createResidualStrain("b02/06", "38");
-//           createResidualStrain("b02/07", "39");
-//           createResidualStrain("b02/08", "40");
-//           
-//           createResidualStrain("b03/01", "41");
-//           createResidualStrain("b03/02", "42");
-//           createResidualStrain("b03/03", "43");
-//           createResidualStrain("b03/04", "44");
-//           createResidualStrain("b03/05", "45");
-//           createResidualStrain("b03/06", "46");
-//           createResidualStrain("b03/07", "47");
-//           createResidualStrain("b03/08", "48");
-//           
-//           createResidualStrain("c01/01", "49");
-//           createResidualStrain("c01/02", "50");
-//           createResidualStrain("c01/03", "51");
-//           createResidualStrain("c01/04", "52");
-//           createResidualStrain("c01/05", "53");
-//           createResidualStrain("c01/06", "54");
-//           createResidualStrain("c01/07", "55");
-//           createResidualStrain("c01/08", "56");
-//           
-//           createResidualStrain("c02/01", "57");
-//           createResidualStrain("c02/02", "58");
-//           createResidualStrain("c02/03", "59");
-//           createResidualStrain("c02/04", "60");
-//           createResidualStrain("c02/05", "61");
-//           createResidualStrain("c02/06", "62");
-//           createResidualStrain("c02/07", "63");
-//           createResidualStrain("c02/08", "64");
-//           
-//           createResidualStrain("c03/01", "65");
-//           createResidualStrain("c03/02", "66");
-//           createResidualStrain("c03/03", "67");
-//           createResidualStrain("c03/04", "68");
-//           createResidualStrain("c03/05", "69");
-//           createResidualStrain("c03/06", "70");
-//           createResidualStrain("c03/07", "71");
-//           createResidualStrain("c03/08", "72");
-//           
-//           createResidualStrain("d01/01", "73");
-//           createResidualStrain("d01/02", "74");
-//           createResidualStrain("d01/03", "75");
-//           createResidualStrain("d01/04", "76");
-//           createResidualStrain("d01/05", "77");
-//           createResidualStrain("d01/06", "78");
-//           createResidualStrain("d01/07", "79");
-//           createResidualStrain("d01/08", "80");
-//           
-//           createResidualStrain("d02/01", "81");
-//           createResidualStrain("d02/02", "82");
-//           createResidualStrain("d02/03", "83");
-//           createResidualStrain("d02/04", "84");
-//           createResidualStrain("d02/05", "85");
-//           createResidualStrain("d02/06", "86");
-//           createResidualStrain("d02/07", "87");
-//           createResidualStrain("d02/08", "88");
-//          
-//           createResidualStrain("d03/01", "89");
-//           createResidualStrain("d03/02", "90");
-//           createResidualStrain("d03/03", "91");
-//           createResidualStrain("d03/04", "92");
-//           createResidualStrain("d03/05", "93");
-//           createResidualStrain("d03/06", "94");
-//           createResidualStrain("d03/07", "95");
-//           createResidualStrain("d03/08", "96");
-//           
-//           createResidualStrain("e01/01", "97");
-//           createResidualStrain("e01/02", "98");
-//           createResidualStrain("e01/03", "99");
-//           createResidualStrain("e01/04", "100");
-//           createResidualStrain("e01/05", "101");
-//           createResidualStrain("e01/06", "102");
-//           createResidualStrain("e01/07", "103");
-//           createResidualStrain("e01/08", "104");
-//           
-//           createResidualStrain("e02/01", "105");
-//           createResidualStrain("e02/02", "106");
-//           createResidualStrain("e02/03", "107");
-//           createResidualStrain("e02/04", "108");
-//           createResidualStrain("e02/05", "109");
-//           createResidualStrain("e02/06", "110");
-//           createResidualStrain("e02/07", "111");
-//           createResidualStrain("e02/08", "112");
-//          
-//           createResidualStrain("e03/01", "113");
-//           createResidualStrain("e03/02", "114");
-//           createResidualStrain("e03/03", "115");
-//           createResidualStrain("e03/04", "116");
-//           createResidualStrain("e03/05", "117");
-//           createResidualStrain("e03/06", "118");
-//           createResidualStrain("e03/07", "119");
-//           createResidualStrain("e03/08", "120");
-//           
-//           createResidualStrain("f01/01", "121");
-//           createResidualStrain("f01/02", "122");
-//           createResidualStrain("f01/03", "123");
-//           createResidualStrain("f01/04", "124");
-//           createResidualStrain("f01/05", "125");
-//           createResidualStrain("f01/06", "126");
-//           createResidualStrain("f01/07", "127");
-//           createResidualStrain("f01/08", "128");
-//           
-//           createResidualStrain("f02/01", "129");
-//           createResidualStrain("f02/02", "130");
-//           createResidualStrain("f02/03", "131");
-//           createResidualStrain("f02/04", "132");
-//           createResidualStrain("f02/05", "133");
-//           createResidualStrain("f02/06", "134");
-//           createResidualStrain("f02/07", "135");
-//           createResidualStrain("f02/08", "136");
-//           
-//           createResidualStrain("f03/01", "137");
-//           createResidualStrain("f03/02", "138");
-//           createResidualStrain("f03/03", "139");
-//           createResidualStrain("f03/04", "140");
-//           createResidualStrain("f03/05", "141");
-//           createResidualStrain("f03/06", "142");
-//           createResidualStrain("f03/07", "143");
-//           createResidualStrain("f03/08", "144");
-//           
-//           createResidualStrain("g01/01", "145");
-//           createResidualStrain("g01/02", "146");
-//           createResidualStrain("g01/03", "147");
-//           createResidualStrain("g01/04", "148");
-//           createResidualStrain("g01/05", "149");
-//           createResidualStrain("g01/06", "150");
-//           createResidualStrain("g01/07", "151");
-//           createResidualStrain("g01/08", "152");
-//           
-//           createResidualStrain("g02/01", "153");
-//           createResidualStrain("g02/02", "154");
-//           createResidualStrain("g02/03", "155");
-//           createResidualStrain("g02/04", "156");
-//           createResidualStrain("g02/05", "157");
-//           createResidualStrain("g02/06", "158");
-//           createResidualStrain("g02/07", "159");
-//           createResidualStrain("g02/08", "160");
-//           
-//           createResidualStrain("g03/01", "161");
-//           createResidualStrain("g03/02", "162");
-//           createResidualStrain("g03/03", "163");
-//           createResidualStrain("g03/04", "164");
-//           createResidualStrain("g03/05", "165");
-//           createResidualStrain("g03/06", "166");
-//           createResidualStrain("g03/07", "167");
-//           createResidualStrain("g03/08", "168");
-//           
-//           createResidualStrain("h01/01", "169");
-//           createResidualStrain("h01/02", "170");
-//           createResidualStrain("h01/03", "171");
-//           createResidualStrain("h01/04", "172");
-//           createResidualStrain("h01/05", "173");
-//           createResidualStrain("h01/06", "174");
-//           createResidualStrain("h01/07", "175");
-//           createResidualStrain("h01/08", "176");
-//           
-//           createResidualStrain("h02/01", "177");
-//           createResidualStrain("h02/02", "178");
-//           createResidualStrain("h02/03", "179");
-//           createResidualStrain("h02/04", "180");
-//           createResidualStrain("h02/05", "181");
-//           createResidualStrain("h02/06", "182");
-//           createResidualStrain("h02/07", "183");
-//           createResidualStrain("h02/08", "184");
-//           
-//           createResidualStrain("h03/01", "185");
-//           createResidualStrain("h03/02", "186");
-//           createResidualStrain("h03/03", "187");
-//           createResidualStrain("h03/04", "188");
-//           createResidualStrain("h03/05", "189");
-//           createResidualStrain("h03/06", "190");
-//           createResidualStrain("h03/07", "191");
-//           createResidualStrain("h03/08", "192");
-//          
-//           createResidualStrain("i01/01", "193");
-//           createResidualStrain("i01/02", "194");
-//           createResidualStrain("i01/03", "195");
-//           createResidualStrain("i01/04", "196");
-//           createResidualStrain("i01/05", "197");
-//           createResidualStrain("i01/06", "198");
-//           createResidualStrain("i01/07", "199");
-//           createResidualStrain("i01/08", "200");
-//          
-//           createResidualStrain("i02/01", "201");
-//           createResidualStrain("i02/02", "202");
-//           createResidualStrain("i02/03", "203");
-//           createResidualStrain("i02/04", "204");
-//           createResidualStrain("i02/05", "205");
-//           createResidualStrain("i02/06", "206");
-//           createResidualStrain("i02/07", "207");
-//           createResidualStrain("i02/08", "208");
-//          
-//           createResidualStrain("i03/01", "209");
-//           createResidualStrain("i03/02", "210");
-//           createResidualStrain("i03/03", "211");
-//           createResidualStrain("i03/04", "212");
-//           createResidualStrain("i03/05", "213");
-//           createResidualStrain("i03/06", "214");
-//           createResidualStrain("i03/07", "215");
-//           createResidualStrain("i03/08", "216");
-//           
-//           createResidualStrain("j01/01", "217");
-//           createResidualStrain("j01/02", "218");
-//           createResidualStrain("j01/03", "219");
-//           createResidualStrain("j01/04", "220");
-//           createResidualStrain("j01/05", "221");
-//           createResidualStrain("j01/06", "222");
-//           createResidualStrain("j01/07", "223");
-//           createResidualStrain("j01/08", "224");
-//           
-//           createResidualStrain("j02/01", "225");
-//           createResidualStrain("j02/02", "226");
-//           createResidualStrain("j02/03", "227");
-//           createResidualStrain("j02/04", "228");
-//           createResidualStrain("j02/05", "229");
-//           createResidualStrain("j02/06", "230");
-//           createResidualStrain("j02/07", "231");
-//           createResidualStrain("j02/08", "232");
-//           
-//           createResidualStrain("j03/01", "233");
-//           createResidualStrain("j03/02", "234");
-//           createResidualStrain("j03/03", "235");
-//           createResidualStrain("j03/04", "236");
-//           createResidualStrain("j03/05", "237");
-//           createResidualStrain("j03/06", "238");
-//           createResidualStrain("j03/07", "239");
-//           createResidualStrain("j03/08", "240");
-
            createResidualStrain("a01/01", "a11");
            createResidualStrain("a01/02", "a12");
            createResidualStrain("a01/03", "a13");
@@ -614,7 +343,7 @@ public class A900residualstrainfunctioncomplete {
 
         try {
 //            String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/ed14v230614";
-            String ed06dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/res22ed06";
+            String ed06dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\test/res22ed06test";
 
             
             // Connect to database
@@ -832,7 +561,7 @@ public class A900residualstrainfunctioncomplete {
             
             
             NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-            rangeAxis.setRange(-10000, 10000); // Set the y-axis range
+            rangeAxis.setRange(-30000, 30000); // Set the y-axis range
             rangeAxis.setStandardTickUnits(NumberAxis.createStandardTickUnits());
 
             XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
@@ -853,7 +582,7 @@ public class A900residualstrainfunctioncomplete {
 //            File chartFile = new File(filePath);
 //            ChartUtils.saveChartAsPNG(chartFile, chart, width, height);
 
-              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\residualstrain\\residualstrain_"+tableName+".svg";
+              String filePath = "C:\\Users\\75496\\Documents\\E-Defense\\residualstraintest\\residualstrain_"+tableName+".svg";
               JunChartUtil.svg(filePath, width, height, chart);
 
 
@@ -866,7 +595,7 @@ public class A900residualstrainfunctioncomplete {
             con.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(A900residualstrainfunctioncomplete.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(A900residualstrainfunctioncompleteshift.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
