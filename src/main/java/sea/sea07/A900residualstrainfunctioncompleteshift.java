@@ -382,33 +382,24 @@ public class A900residualstrainfunctioncompleteshift {
 //            String beamName = beamInfo.getName();
             
             // Create table to store results if it doesn't exist
-            st.executeUpdate("DROP TABLE IF EXISTS \"ResidualStrain" + table + "\"");
-            st.executeUpdate("CREATE TABLE IF NOT EXISTS \"ResidualStrain" + table + "\" (TestName VARCHAR(20), ResidualStrain DOUBLE)");
+        st.executeUpdate("DROP TABLE IF EXISTS \"RS" + table + "\"");
+        st.executeUpdate("CREATE TABLE IF NOT EXISTS \"RS" + table + "\" (Number INT, TestName VARCHAR(20), ResidualStrain DOUBLE)");
 
             
 
-            for (int i = 0; i < kasins.length; i++) {
-                String testName = kasins[i].getTestName();  //D01Q01
-                String waveName = kasins[i].getWaveName();  // Random
+        for (int i = 0; i < kasins.length; i++) {
+            int number = i + 1; // Count of iterations
+            String testName = kasins[i].getTestName();
+            String waveName = kasins[i].getWaveName();
 
-                // Execute query and get result set
-//                    ResultSet rs = st.executeQuery("SELECT \"INFLECTIONPOINT\" FROM \"INFLECTIONPOINTDATA\" where TESTNAME='" + testName + "' and BEAMNAME='"+beamName+"';");
-                    
-                    ResultSet rs = st.executeQuery("SELECT TESTNAME, AVG(\"Strain[με]\") AS avg_strain FROM \"T220TimeHistoryStrain\".\"" + table + "\" WHERE TESTNAME='" + testName + "t' GROUP BY TESTNAME ORDER BY avg_strain DESC LIMIT 10");
-//                    ResultSet rs = st.executeQuery("select TESTNAME, avg(\"Strain[με]\") from (select * from \"T220TimeHistoryStrain\".\"a01/" where TESTNAME='" + testName + "t' order by \"TotalTime[s]\" desc limit 10)");
-                    
-//                    select TESTNAME, avg('Strain[με]') from (select * from "T220TimeHistoryStrain"."a01/01" where TESTNAME='" + testName + "t' order by 'TotalTime[s]' desc limit 10)
-                    
-                    rs.next();
+            ResultSet rs = st.executeQuery("SELECT TESTNAME, AVG(\"Strain[με]\") AS avg_strain FROM \"T220TimeHistoryStrain\".\"" + table + "\" WHERE TESTNAME='" + testName + "t' GROUP BY TESTNAME ORDER BY avg_strain DESC LIMIT 10");
+            rs.next();
+            double residualStrain = rs.getDouble(2);
 
-                    // get results
-                    double residualStrain = rs.getDouble(2);
-                    
-                    
-                // Insert the result into the table
-                String insertQuery = "INSERT INTO \"ResidualStrain" + table + "\" (TestName, ResidualStrain) VALUES ('" + testName + "', " + residualStrain + ")";
-                st.executeUpdate(insertQuery);
-                System.out.println("Record for TestName '" + testName + "' inserted into the table.");
+            // Insert the result into the table with the "Number" column
+            String insertQuery = "INSERT INTO \"RS" + table + "\" (Number, TestName, ResidualStrain) VALUES (" + number + ", '" + testName + "', " + residualStrain + ")";
+            st.executeUpdate(insertQuery);
+            System.out.println("Record for TestName '" + testName + "' inserted into the table.");
 
 
 

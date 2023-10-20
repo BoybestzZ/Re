@@ -4,10 +4,16 @@
  */
 package org.jfree.chart;
 
+import java.io.File;
+
 /**
  *
  * @author 75496
  */
 public class ChartUtilities {
+
+    public static void saveChartAsSVG(File toFile, JFreeChart chart, int i, int i0) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
     
 }
