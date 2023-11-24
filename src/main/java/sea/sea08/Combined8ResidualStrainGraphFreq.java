@@ -51,7 +51,7 @@ public class Combined8ResidualStrainGraphFreq{
 
     public static void createResidualStrain(String table1, String table2, String table3, String table4, String table5, String table6, String table7, String table8, String tableset) {
         try {
-            String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\\\test/res22ed06test";
+            String dburl = "jdbc:h2:tcp://localhost/C:\\Users\\75496\\Documents\\E-Defense\\\\test/res22ed06test2";
             String sql1 = "SELECT NUMBER, \"RESIDUALSTRAIN\" FROM \"" + table1 + "\"";
             String sql2 = "SELECT NUMBER, \"RESIDUALSTRAIN\" FROM \"" + table2 + "\"";
             String sql3 = "SELECT NUMBER, \"RESIDUALSTRAIN\" FROM \"" + table3 + "\"";

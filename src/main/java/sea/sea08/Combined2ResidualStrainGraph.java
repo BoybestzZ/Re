@@ -34,7 +34,11 @@ import org.jfree.ui.RefineryUtilities;
 public class Combined2ResidualStrainGraph{ 
 
         public static void main(String[] args) throws IOException, SQLException{
-        createResidualStrain("d02/01", "d02/05", "d115");
+        createResidualStrain("d03/01", "d03/05", "d315");
+        createResidualStrain("d03/02", "d03/06", "d324");
+        createResidualStrain("d03/03", "d03/07", "d336");
+        createResidualStrain("d03/04", "d03/08", "d348");
+        
     }
 
     public static void createResidualStrain(String table1, String table2, String tableset) {

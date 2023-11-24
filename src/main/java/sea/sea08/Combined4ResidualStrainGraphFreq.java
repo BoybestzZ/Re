@@ -48,7 +48,7 @@ public class Combined4ResidualStrainGraphFreq{
         createResidualStrain("RSf01/01", "RSf01/02", "RSf01/03", "RSf01/04","fourierf11234");
         createResidualStrain("RSf01/05", "RSf01/06", "RSf01/07", "RSf01/08", "fourierf15678");
         createResidualStrain("RSf02/01", "RSf02/02", "RSf02/03", "RSf02/04","fourierf21234");
-        createResidualStrain( "RSf02/05", "RSf02/06", "RSf02/07", "RSf02/08", "fourierf25678");
+        createResidualStrain("RSf02/05", "RSf02/06", "RSf02/07", "RSf02/08", "fourierf25678");
         createResidualStrain("RSh02/01", "RSh02/02", "RSh02/03", "RSh02/04", "fourierh21234");
         createResidualStrain( "RSh02/05", "RSh02/06", "RSh02/07", "RSh02/08", "fourierh25678");
         createResidualStrain("RSh03/01", "RSh03/02", "RSh03/03", "RSh03/04", "fourierh31234");

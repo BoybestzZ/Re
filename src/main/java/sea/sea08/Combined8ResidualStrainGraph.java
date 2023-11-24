@@ -35,8 +35,8 @@ public class Combined8ResidualStrainGraph{
 
         public static void main(String[] args) throws IOException, SQLException{
         
-        createResidualStrain("b02/01", "b02/02", "b02/03", "b02/04", "b02/05", "b02/06", "b02/07", "b02/08", "b2all");
-//        createResidualStrain("b03/01", "b03/02", "b03/03", "b03/04", "b03/05", "b03/06", "b03/07", "b03/08", "d2all");
+//        createResidualStrain("b02/01", "b02/02", "b02/03", "b02/04", "b02/05", "b02/06", "b02/07", "b02/08", "b2all");
+        createResidualStrain("b03/01", "b03/02", "b03/03", "b03/04", "b03/05", "b03/06", "b03/07", "b03/08", "b3all");
 //        createResidualStrain("d02/01", "d02/02", "d02/03", "d02/04","d02/05", "d02/06", "d02/07", "d02/08", "d2all");
 //        createResidualStrain("d03/01", "d03/02", "d03/03", "d03/04","d03/05", "d03/06", "d03/07", "d03/08", "d3all");
 //        createResidualStrain("f01/01", "f01/02", "f01/03", "f01/04", "f01/05", "f01/06", "f01/07", "f01/08", "f1all");
@@ -118,6 +118,22 @@ public class Combined8ResidualStrainGraph{
             plot.setOutlinePaint(Color.BLACK);
             plot.setOutlineStroke(new BasicStroke(2f)); // frame around the plot
             plot.setAxisOffset(RectangleInsets.ZERO_INSETS); // remove space between frame and axis.
+            
+
+
+            
+            
+         
+            
+            
+            
+//            NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+//            rangeAxis.setRange(-100, 100); // Set the y-axis range
+//            rangeAxis.setStandardTickUnits(NumberAxis.createStandardTickUnits());
+
+            XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+            renderer.setSeriesPaint(0, Color.RED);
+            plot.setRenderer(renderer);
 
 //            chart.setBackgroundPaint(Color.WHITE);
 
